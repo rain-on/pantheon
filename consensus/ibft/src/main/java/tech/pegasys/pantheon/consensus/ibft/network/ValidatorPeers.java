@@ -45,13 +45,13 @@ public class ValidatorPeers implements ValidatorMulticaster, PeerCollection {
   }
 
   @Override
-  public void peerAdded(final PeerConnection newConnection) {
+  public void add(final PeerConnection newConnection) {
     final Address peerAddress = newConnection.getPeer().getAddress();
     peerConnections.put(peerAddress, newConnection);
   }
 
   @Override
-  public void peerRemoved(final PeerConnection removedConnection) {
+  public void remove(final PeerConnection removedConnection) {
     final Address peerAddress = removedConnection.getPeer().getAddress();
     peerConnections.remove(peerAddress);
   }

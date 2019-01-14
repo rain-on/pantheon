@@ -72,7 +72,7 @@ public class IbftNetworkPeersTest {
 
     final ValidatorPeers peers = new ValidatorPeers(validatorProvider);
     for (final PeerConnection peer : peerConnections) {
-      peers.peerAdded(peer);
+      peers.add(peer);
     }
 
     final MessageData messageToSend = new RawMessage(1, BytesValue.EMPTY);
@@ -94,7 +94,7 @@ public class IbftNetworkPeersTest {
     final ValidatorPeers peers = new ValidatorPeers(validatorProvider);
 
     // only add peer connections 1, 2 & 3, none of which should be invoked.
-    newArrayList(1, 2, 3).forEach(i -> peers.peerAdded(peerConnections.get(i)));
+    newArrayList(1, 2, 3).forEach(i -> peers.add(peerConnections.get(i)));
 
     final MessageData messageToSend = new RawMessage(1, BytesValue.EMPTY);
     peers.send(messageToSend);
@@ -116,7 +116,7 @@ public class IbftNetworkPeersTest {
 
     final ValidatorPeers peers = new ValidatorPeers(validatorProvider);
     for (final PeerConnection peer : peerConnections) {
-      peers.peerAdded(peer);
+      peers.add(peer);
     }
 
     final MessageData messageToSend = new RawMessage(1, BytesValue.EMPTY);

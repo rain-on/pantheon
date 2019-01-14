@@ -85,7 +85,7 @@ public class IbftProtocolManager implements ProtocolManager {
 
   @Override
   public void handleNewConnection(final PeerConnection peerConnection) {
-    peers.peerAdded(peerConnection);
+    peers.add(peerConnection);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class IbftProtocolManager implements ProtocolManager {
       final PeerConnection peerConnection,
       final DisconnectReason disconnectReason,
       final boolean initiatedByPeer) {
-    peers.peerRemoved(peerConnection);
+    peers.remove(peerConnection);
   }
 
   @Override

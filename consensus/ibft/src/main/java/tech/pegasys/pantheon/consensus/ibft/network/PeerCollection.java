@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
 public interface PeerCollection {
 
-  void peerAdded(PeerConnection newConnection);
+  void add(final PeerConnection newConnection);
 
-  void peerRemoved(PeerConnection removedConnection);
+  void remove(final PeerConnection removedConnection);
 }
