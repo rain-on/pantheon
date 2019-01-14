@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessage.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessage.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.network.IbftMulticaster;
+import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 
 /** Class responsible for rebroadcasting IBFT messages to known validators */
 public class IbftGossip {
-  private final IbftMulticaster peers;
+  private final ValidatorMulticaster peers;
 
   // Size of the seenMessages cache, should end up utilising 65bytes * this number + some meta data
   private final int maxSeenMessages;
@@ -50,7 +50,7 @@ public class IbftGossip {
             }
           });
 
-  IbftGossip(final IbftMulticaster peers, final int maxSeenMessages) {
+  IbftGossip(final ValidatorMulticaster peers, final int maxSeenMessages) {
     this.maxSeenMessages = maxSeenMessages;
     this.peers = peers;
   }
@@ -60,7 +60,7 @@ public class IbftGossip {
    *
    * @param peers The always up to date set of connected peers that understand IBFT
    */
-  public IbftGossip(final IbftMulticaster peers) {
+  public IbftGossip(final ValidatorMulticaster peers) {
     this(peers, 10_000);
   }
 
@@ -100,7 +100,7 @@ public class IbftGossip {
       final List<Address> excludeAddressesList =
           Lists.newArrayList(
               message.getConnection().getPeer().getAddress(), signedData.getSender());
-      peers.multicastToValidatorsExcept(messageData, excludeAddressesList);
+      peers.send(messageData, excludeAddressesList);
       seenMessages.add(signature);
       return true;
     }

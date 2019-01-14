@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;

@@ -124,7 +124,7 @@ public class TestContextFactory {
     final KeyPair nodeKeys = networkNodes.getLocalNode().getNodeKeyPair();
 
     // Use a stubbed version of the multicaster, to prevent creating PeerConnections etc.
-    final StubIbftMulticaster stubbedNetworkPeers = new StubIbftMulticaster();
+    final StubValidatorMulticaster stubbedNetworkPeers = new StubValidatorMulticaster();
 
     final ControllerAndState controllerAndState =
         createControllerAndFinalState(blockChain, stubbedNetworkPeers, nodeKeys, clock);
@@ -185,7 +185,7 @@ public class TestContextFactory {
 
   private static ControllerAndState createControllerAndFinalState(
       final MutableBlockchain blockChain,
-      final StubIbftMulticaster stubbedNetworkPeers,
+      final StubValidatorMulticaster stubbedNetworkPeers,
       final KeyPair nodeKeys,
       final Clock clock) {
 

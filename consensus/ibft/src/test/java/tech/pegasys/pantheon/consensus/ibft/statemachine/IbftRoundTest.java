@@ -33,6 +33,7 @@ import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
