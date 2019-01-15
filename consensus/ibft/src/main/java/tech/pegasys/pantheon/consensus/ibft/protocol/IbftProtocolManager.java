@@ -29,7 +29,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class IbftProtocolManager implements ProtocolManager {
-
   private final IbftEventQueue ibftEventQueue;
 
   private final Logger LOG = LogManager.getLogger();
@@ -39,7 +38,7 @@ public class IbftProtocolManager implements ProtocolManager {
    * Constructor for the ibft protocol manager
    *
    * @param ibftEventQueue Entry point into the ibft event processor
-   * @param peers iBFT network peers
+   * @param peers Used to track all connected IBFT peers.
    */
   public IbftProtocolManager(
       final IbftEventQueue ibftEventQueue, final PeerConnectionTracker peers) {

@@ -7,7 +7,7 @@ source: rinkeby.json
 
 ## Bootnodes
 
-Bootnodes are used to initially discover peers. 
+Bootnodes are used to initially discover multicaster.
 
 ### Mainnet and Public Testnets
 

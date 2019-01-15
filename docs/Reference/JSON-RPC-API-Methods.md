@@ -207,7 +207,7 @@ None
 
 ### net_peerCount
 
-Returns the number of peers currently connected to the client.
+Returns the number of multicaster currently connected to the client.
 
 **Parameters**
 
@@ -215,7 +215,7 @@ None
 
 **Returns**
 
-`result` : *integer* - Number of connected peers in hexadecimal.
+`result` : *integer* - Number of connected multicaster in hexadecimal.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -256,7 +256,7 @@ None
 
 * `currentBlock` : *quantity* - Index of the latest block (also known as the best block) for the current node. This is the same index that [eth_blockNumber](#eth_blocknumber) returns.
 
-* `highestBlock`: *quantity* - Index of the highest known block in the peer network (that is, the highest block so far discovered among peer nodes). This is the same value as `currentBlock` if the current node has no peers.
+* `highestBlock`: *quantity* - Index of the highest known block in the peer network (that is, the highest block so far discovered among peer nodes). This is the same value as `currentBlock` if the current node has no multicaster.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -1806,7 +1806,7 @@ None
                 },
                 "height": 1908793
             },
-            "peers": {
+            "multicaster": {
                 "disconnected_total": {
                     "remote": {
                         "SUBPROTOCOL_TRIGGERED": 5

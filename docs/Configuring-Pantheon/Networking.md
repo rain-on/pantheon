@@ -1,9 +1,9 @@
-description: Pantheon networking is about P2P discovery and communication between peers and access to the JSON RPC APIs
+description: Pantheon networking is about P2P discovery and communication between multicaster and access to the JSON RPC APIs
 <!--- END of page meta data -->
 
 # Networking
 
-Pantheon uses the network to find and connect to peers. 
+Pantheon uses the network to find and connect to multicaster.
 
 ## Firewalls and Incoming Connections
 
@@ -24,13 +24,13 @@ The [`--p2p-listen`](../Reference/Pantheon-CLI-Syntax.md#p2p-listen) option spec
  
 ## Limiting Peers
 
-Limiting peers reduces the bandwidth used by Pantheon. It also reduces the CPU time and disk access used to manage and respond to peers.  
+Limiting multicaster reduces the bandwidth used by Pantheon. It also reduces the CPU time and disk access used to manage and respond to multicaster.
  
-Use the [`--max-peers`](../Reference/Pantheon-CLI-Syntax.md#max-peers) command line option to reduce the maximum number of peers. The default is 25.
+Use the [`--max-multicaster`](../Reference/Pantheon-CLI-Syntax.md#max-multicaster) command line option to reduce the maximum number of multicaster. The default is 25.
  
-Use the  [`--max-trailing-peers`](../Reference/Pantheon-CLI-Syntax.md#max-trailing-peers) option to reduce the maximum P2P peer connections for peers that are trailing behind the local chain head. The default is unlimited but the number of trailing peers cannot exceed the value specified by [`--max-peers`](../Reference/Pantheon-CLI-Syntax.md#max-peers).
+Use the  [`--max-trailing-multicaster`](../Reference/Pantheon-CLI-Syntax.md#max-trailing-multicaster) option to reduce the maximum P2P peer connections for multicaster that are trailing behind the local chain head. The default is unlimited but the number of trailing multicaster cannot exceed the value specified by [`--max-multicaster`](../Reference/Pantheon-CLI-Syntax.md#max-multicaster).
 
-Trailing peers cannot be used to get new blocks and are more likely to be requesting blocks from you. Limiting trailing peers may reduce the time taken to catch up to the chain head when synchronizing. 
+Trailing multicaster cannot be used to get new blocks and are more likely to be requesting blocks from you. Limiting trailing multicaster may reduce the time taken to catch up to the chain head when synchronizing.
 
 ## No Discovery
 

@@ -202,39 +202,39 @@ Comma-separated list of hostnames to allow access to the HTTP JSON-RPC API. Defa
 !!!note
     This option is only available from v0.8.3. Earlier versions allow access by all hostnames. 
 
-### max-peers
+### max-multicaster
 
 ```bash tab="Syntax"
---max-peers=<INTEGER>
+--max-multicaster=<INTEGER>
 ```
 
 ```bash tab="Example Command Line"
---max-peers=42
+--max-multicaster=42
 ```
 
 ```bash tab="Example Configuration File"
-max-peers=42
+max-multicaster=42
 ```
 
 Specifies the maximum P2P peer connections that can be established.
 The default is 25.
 
-### max-trailing-peers
+### max-trailing-multicaster
 
 ```bash tab="Syntax"
---max-trailing-peers=<INTEGER>
+--max-trailing-multicaster=<INTEGER>
 ```
 
 ```bash tab="Example Command Line"
---max-trailing-peers=2
+--max-trailing-multicaster=2
 ```
 
 ```bash tab="Example Configuration File"
-max-trailing-peers=2
+max-trailing-multicaster=2
 ```
 
-Specifies the maximum P2P peer connections for peers that are trailing behind the local chain head. 
-The default is unlimited but the number of trailing peers cannot exceed the value specified by [`--max-peers`](#max-peers).
+Specifies the maximum P2P peer connections for multicaster that are trailing behind the local chain head.
+The default is unlimited but the number of trailing multicaster cannot exceed the value specified by [`--max-multicaster`](#max-multicaster).
 
 ### metrics-enabled
 
