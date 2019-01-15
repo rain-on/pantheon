@@ -66,7 +66,8 @@ public class IbftGossipTest {
 
     final boolean gossipResult = ibftGossip.gossipMessage(message);
     assertThat(gossipResult).isTrue();
-    verify(validatorMulticaster).send(messageData, newArrayList(senderAddress, payload.getSender()));
+    verify(validatorMulticaster)
+        .send(messageData, newArrayList(senderAddress, payload.getSender()));
   }
 
   private <P extends Payload> void assertRebroadcastOnlyOnce(

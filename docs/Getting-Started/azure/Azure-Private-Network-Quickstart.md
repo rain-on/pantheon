@@ -100,7 +100,7 @@ On the right part of the virtual machine page you can read the **Public IP addre
 Copy it then open a new browser tab or window and past it in the navigation bar.
 
 You now should see the the EthStat-light explorer.
-Wait a few seconds and you should see 6 multicaster indicated and a few blocks mined.
+Wait a few seconds and you should see 6 peers indicated and a few blocks mined.
 
 ![Alethio EthStat-light explorer](alethio-light-explorer-screenshot.png)
 

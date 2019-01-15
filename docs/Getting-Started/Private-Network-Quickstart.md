@@ -61,7 +61,7 @@ quickstart\docker-compose up -d --scale node=4
 quickstart\docker-compose port explorer 80
 ```
 
-This script builds Pantheon, builds the images and runs the containers. It will also scale the regular node container to four containers to simulate a network with enough multicaster to synchronize.
+This script builds Pantheon, builds the images and runs the containers. It will also scale the regular node container to four containers to simulate a network with enough peers to synchronize.
 
 When the process ends, it lists the running services:
 
@@ -120,7 +120,7 @@ The block explorer displays a summary of the private network:
 
 ![Block Explorer](ExplorerSummary.png)
 
-Notice the explorer indicates 6 multicaster: the 4 regular nodes, the mining node and the bootnode.
+Notice the explorer indicates 6 peers: the 4 regular nodes, the mining node and the bootnode.
 
 Click on the block number to the right of **Best Block** to display the block details. 
 
@@ -176,7 +176,7 @@ Poll the peer count using `net_peerCount`:
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' http://localhost:http-rpc-port
 ```
 
-The result should be the following response, indicating that there are 6 multicaster:
+The result should be the following response, indicating that there are 6 peers:
 
 ```json
 {
