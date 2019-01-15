@@ -133,7 +133,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final KeyPair nodeKeys,
       final MetricsSystem metricsSystem) {
     final ProtocolSchedule<IbftContext> protocolSchedule =
-        IbftProtocolSchedule.create(genesisConfig.getConfigOptions());
+        IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), metricsSystem);
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfig, protocolSchedule);
     final BlockchainStorage blockchainStorage =
         storageProvider.createBlockchainStorage(protocolSchedule);
@@ -199,8 +199,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
-    final IbftNetworkPeers peers =
-        new IbftNetworkPeers(protocolContext.getConsensusState().getVoteTally());
+    final ValidatorPeers peers =
+        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
 
     final BlockHeaderValidator<IbftContext> blockHeaderValidator =
         IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(
