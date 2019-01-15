@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.protocol;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvent;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.IbftEvents;
-import tech.pegasys.pantheon.consensus.ibft.network.PeerCollection;
+import tech.pegasys.pantheon.consensus.ibft.network.PeerConnectionTracker;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.api.ProtocolManager;
@@ -33,7 +33,7 @@ public class IbftProtocolManager implements ProtocolManager {
   private final IbftEventQueue ibftEventQueue;
 
   private final Logger LOG = LogManager.getLogger();
-  private final PeerCollection peers;
+  private final PeerConnectionTracker peers;
 
   /**
    * Constructor for the ibft protocol manager
@@ -41,7 +41,8 @@ public class IbftProtocolManager implements ProtocolManager {
    * @param ibftEventQueue Entry point into the ibft event processor
    * @param peers iBFT network peers
    */
-  public IbftProtocolManager(final IbftEventQueue ibftEventQueue, final PeerCollection peers) {
+  public IbftProtocolManager(
+      final IbftEventQueue ibftEventQueue, final PeerConnectionTracker peers) {
     this.ibftEventQueue = ibftEventQueue;
     this.peers = peers;
   }

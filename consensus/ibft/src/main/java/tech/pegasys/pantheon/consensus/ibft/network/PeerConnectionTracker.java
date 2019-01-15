@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.network;
 
 import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 
-public interface PeerCollection {
+public interface PeerConnectionTracker {
 
   void add(final PeerConnection newConnection);
 

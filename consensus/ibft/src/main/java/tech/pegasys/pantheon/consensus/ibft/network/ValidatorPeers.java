@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
  * Responsible for tracking the network peers which have a connection to this node, then
  * multicasting packets to ONLY the peers which have been identified as being validators.
  */
-public class ValidatorPeers implements ValidatorMulticaster, PeerCollection {
+public class ValidatorPeers implements ValidatorMulticaster, PeerConnectionTracker {
 
   private static final Logger LOG = LogManager.getLogger();
 
