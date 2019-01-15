@@ -32,9 +32,9 @@ import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
-import tech.pegasys.pantheon.consensus.ibft.ibftmessagedata.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorPeers;
+import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
@@ -199,8 +199,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
 
     final ProposerSelector proposerSelector =
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
-    final ValidatorPeers peers =
-        new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
+    final IbftNetworkPeers peers =
+        new IbftNetworkPeers(protocolContext.getConsensusState().getVoteTally());
 
     final BlockHeaderValidator<IbftContext> blockHeaderValidator =
         IbftBlockHeaderValidationRulesetFactory.ibftProposedBlockValidator(

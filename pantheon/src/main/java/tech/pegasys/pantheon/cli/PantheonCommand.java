@@ -38,11 +38,11 @@ import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.util.BlockImporter;
+import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
@@ -109,6 +109,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private static final String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
 
   public static class RpcApisConverter implements ITypeConverter<RpcApi> {
+
     @Override
     public RpcApi convert(final String name) throws RpcApisConversionException {
       final String uppercaseName = name.trim().toUpperCase();
@@ -124,6 +125,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   public static class RpcApisConversionException extends Exception {
+
     RpcApisConversionException(final String s) {
       super(s);
     }
