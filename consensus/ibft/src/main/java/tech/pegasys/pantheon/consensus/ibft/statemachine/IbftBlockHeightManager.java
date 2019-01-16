@@ -103,7 +103,7 @@ public class IbftBlockHeightManager {
         (roundIdentifier) ->
             new RoundState(
                 roundIdentifier,
-                finalState.getQuorumSize(),
+                finalState.getQuorum(),
                 messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
   }
 
