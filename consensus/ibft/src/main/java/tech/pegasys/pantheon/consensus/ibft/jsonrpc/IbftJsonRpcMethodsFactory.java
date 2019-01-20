@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.jsonrpc;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods.IbftDiscardValidatorVote;
+import tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods.IbftGetValidatorsByBlockHash;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods.IbftGetValidatorsByBlockNumber;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.methods.IbftProposeValidatorVote;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -46,7 +47,9 @@ public class IbftJsonRpcMethodsFactory {
           new IbftGetValidatorsByBlockNumber(
               blockchainQueries, new IbftBlockInterface(), jsonRpcParameter),
           new IbftDiscardValidatorVote(
-              context.getConsensusState().getVoteProposer(), jsonRpcParameter));
+              context.getConsensusState().getVoteProposer(), jsonRpcParameter),
+          new IbftGetValidatorsByBlockHash(
+              context.getBlockchain(), new IbftBlockInterface(), jsonRpcParameter));
     }
 
     return rpcMethods;
