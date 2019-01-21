@@ -88,7 +88,7 @@ public class TestContextBuilder {
     public ControllerAndState(
         final IbftController controller,
         final IbftFinalState finalState,
-        EventMultiplexer eventMultiplexer) {
+        final EventMultiplexer eventMultiplexer) {
       this.controller = controller;
       this.finalState = finalState;
       this.eventMultiplexer = eventMultiplexer;
