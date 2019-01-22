@@ -29,7 +29,7 @@ public class IbftDiscard implements Transaction<Boolean> {
   @Override
   public Boolean execute(final PantheonWeb3j node) {
     try {
-      final DiscardResponse result = node.cliqueDiscard(address).send();
+      final DiscardResponse result = node.ibftDiscard(address).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();
