@@ -12,14 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidators;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidators;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
 

@@ -21,17 +21,17 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.SignersBlockResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
-public class IbftGetSigners implements Transaction<List<Address>> {
+public class IbftGetValidators implements Transaction<List<Address>> {
   private final String blockNumber;
 
-  public IbftGetSigners(final String blockNumber) {
+  public IbftGetValidators(final String blockNumber) {
     this.blockNumber = blockNumber;
   }
 
   @Override
   public List<Address> execute(final PantheonWeb3j node) {
     try {
-      final SignersBlockResponse result = node.cliqueGetSigners(blockNumber).send();
+      final SignersBlockResponse result = node.ibftGetValidators(blockNumber).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

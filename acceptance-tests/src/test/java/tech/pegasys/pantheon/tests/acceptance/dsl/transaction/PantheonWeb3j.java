@@ -91,7 +91,7 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
         ProposalsResponse.class);
   }
 
-  public Request<?, SignersBlockResponse> ibftGetSigners(final String blockNumber) {
+  public Request<?, SignersBlockResponse> ibftGetValidators(final String blockNumber) {
     return new Request<>(
         "ibft_getValidatorsByBlockNumber", singletonList(blockNumber), web3jService,
         SignersBlockResponse.class);

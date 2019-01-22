@@ -22,10 +22,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.SignersBlockResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
-public class IbftGetSignersAtHash implements Transaction<List<Address>> {
+public class IbftGetValidatorsAtHash implements Transaction<List<Address>> {
   private final Hash hash;
 
-  public IbftGetSignersAtHash(final Hash hash) {
+  public IbftGetValidatorsAtHash(final Hash hash) {
     this.hash = hash;
   }
 

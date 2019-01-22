@@ -34,12 +34,12 @@ public class IbftTransactions {
     return new IbftProposals();
   }
 
-  public IbftGetSigners createGetSigners(final String blockNumber) {
-    return new IbftGetSigners(blockNumber);
+  public IbftGetValidators createGetValidators(final String blockNumber) {
+    return new IbftGetValidators(blockNumber);
   }
 
-  public IbftGetSignersAtHash createGetSignersAtHash(final Hash blockHash) {
-    return new IbftGetSignersAtHash(blockHash);
+  public IbftGetValidatorsAtHash createGetValidatorsAtHash(final Hash blockHash) {
+    return new IbftGetValidatorsAtHash(blockHash);
   }
 
   public IbftDiscard createDiscardProposal(final PantheonNode node) {

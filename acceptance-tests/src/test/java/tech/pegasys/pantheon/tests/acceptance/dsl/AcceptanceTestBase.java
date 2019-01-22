@@ -68,7 +68,7 @@ public class AcceptanceTestBase {
     web3 = new Web3(new Web3Transactions());
     pantheon = new PantheonNodeFactory();
     contractVerifier = new ContractVerifier(accounts.getPrimaryBenefactor());
-    wait = new WaitConditions(ethTransactions, cliqueTransactions);
+    wait = new WaitConditions(ethTransactions, cliqueTransactions, ibftTransactions);
   }
 
   @After
