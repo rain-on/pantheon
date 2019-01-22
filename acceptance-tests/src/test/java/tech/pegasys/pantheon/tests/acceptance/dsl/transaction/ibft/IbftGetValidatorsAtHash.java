@@ -14,13 +14,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.util.List;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.SignersBlockResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+
+import java.io.IOException;
+import java.util.List;
 
 public class IbftGetValidatorsAtHash implements Transaction<List<Address>> {
   private final Hash hash;

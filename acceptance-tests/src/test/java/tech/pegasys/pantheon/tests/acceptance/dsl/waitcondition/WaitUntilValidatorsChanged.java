@@ -16,11 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
-import java.util.List;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
+
+import java.util.List;
 
 public class WaitUntilValidatorsChanged implements WaitCondition {
 

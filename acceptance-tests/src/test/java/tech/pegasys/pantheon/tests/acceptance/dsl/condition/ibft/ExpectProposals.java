@@ -15,12 +15,12 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import java.util.Map;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
+
+import java.util.Map;
 
 public class ExpectProposals implements Condition {
   private final IbftTransactions ibft;

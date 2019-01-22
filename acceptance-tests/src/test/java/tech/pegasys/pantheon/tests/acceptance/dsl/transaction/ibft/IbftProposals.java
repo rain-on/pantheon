@@ -14,12 +14,13 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.util.Map;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.ProposalsResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class IbftProposals implements Transaction<Map<Address, Boolean>> {
 

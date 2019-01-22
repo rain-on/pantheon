@@ -12,14 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals;
@@ -27,6 +19,16 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidator
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMap;
 
 public class Ibft {
 
@@ -86,7 +88,8 @@ public class Ibft {
               .entrySet()
               .stream()
               .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
-      return new tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals(ibft, proposalsAsAddress);
+      return new tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals(
+          ibft, proposalsAsAddress);
     }
   }
 }

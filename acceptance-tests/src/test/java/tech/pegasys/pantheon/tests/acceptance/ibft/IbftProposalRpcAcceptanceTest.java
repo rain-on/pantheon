@@ -12,10 +12,12 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.ibft;
 
-import java.io.IOException;
-import org.junit.Test;
 import tech.pegasys.pantheon.tests.acceptance.dsl.AcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+
+import java.io.IOException;
+
+import org.junit.Test;
 
 public class IbftProposalRpcAcceptanceTest extends AcceptanceTestBase {
 
