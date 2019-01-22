@@ -31,7 +31,7 @@ public class IbftPropose implements Transaction<Boolean> {
   @Override
   public Boolean execute(final PantheonWeb3j node) {
     try {
-      final ProposeResponse result = node.cliquePropose(address, auth).send();
+      final ProposeResponse result = node.ibftPropose(address, auth).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

@@ -26,7 +26,7 @@ public class IbftProposals implements Transaction<Map<Address, Boolean>> {
   @Override
   public Map<Address, Boolean> execute(final PantheonWeb3j node) {
     try {
-      final ProposalsResponse result = node.cliqueProposals().send();
+      final ProposalsResponse result = node.ibftProposals().send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

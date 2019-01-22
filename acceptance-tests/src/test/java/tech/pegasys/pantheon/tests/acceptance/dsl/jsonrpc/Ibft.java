@@ -12,10 +12,17 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
@@ -45,5 +52,41 @@ public class Ibft {
 
   private Address[] validatorAddresses(final PantheonNode[] validators) {
     return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
+  }
+
+  public Condition noProposals() {
+    return new ExpectProposals(ibft, ImmutableMap.of());
+  }
+
+  public ProposalsConfig proposalsEqual() {
+    return new ProposalsConfig(ibft);
+  }
+
+  public static class ProposalsConfig {
+    private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
+    private final IbftTransactions ibft;
+
+    public ProposalsConfig(final IbftTransactions ibft) {
+      this.ibft = ibft;
+    }
+
+    public Ibft.ProposalsConfig addProposal(final PantheonNode node) {
+      proposals.put(node, true);
+      return this;
+    }
+
+    public Ibft.ProposalsConfig removeProposal(final PantheonNode node) {
+      proposals.put(node, false);
+      return this;
+    }
+
+    public Condition build() {
+      final Map<Address, Boolean> proposalsAsAddress =
+          this.proposals
+              .entrySet()
+              .stream()
+              .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
+      return new tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals(ibft, proposalsAsAddress);
+    }
   }
 }
