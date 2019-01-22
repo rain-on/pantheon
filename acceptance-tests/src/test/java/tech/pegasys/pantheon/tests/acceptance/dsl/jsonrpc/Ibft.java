@@ -12,13 +12,26 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.clique.ExpectValidators;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
 
 public class Ibft {
+
+  private final EthTransactions eth;
+  private final IbftTransactions ibft;
+
+  public Ibft(final EthTransactions eth, final IbftTransactions ibft) {
+    this.eth = eth;
+    this.ibft = ibft;
+  }
 
   public List<PantheonNode> validators(final PantheonNode[] nodes) {
     final Comparator<PantheonNode> compareByAddress =
@@ -26,5 +39,13 @@ public class Ibft {
     List<PantheonNode> pantheonNodes = Arrays.asList(nodes);
     pantheonNodes.sort(compareByAddress);
     return pantheonNodes;
+  }
+
+  public ExpectValidators validatorsEqual(final PantheonNode... validators) {
+    return new ExpectValidators(ibft, validatorAddresses(validators));
+  }
+
+  private Address[] validatorAddresses(final PantheonNode[] validators) {
+    return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
   }
 }
