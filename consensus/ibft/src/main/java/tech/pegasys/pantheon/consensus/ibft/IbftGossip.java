@@ -35,6 +35,7 @@ import com.google.common.collect.Lists;
 
 /** Class responsible for rebroadcasting IBFT messages to known validators */
 public class IbftGossip {
+
   private final ValidatorMulticaster multicaster;
 
   // Size of the seenMessages cache, should end up utilising 65bytes * this number + some meta data
@@ -100,9 +101,16 @@ public class IbftGossip {
       final List<Address> excludeAddressesList =
           Lists.newArrayList(
               message.getConnection().getPeer().getAddress(), signedData.getSender());
-      multicaster.send(messageData, excludeAddressesList);
-      seenMessages.add(signature);
+      transmit(messageData, signature, excludeAddressesList);
       return true;
     }
+  }
+
+  public void transmit(
+      final MessageData messageData,
+      final Signature signature,
+      final List<Address> excludeAddressesList) {
+    multicaster.send(messageData, excludeAddressesList);
+    seenMessages.add(signature);
   }
 }

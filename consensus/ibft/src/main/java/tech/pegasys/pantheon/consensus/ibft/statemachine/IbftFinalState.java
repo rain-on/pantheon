@@ -17,6 +17,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
@@ -64,7 +65,8 @@ public class IbftFinalState {
     this.blockCreatorFactory = blockCreatorFactory;
     this.messageFactory = messageFactory;
     this.clock = clock;
-    this.messageTransmitter = new IbftMessageTransmitter(messageFactory, validatorMulticaster);
+    this.messageTransmitter =
+        new IbftMessageTransmitter(messageFactory, new IbftGossip(validatorMulticaster));
   }
 
   public int getQuorum() {
