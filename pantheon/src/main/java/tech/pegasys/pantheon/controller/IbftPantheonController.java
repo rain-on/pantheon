@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
+import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
@@ -205,6 +206,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
     minedBlockObservers.subscribe(ethProtocolManager);
 
+    final IbftGossip gossiper = new IbftGossip(peers);
+
     final IbftFinalState finalState =
         new IbftFinalState(
             voteTally,
@@ -223,7 +226,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 Clock.systemUTC()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
-            Clock.systemUTC());
+            Clock.systemUTC(),
+            gossiper);
 
     final MessageValidatorFactory messageValidatorFactory =
         new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
@@ -236,7 +240,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 finalState,
                 new IbftRoundFactory(
                     finalState, protocolContext, protocolSchedule, minedBlockObservers),
-                messageValidatorFactory));
+                messageValidatorFactory),
+            gossiper);
     ibftController.start();
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);

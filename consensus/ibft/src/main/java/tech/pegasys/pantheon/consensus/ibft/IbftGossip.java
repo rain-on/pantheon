@@ -20,8 +20,8 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
@@ -34,7 +34,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 
 /** Class responsible for rebroadcasting IBFT messages to known validators */
-public class IbftGossip {
+public class IbftGossip implements Gossiper {
 
   private final ValidatorMulticaster multicaster;
 
@@ -42,11 +42,11 @@ public class IbftGossip {
   private final int maxSeenMessages;
 
   // Set that starts evicting members when it hits capacity
-  private final Set<Signature> seenMessages =
+  private final Set<Hash> seenMessages =
       Collections.newSetFromMap(
-          new LinkedHashMap<Signature, Boolean>() {
+          new LinkedHashMap<Hash, Boolean>() {
             @Override
-            protected boolean removeEldestEntry(final Map.Entry<Signature, Boolean> eldest) {
+            protected boolean removeEldestEntry(final Map.Entry<Hash, Boolean> eldest) {
               return size() > maxSeenMessages;
             }
           });
@@ -71,6 +71,7 @@ public class IbftGossip {
    * @param message The raw message to be gossiped
    * @return Whether the message was rebroadcast or has been ignored as a repeat
    */
+  @Override
   public boolean gossipMessage(final Message message) {
     final MessageData messageData = message.getData();
     final SignedData<?> signedData;
@@ -94,23 +95,20 @@ public class IbftGossip {
         throw new IllegalArgumentException(
             "Received message does not conform to any recognised IBFT message structure.");
     }
-    final Signature signature = signedData.getSignature();
-    if (seenMessages.contains(signature)) {
-      return false;
-    } else {
-      final List<Address> excludeAddressesList =
-          Lists.newArrayList(
-              message.getConnection().getPeer().getAddress(), signedData.getSender());
-      transmit(messageData, signature, excludeAddressesList);
-      return true;
-    }
+    final List<Address> excludeAddressesList =
+        Lists.newArrayList(message.getConnection().getPeer().getAddress(), signedData.getSender());
+
+    return send(messageData, excludeAddressesList);
   }
 
-  public void transmit(
-      final MessageData messageData,
-      final Signature signature,
-      final List<Address> excludeAddressesList) {
+  @Override
+  public boolean send(final MessageData messageData, final List<Address> excludeAddressesList) {
+    Hash uniqueID = Hash.hash(messageData.getData());
+    if (seenMessages.contains(uniqueID)) {
+      return false;
+    }
     multicaster.send(messageData, excludeAddressesList);
-    seenMessages.add(signature);
+    seenMessages.add(uniqueID);
+    return true;
   }
 }
