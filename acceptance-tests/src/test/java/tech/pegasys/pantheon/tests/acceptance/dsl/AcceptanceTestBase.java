@@ -60,7 +60,7 @@ public class AcceptanceTestBase {
     ibftTransactions = new IbftTransactions();
 
     clique = new Clique(ethTransactions, cliqueTransactions);
-    ibft = new Ibft(ethTransactions, ibftTransactions);
+    ibft = new Ibft(ibftTransactions);
     net = new Net(new NetTransactions());
     cluster = new Cluster(net);
     transactions = new Transactions(accounts);

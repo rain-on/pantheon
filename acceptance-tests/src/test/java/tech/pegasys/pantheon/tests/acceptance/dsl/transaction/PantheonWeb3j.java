@@ -43,35 +43,6 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
     super(web3jService, pollingInterval, scheduledExecutorService);
   }
 
-  public Request<?, ProposeResponse> cliquePropose(final String address, final Boolean auth) {
-    return new Request<>(
-        "clique_propose",
-        Arrays.asList(address, auth.toString()),
-        web3jService,
-        ProposeResponse.class);
-  }
-
-  public Request<?, DiscardResponse> cliqueDiscard(final String address) {
-    return new Request<>(
-        "clique_discard", singletonList(address), web3jService, DiscardResponse.class);
-  }
-
-  public Request<?, ProposalsResponse> cliqueProposals() {
-    return new Request<>("clique_proposals", emptyList(), web3jService, ProposalsResponse.class);
-  }
-
-  public Request<?, SignersBlockResponse> cliqueGetSigners(final String blockNumber) {
-    return new Request<>(
-        "clique_getSigners", singletonList(blockNumber), web3jService, SignersBlockResponse.class);
-  }
-
-  public Request<?, SignersBlockResponse> cliqueGetSignersAtHash(final Hash hash) {
-    return new Request<>(
-        "clique_getSignersAtHash",
-        singletonList(hash.toString()),
-        web3jService,
-        SignersBlockResponse.class);
-  }
 
   public Request<?, ProposeResponse> ibftPropose(final String address, final Boolean auth) {
     return new Request<>(

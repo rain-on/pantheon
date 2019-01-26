@@ -12,14 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals;
-import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidators;
-import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthTransactions;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
-
+import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,16 +20,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.ImmutableMap;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectProposals;
+import tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft.ExpectValidators;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions;
 
 public class Ibft {
 
-  private final EthTransactions eth;
   private final IbftTransactions ibft;
 
-  public Ibft(final EthTransactions eth, final IbftTransactions ibft) {
-    this.eth = eth;
+  public Ibft(final IbftTransactions ibft) {
     this.ibft = ibft;
   }
 

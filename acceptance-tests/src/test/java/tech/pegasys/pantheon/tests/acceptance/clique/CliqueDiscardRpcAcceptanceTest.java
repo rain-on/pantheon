@@ -32,6 +32,8 @@ public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
         pantheon.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
+    minerNode1.execute(CliqueTransactions::proposeRemovalOf(minerNode2));
+
     minerNode1.execute(cliqueTransactions.createRemoveProposal(minerNode2));
     minerNode2.execute(cliqueTransactions.createRemoveProposal(minerNode2));
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));
