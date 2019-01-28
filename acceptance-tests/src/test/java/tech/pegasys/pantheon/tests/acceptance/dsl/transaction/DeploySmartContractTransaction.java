@@ -43,9 +43,11 @@ public class DeploySmartContractTransaction<T extends Contract> implements Trans
           clazz.getMethod(
               "deploy", Web3j.class, Credentials.class, BigInteger.class, BigInteger.class);
 
+
+
       final Object invoked =
           method.invoke(
-              METHOD_IS_STATIC, node, BENEFACTOR_ONE, DEFAULT_GAS_PRICE, DEFAULT_GAS_LIMIT);
+              METHOD_IS_STATIC, node.eth(), BENEFACTOR_ONE, DEFAULT_GAS_PRICE, DEFAULT_GAS_LIMIT);
 
       return cast(invoked).send();
     } catch (final Exception e) {
