@@ -4,9 +4,10 @@ description: Pantheon commande line interface reference
 # Pantheon Command Line
 
 !!! important "Breaking Changes in v0.9"
-    In v0.9, changes will be made to the command line options to improve usability. These will be breaking changes; that is, 
-    in many cases the v0.8 command line options will no longer work. This reference and the rest of the documentation will be 
-    updated to reflect these changes. Any further information required about the changes will be included in the v0.9 release notes. 
+    In v0.9, the command line changed to improve usability. These are breaking changes; that is, 
+    in many cases the v0.8 command line options no longer work. 
+    This reference and the rest of the documentation has been updated to reflect these changes. The [release notes](https://github.com/PegaSysEng/pantheon/blob/master/CHANGELOG.md) 
+    include a mapping of the previous command line options to the new options. 
 
 This reference describes the syntax of the Pantheon Command Line Interface (CLI) options and subcommands.
 
@@ -36,10 +37,10 @@ Comma separated account public keys for permissioned transactions. You can speci
 !!!note
     Permissioning is under development and will be available in v1.0.
 
-### banned-nodeids
+### banned-node-ids
 
 ```bash tab="Syntax"
---banned-nodeids=<bannedNodeId>[,<bannedNodeId>...]...
+--banned-node-ids=<bannedNodeId>[,<bannedNodeId>...]...
 ```
 
 ```bash tab="Example Command Line"
@@ -51,9 +52,10 @@ banned-nodeids=["0xc35c3...d615f","0xf42c13...fc456"]
 ```
 
 List of node IDs with which this node will not peer. The node ID is the public key of the node. You can specify the banned node IDs with or without the `0x` prefix.
-  
-!!!info
-    This option is only available from v0.8.2. 
+
+!!!tip
+    The singular `--banned-node-id` and plural `--banned-node-ids` are available and are just two
+    names for the same option.
  
 ### bootnodes
 
@@ -75,21 +77,25 @@ bootnodes=["enode://c35c3...d615f@1.2.3.4:30303","enode://f42c13...fc456@1.2.3.5
   
 List of comma-separated enode URLs for P2P discovery bootstrap. 
   
-When connecting to mainnet or public testnets, the default is a predefined list of enode URLs. 
-Specify bootnodes when connecting to a [private network](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes).
+When connecting to MainNet or public testnets, the default is a predefined list of enode URLs. 
+
+On custom networks defined by [`--genesis-file`](#genesis-file) option,
+an empty list of bootnodes is defined by default unless you define custom bootnodes as described in 
+[private network documentation](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes).
 
 !!! note
-    Specifying a node is a [bootnode](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes) 
-    must be done on the command line not in a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).  
+    Specifying that a node is a [bootnode](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes) 
+    must be done on the command line using [`--bootnodes`](#bootnodes) option without value,
+    not in a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).  
 
-### config
+### config-file
 
 ```bash tab="Syntax"
---config=<PATH>
+--config-file=<FILE>
 ```
 
 ```bash tab="Example Command Line"
---config=/home/me/me_node/config.toml
+--config-file=/home/me/me_node/config.toml
 ```
 
 The path to the [TOML configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
@@ -98,18 +104,18 @@ The default is `none`.
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-configuration-file) or in a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
     
-### datadir
+### data-path
 
 ```bash tab="Syntax"
---datadir=<PATH>
+--data-path=<PATH>
 ```
 
 ```bash tab="Example Command Line"
---datadir=/home/me/me_node
+--data-path=/home/me/me_node
 ```
 
 ```bash tab="Example Configuration File"
-datadir="/home/me/me_node"
+data-path="/home/me/me_node"
 ```
 
 The path to the Pantheon data directory. The default is the `/build/distributions/pantheon-<version>` directory in the Pantheon installation directory.
@@ -117,68 +123,46 @@ The path to the Pantheon data directory. The default is the `/build/distribution
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#persisting-data). 
 
-
-### dev-mode
+### discovery-enabled
 
 ```bash tab="Syntax"
---dev-mode
+--discovery-enabled=false
 ```
 
 ```bash tab="Example Configuration File"
-dev-mode=true
+discovery-enabled=false
 ```
-  
-Set this option to `true` to run in development mode. 
-For example, specify this option to perform CPU mining more easily in a private test network. 
-In development mode, a custom genesis configuration specifies the chain ID. 
-When using this option, also set the [`--network-id`](#network-id) option to the network you use for development.
-Default is `false`.
-  
-  
-!!!note
-    The [`--dev-mode`](#dev-mode) option overrides the [`--genesis`](#genesis) option. If both are specified, the development mode configuration is used.  
 
+Enables or disables P2P peer discovery.
+The default is `true`.
 
-### genesis
+### genesis-file
+
+Genesis file is used to create a custom network.
+
+!!!tip
+    To use a public Ethereum network such as Rinkeby, use the [`--network`](#network) option.
+    The network option defines the genesis file for public networks.
 
 ```bash tab="Syntax"
---genesis=<PATH>
+--genesis-file=<FILE>
 ```
 
 ```bash tab="Example Command Line"
---genesis=/home/me/me_node/customGenesisFile.json
+--genesis-file=/home/me/me_node/customGenesisFile.json
 ```
 
 ```bash tab="Example Configuration File"
-genesis="/home/me/me_node/customGenesisFile.json"
+genesis-file="/home/me/me_node/customGenesisFile.json"
 ```
 
-The path to the genesis file. The default is the embedded genesis file for the Ethereum mainnet. 
-When using this option, it is recommended to also set the [`--network-id`](#network-id) option.
+The path to the genesis file.
+
+!!!important
+    The [`--genesis-file`](#genesis-file) and [`--network`](#network) option can't be used at the same time.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
-
-!!!note
-    The [`--genesis`](#genesis) option is overridden by the [`--dev-mode`](#dev-mode) option. 
-    If both are specified, the specified genesis file is ignored and the development mode configuration used. 
-
-
-### goerli
-
-```bash tab="Syntax"
---goerli
-```
-
-```bash tab="Example Configuration File"
-goerli=true
-```
-
-Uses the Goerli test network. Default is false.
-
-!!!note
-    This option is only available from v0.8.3.
-
 
 ### host-whitelist
 
@@ -199,9 +183,6 @@ Comma-separated list of hostnames to allow access to the HTTP JSON-RPC API. Defa
 !!!tip
     To allow all hostnames, use `*` or `all`. We don't recommend allowing all hostnames for production code.
 
-!!!note
-    This option is only available from v0.8.3. Earlier versions allow access by all hostnames. 
-
 ### max-peers
 
 ```bash tab="Syntax"
@@ -221,6 +202,10 @@ The default is 25.
 
 ### max-trailing-peers
 
+!!!important
+    This option is deprecated in favor of a intelligent default setting and will be removed in 0.9
+    release.
+    
 ```bash tab="Syntax"
 --max-trailing-peers=<INTEGER>
 ```
@@ -249,22 +234,39 @@ metrics-enabled=true
 Set to `true` to enable the [Prometheus](https://prometheus.io/) monitoring service to access [Pantheon metrics](../Using-Pantheon/Debugging.md#monitor-node-performance-using-third-party-clients).
 The default is `false`.
 
-### metrics-listen
+### metrics-host
 
 ```bash tab="Syntax"
---metrics-listen=<HOST:PORT>
+--metrics-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
---metrics-listen=127.0.0.1:6174
+--metrics-host=127.0.0.1
 ```
 
 ```bash tab="Example Configuration File"
-metrics-listen="127.0.0.1:6174"
+metrics-host="127.0.0.1"
 ```
 
-Specifies the host and port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
-metrics. The default is `127.0.0.1:9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+Specifies the host on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
+metrics. The default is `127.0.0.1`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
+
+### metrics-port
+
+```bash tab="Syntax"
+--metrics-port=<PORT>
+```
+
+```bash tab="Example Command Line"
+--metrics-port=6174
+```
+
+```bash tab="Example Configuration File"
+metrics-port="6174"
+```
+
+Specifies the port on which the [Prometheus](https://prometheus.io/) monitoring service accesses Pantheon
+metrics. The default is `9545`. The metrics server respects the [`--host-whitelist` option](#host-whitelist).
 
 ### miner-coinbase
 
@@ -285,7 +287,7 @@ You must specify a valid coinbase when you enable mining using the [`--miner-ena
 option or the [`miner_start`](JSON-RPC-API-Methods.md#miner_start) JSON RPC-API method.
 
 !!!note
-    This option is ignored in networks using the [Clique Proof-of-Authority (PoA) consensus protocol](../Configuring-Pantheon/Proof-of-Authority.md). 
+    This option is ignored in networks using [Clique](../Consensus-Protocols/Clique.md) and [IBFT 2.0](../Consensus-Protocols/IBFT.md) consensus protocols. 
 
 ### miner-enabled
 
@@ -300,39 +302,79 @@ miner-enabled=true
 Enables mining when the node is started.
 Default is `false`.
   
-### miner-extraData
+### miner-extra-data
 
 ```bash tab="Syntax"
---miner-extraData=<Extra data>
+--miner-extra-data=<Extra data>
 ```
 
 ```bash tab="Example Command Line"
---miner-extraData=0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021
+--miner-extra-data=0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021
 ```
 
 ```bash tab="Example Configuration File"
-miner-extraData="0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021"
+miner-extra-data="0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021"
 ```
 
 A hex string representing the 32 bytes to be included in the extra data field of a mined block.
 The default is 0x.
 
-### miner-minTransactionGasPriceWei
+### min-gas-price
 
 ```bash tab="Syntax"
---miner-minTransactionGasPriceWei=<minTransactionGasPrice>
+--min-gas-price=<minTransactionGasPrice>
 ```
 
 ```bash tab="Example Command Line"
---miner-minTransactionGasPriceWei=1337
+--min-gas-price=1337
 ```
 
 ```bash tab="Example Configuration File"
-miner-minTransactionGasPriceWei="1337"
+min-gas-price="1337"
 ```
 
 The minimum price that a transaction offers for it to be included in a mined block.
 The default is 1000.
+
+### network
+
+```bash tab="Syntax"
+--network=<NETWORK>
+```
+
+```bash tab="Example Command Line"
+--network=rinkeby
+```
+
+```bash tab="Example Configuration File"
+network="rinkeby"
+```
+
+Predefined network configuration.
+The default is `mainnet`.
+
+Possible values are :
+
+`mainnet`
+:   Main Ethereum network
+
+`ropsten`
+:   PoW test network similar to current main Ethereum network. 
+
+`rinkeby`
+:   PoA test network using Clique.
+
+`goerli`
+:   PoA test network using Clique.
+
+`dev`
+:   PoW development network with a very low difficulty to enable local CPU mining.
+
+!!!note
+    Values are case insensitive, so either `mainnet` or `MAINNET` works.
+    
+!!!important
+    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
 
 ### network-id
 
@@ -349,36 +391,25 @@ network-id="8675309"
 ```
 
 P2P network identifier.
-The default is set to mainnet with value `1`.
 
-### no-discovery
+This option can be used to override your current network ID.
+The default value is the current network chain ID which is defined in the genesis file.
 
-```bash tab="Syntax"
---no-discovery
-```
-
-```bash tab="Example Configuration File"
-no-discovery=true
-```
-
-Disables P2P peer discovery.
-The default is `false`.
-
-### node-private-key
+### node-private-key-file
 
 ```bash tab="Syntax"
---node-private-key=<PATH>
+--node-private-key-file=<FILE>
 ```
 
 ```bash tab="Example Command Line"
---node-private-key=/home/me/me_node/myPrivateKey
+--node-private-key-file=/home/me/me_node/myPrivateKey
 ```
 
 ```bash tab="Example Configuration File"
-node-private-key="/home/me/me_node/myPrivateKey"
+node-private-key-file="/home/me/me_node/myPrivateKey"
 ```
 
-`<PATH>` is the path of the private key file of the node.
+`<FILE>` is the path of the private key file of the node.
 The default is the key file in the data directory.
 If no key file exists, a key file containing the generated private key is created;
 otherwise, the existing key file specifies the node private key.
@@ -386,9 +417,6 @@ otherwise, the existing key file specifies the node private key.
 
 !!!attention
     The private key is not encrypted.
-  
-!!!note
-    This option is only available from v0.8.2. 
 
 ### nodes-whitelist
 
@@ -407,155 +435,169 @@ nodes-whitelist=["enode://c35c3...d615f@3.14.15.92:30303","enode://f42c13...fc45
 Comma-separated enode URLs for permissioned networks.
 Not intended for use with mainnet or public testnets. 
 
-
-!!!note
-    This option is only available from v0.8.3. 
-
 !!!note
     Permissioning is under development and will be available in v1.0.
 
-### ottoman
+### p2p-enabled
 
 ```bash tab="Syntax"
---ottoman
+--p2p-enabled=<true|false>
+```
+
+```bash tab="Command line"
+--p2p-enabled=false
 ```
 
 ```bash tab="Example Configuration File"
-ottoman=true
+p2p-enabled=false
 ```
 
-Synchronize against the Ottoman test network. This is only useful if you are using an IBFT genesis file.  The default is `false`.
+Enables or disables all p2p communication.
+The default is true.
 
-!!!note
-    :construction: IBFT is not currently supported. Support for IBFT is in active development. 
-
-### p2p-listen
+### p2p-host
 
 ```bash tab="Syntax"
---p2p-listen=<HOST:PORT>
+--p2p-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
-# to listen on all interfaces on port 1789
---p2p-listen=0.0.0.0:1789
+# to listen on all interfaces
+--p2p-host=0.0.0.0
 ```
 
 ```bash tab="Example Configuration File"
-p2p-listen="0.0.0.0:1789"
+p2p-host="0.0.0.0"
 ```
 
-Specifies the host and port on which P2P peer discovery listens.
-The default is 127.0.0.1:30303.
+Specifies the host on which P2P peer discovery listens.
+The default is 127.0.0.1.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
-### rinkeby
+### p2p-port
 
 ```bash tab="Syntax"
---rinkeby
+--p2p-port=<PORT>
+```
+
+```bash tab="Example Command Line"
+# to listen on port 1789
+--p2p-port=1789
 ```
 
 ```bash tab="Example Configuration File"
-rinkeby=true
+p2p-port="1789"
 ```
 
-Uses the Rinkeby test network.
-Default is `false`.
-  
-  
-### ropsten
-
-```bash tab="Syntax"
---ropsten
-```
-
-```bash tab="Example Configuration File"
-ropsten=true
-```
-
-Uses the Ropsten test network.
-Default is `false`.
+Specifies the port on which P2P peer discovery listens.
+The default is 30303.
 
 !!!note
-    This option is only available only from v0.8.2. For v0.8.1, refer to [Starting Pantheon](../Getting-Started/Starting-Pantheon.md#run-a-node-on-ropsten-testnet). 
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
-### rpc-enabled
+### rpc-http-enabled
 
 ```bash tab="Syntax"
---rpc-enabled
+--rpc-http-enabled
 ```
 
 ```bash tab="Example Configuration File"
-rpc-enabled=true
+rpc-http-enabled=true
 ```
 
-Set to `true` to enable the JSON-RPC service (RPC over HTTP).
+Set to `true` to enable the HTTP JSON-RPC service.
 The default is `false`.
 
-### rpc-listen
+### rpc-http-host
 
 ```bash tab="Syntax"
---rpc-listen=<HOST:PORT>
+--rpc-http-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
-# to listen on all interfaces on port 3435
---rpc-listen=0.0.0.0:3435
+# to listen on all interfaces
+--rpc-http-host=0.0.0.0
 ```
 
 ```bash tab="Example Configuration File"
-rpc-listen="0.0.0.0:3435"
+rpc-http-host="0.0.0.0"
 ```
 
-Specifies the host and port on which JSON-RPC listens.
-The default is 127.0.0.1:8545.
+Specifies the host on which HTTP JSON-RPC listens.
+The default is 127.0.0.1.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
-### rpc-api
+### rpc-http-port
 
 ```bash tab="Syntax"
---rpc-api=<api name>[,<api name>...]...
+--rpc-http-port=<PORT>
 ```
 
 ```bash tab="Example Command Line"
---rpc-api=ETH,NET,WEB3
+# to listen on port 3435
+--rpc-http-port=3435
 ```
 
 ```bash tab="Example Configuration File"
-rpc-api=["ETH","NET","WEB3"]
+rpc-http-port="3435"
 ```
 
-Comma-separated APIs to enable on the JSON-RPC channel.
-When you use this option, the `--rpc-enabled` option must also be specified.
+Specifies the port on which HTTP JSON-RPC listens.
+The default is 8545.
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
+
+### rpc-http-api
+
+```bash tab="Syntax"
+--rpc-http-api=<api name>[,<api name>...]...
+```
+
+```bash tab="Example Command Line"
+--rpc-http-api=ETH,NET,WEB3
+```
+
+```bash tab="Example Configuration File"
+rpc-http-api=["ETH","NET","WEB3"]
+```
+
+Comma-separated APIs to enable on the HTTP JSON-RPC channel.
+When you use this option, the `--rpc-http-enabled` option must also be specified.
 The available API options are: `ADMIN`, `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, and `MINER`.
-The default is: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`.
+The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
     :construction: IBFT is not currently supported. Support for IBFT is in active development. 
 
-### rpc-cors-origins
+!!!tip
+    The singular `--rpc-http-api` and plural `--rpc-http-apis` are available and are just two
+    names for the same option.
+    
+### rpc-http-cors-origins
 
 ```bash tab="Syntax"
---rpc-cors-origins=<rpcCorsAllowedOrigins> or all
+--rpc-http-cors-origins=<url>[,<url>...]... or all or *
 ```
 
 ```bash tab="Example Command Line"
 # You can whitelist one or more domains with a comma-separated list.
 
---rpc-cors-origins="http://medomain.com","https://meotherdomain.com"
+--rpc-http-cors-origins="http://medomain.com","https://meotherdomain.com"
 ```
 
 ```bash tab="Example Configuration File"
-rpc-cors-origins=["http://medomain.com","https://meotherdomain.com"]
+rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
 ```
 
 ```bash tab="Remix IDE domain example"
 # The following allows Remix to interact with your Pantheon node without using MetaMask.
 
---rpc-cors-origins="http://remix.ethereum.org"
+--rpc-http-cors-origins="http://remix.ethereum.org"
 ```
 
 Specifies domain URLs for CORS validation.
@@ -573,72 +615,98 @@ If you don't whitelist any domains, you won't be able to use webapps to interact
     If Remix is connecting to the node through MetaMask, it also does not require CORS validation.
     
 !!!tip
-    For development purposes, you can use `"all"` to accept requests from any domain, but we don't recommend this for production code.
+    For development purposes, you can use `"all"` or `"*"` to accept requests from any domain, 
+    but we don't recommend this for production code.
 
-### ws-enabled
+### rpc-ws-enabled
 
 ```bash tab="Syntax"
---ws-enabled
+--rpc-ws-enabled
 ```
 
 ```bash tab="Example Configuration File"
-ws-enabled=true
+rpc-ws-enabled=true
 ```
 
-Set to `true` to enable the WS-RPC (WebSockets) service.
+Set to `true` to enable the WebSockets JSON-RPC service.
 The default is `false`.
 
-### ws-api
+### rpc-ws-api
 
 ```bash tab="Syntax"
---ws-api=<api name>[,<api name>...]...
+--rpc-ws-api=<api name>[,<api name>...]...
 ```
 
 ```bash tab="Example Command Line"
---ws-api=ETH,NET,WEB3
+--rpc-ws-api=ETH,NET,WEB3
 ```
 
 ```bash tab="Example Configuration File"
-ws-api=["ETH","NET","WEB3"]
+rpc-ws-api=["ETH","NET","WEB3"]
 ```
 
 Comma-separated APIs to enable on Websockets channel.
-When you use this option, the `--ws-enabled` option must also be specified.
+When you use this option, the `--rpc-ws-enabled` option must also be specified.
 The available API options are: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`, `DEBUG`, and `MINER`.
-The default is: `ETH`, `NET`, `WEB3`, `CLIQUE`, `IBFT`.
+The default is: `ETH`, `NET`, `WEB3`.
 
 !!!note
     :construction: IBFT is not currently supported. Support for IBFT is in active development. 
 
-### ws-listen
+!!!tip
+    The singular `--rpc-ws-api` and plural `--rpc-ws-apis` are available and are just two
+    names for the same option.
+    
+### rpc-ws-host
 
 ```bash tab="Syntax"
---ws-listen=<HOST:PORT>
+--ws-host=<HOST>
 ```
 
 ```bash tab="Example Command Line"
-# to listen on all interfaces on port 6174
---ws-listen=0.0.0.0:6174
+# to listen on all interfaces
+--ws-host=0.0.0.0
 ```
 
 ```bash tab="Example Configuration File"
-ws-listen="0.0.0.0:6174"
+ws-host="0.0.0.0"
 ```
 
-Host and port for WS-RPC (Websocket) to listen on.
-The default is 127.0.0.1:8546.
+Host for Websocket WS-RPC to listen on.
+The default is 127.0.0.1.
+
+!!!note
+    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
+    
+### rpc-ws-port
+
+```bash tab="Syntax"
+--ws-port=<PORT>
+```
+
+```bash tab="Example Command Line"
+# to listen on port 6174
+--ws-port=6174
+```
+
+```bash tab="Example Configuration File"
+ws-port="6174"
+```
+
+Port for Websocket WS-RPC to listen on.
+The default is 8546.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
-### ws-refresh-delay
+### rpc-ws-refresh-delay
 
 ```bash tab="Syntax"
---ws-refresh-delay=<refresh delay>
+--rpc-ws-refresh-delay=<refresh delay>
 ```
 
 ```bash tab="Example"
---ws-refresh-delay="10000"
+--rpc-ws-refresh-delay="10000"
 ```
 
 Refresh delay for Websocket synchronizing subscription in milliseconds. 
@@ -683,26 +751,34 @@ Print version information and exit.
 
 Pantheon subcommands are: 
 
-### import
+### blocks
+
+This command provides blocks related actions.
+
+#### import
 
 ```bash tab="Syntax"
-$ pantheon import <block-file>
+$ pantheon blocks import --from=<block-file>
 ```
 
 ```bash tab="Example"
-$ pantheon import /home/me/me_project/mainnet.blocks
+$ pantheon blocks import --from=/home/me/me_project/mainnet.blocks
 ```
 
 Imports blocks from the specified file into the blockchain database
 
-### export-pub-key
+### public-key
+
+This command provides node public key related actions.
+
+#### export
 
 ```bash tab="Syntax"
-$ pantheon export-pub-key <key-file>
+$ pantheon public-key export --to=<key-file>
 ```
 
 ```bash tab="Example"
-$ pantheon export-pub-key /home/me/me_project/not_precious_pub_key
+$ pantheon public-key export --to=/home/me/me_project/not_precious_pub_key
 ```
 
 Exports node public key to the specified file. 

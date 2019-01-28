@@ -53,13 +53,7 @@ import org.apache.logging.log4j.Logger;
  * and sends a Proposal message. If the round times out prior to importing a block, this class is
  * responsible for creating a RoundChange message and transmitting it.
  */
-public class IbftBlockHeightManager {
-
-  protected enum MessageAge {
-    PRIOR_ROUND,
-    CURRENT_ROUND,
-    FUTURE_ROUND
-  }
+public class IbftBlockHeightManager implements BlockHeightManager {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -107,6 +101,7 @@ public class IbftBlockHeightManager {
                 messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
   }
 
+  @Override
   public void start() {
     startNewRound(0);
     if (finalState.isLocalNodeProposerForRound(currentRound.getRoundIdentifier())) {
@@ -114,6 +109,7 @@ public class IbftBlockHeightManager {
     }
   }
 
+  @Override
   public void handleBlockTimerExpiry(final ConsensusRoundIdentifier roundIdentifier) {
     if (roundIdentifier.equals(currentRound.getRoundIdentifier())) {
       currentRound.createAndSendProposalMessage(clock.millis() / 1000);
@@ -125,13 +121,19 @@ public class IbftBlockHeightManager {
     }
   }
 
+  @Override
   public void roundExpired(final RoundExpiry expire) {
     if (!expire.getView().equals(currentRound.getRoundIdentifier())) {
-      LOG.info("Ignoring Round timer expired which does not match current round.");
+      LOG.info(
+          "Ignoring Round timer expired which does not match current round. round={}, timerRound={}",
+          currentRound.getRoundIdentifier(),
+          expire.getView());
       return;
     }
 
-    LOG.info("Round has expired, creating PreparedCertificate and notifying peers.");
+    LOG.info(
+        "Round has expired, creating PreparedCertificate and notifying peers. round={}",
+        currentRound.getRoundIdentifier());
     final Optional<PreparedCertificate> preparedCertificate =
         currentRound.createPrepareCertificate();
 
@@ -151,20 +153,23 @@ public class IbftBlockHeightManager {
     handleRoundChangePayload(localRoundChange);
   }
 
+  @Override
   public void handleProposalPayload(final SignedData<ProposalPayload> signedPayload) {
-    LOG.info("Received a Proposal Payload.");
+    LOG.debug("Received a Proposal Payload.");
     actionOrBufferMessage(
         signedPayload, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
+  @Override
   public void handlePreparePayload(final SignedData<PreparePayload> signedPayload) {
-    LOG.info("Received a prepare Payload.");
+    LOG.debug("Received a Prepare Payload.");
     actionOrBufferMessage(
         signedPayload, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
+  @Override
   public void handleCommitPayload(final SignedData<CommitPayload> payload) {
-    LOG.info("Received a commit Payload.");
+    LOG.debug("Received a Commit Payload.");
     actionOrBufferMessage(payload, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
@@ -185,13 +190,14 @@ public class IbftBlockHeightManager {
     }
   }
 
+  @Override
   public void handleRoundChangePayload(final SignedData<RoundChangePayload> signedPayload) {
     final ConsensusRoundIdentifier targetRound = signedPayload.getPayload().getRoundIdentifier();
     LOG.info("Received a RoundChange Payload for {}", targetRound.toString());
 
     final MessageAge messageAge = determineAgeOfPayload(signedPayload.getPayload());
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received RoundChange Payload for a prior round.");
+      LOG.debug("Received RoundChange Payload for a prior round. targetRound={}", targetRound);
       return;
     }
 
@@ -223,15 +229,16 @@ public class IbftBlockHeightManager {
     roundTimer.startTimer(currentRound.getRoundIdentifier());
   }
 
+  @Override
   public void handleNewRoundPayload(final SignedData<NewRoundPayload> signedPayload) {
     final NewRoundPayload payload = signedPayload.getPayload();
     final MessageAge messageAge = determineAgeOfPayload(payload);
 
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received NewRound Payload for a prior round.");
+      LOG.info("Received NewRound Payload for a prior round={}", payload.getRoundIdentifier());
       return;
     }
-    LOG.info("Received NewRound Payload for {}", payload.getRoundIdentifier().toString());
+    LOG.info("Received NewRound Payload for {}", payload.getRoundIdentifier());
 
     if (newRoundMessageValidator.validateNewRoundMessage(signedPayload)) {
       if (messageAge == FUTURE_ROUND) {
@@ -241,10 +248,12 @@ public class IbftBlockHeightManager {
     }
   }
 
+  @Override
   public long getChainHeight() {
     return currentRound.getRoundIdentifier().getSequenceNumber();
   }
 
+  @Override
   public BlockHeader getParentBlockHeader() {
     return parentHeader;
   }
@@ -258,5 +267,11 @@ public class IbftBlockHeightManager {
       return CURRENT_ROUND;
     }
     return PRIOR_ROUND;
+  }
+
+  public enum MessageAge {
+    PRIOR_ROUND,
+    CURRENT_ROUND,
+    FUTURE_ROUND
   }
 }

@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static tech.pegasys.pantheon.cli.EthNetworkConfig.mainnet;
+import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
@@ -55,7 +55,10 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     final PantheonControllerBuilder builder = new PantheonControllerBuilder();
     final EthNetworkConfig ethNetworkConfig =
         node.ethNetworkConfig()
-            .orElse(new EthNetworkConfig.Builder(mainnet()).setNetworkId(NETWORK_ID).build());
+            .orElse(
+                new EthNetworkConfig.Builder(EthNetworkConfig.getNetworkConfig(MAINNET))
+                    .setNetworkId(NETWORK_ID)
+                    .build());
     final PantheonController<?> pantheonController;
     try {
       pantheonController =
@@ -77,7 +80,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         new RunnerBuilder()
             .vertx(Vertx.vertx())
             .pantheonController(pantheonController)
-            .discovery(true)
+            .discovery(node.isDiscoveryEnabled())
             .bootstrapPeers(node.bootnodes())
             .discoveryHost(node.hostName())
             .discoveryPort(node.p2pPort())
@@ -89,6 +92,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .metricsSystem(noOpMetricsSystem)
             .metricsConfiguration(node.metricsConfiguration())
             .permissioningConfiguration(node.getPermissioningConfiguration())
+            .p2pEnabled(node.p2pEnabled())
             .build();
 
     nodeExecutor.submit(runner::execute);
