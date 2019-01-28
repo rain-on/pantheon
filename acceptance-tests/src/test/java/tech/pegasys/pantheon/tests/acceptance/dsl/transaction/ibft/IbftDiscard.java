@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.DiscardResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
@@ -28,9 +28,9 @@ public class IbftDiscard implements Transaction<Boolean> {
   }
 
   @Override
-  public Boolean execute(final PantheonWeb3j node) {
+  public Boolean execute(final JsonRequestFactories node) {
     try {
-      final DiscardResponse result = node.ibftDiscard(address).send();
+      final DiscardResponse result = node.ibft().ibftDiscard(address).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

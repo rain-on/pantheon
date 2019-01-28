@@ -19,14 +19,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcReque
 public class CliqueTransactions {
   public static final String LATEST = "latest";
 
-  public CliqueTransactions(
-      CliqueJsonRpcRequestFactory requestFactory) {
-    this.requestFactory = requestFactory;
-  }
-
-  private CliqueJsonRpcRequestFactory requestFactory;
-
-
   public CliquePropose createRemoveProposal(final PantheonNode node) {
     return propose(node.getAddress().toString(), false);
   }

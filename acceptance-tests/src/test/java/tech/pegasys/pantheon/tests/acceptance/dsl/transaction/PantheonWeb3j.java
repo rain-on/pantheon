@@ -44,39 +44,7 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
   }
 
 
-  public Request<?, ProposeResponse> ibftPropose(final String address, final Boolean auth) {
-    return new Request<>(
-        "ibft_proposeValidatorVote",
-        Arrays.asList(address, auth.toString()),
-        web3jService,
-        ProposeResponse.class);
-  }
 
-  public Request<?, DiscardResponse> ibftDiscard(final String address) {
-    return new Request<>(
-        "ibft_discardValidatorVote", singletonList(address), web3jService, DiscardResponse.class);
-  }
-
-  public Request<?, ProposalsResponse> ibftProposals() {
-    return new Request<>(
-        "ibft_getPendingVotes", emptyList(), web3jService, ProposalsResponse.class);
-  }
-
-  public Request<?, SignersBlockResponse> ibftGetValidators(final String blockNumber) {
-    return new Request<>(
-        "ibft_getValidatorsByBlockNumber",
-        singletonList(blockNumber),
-        web3jService,
-        SignersBlockResponse.class);
-  }
-
-  public Request<?, SignersBlockResponse> ibftGetSignersAtHash(final Hash hash) {
-    return new Request<>(
-        "ibft_getValidatorsByBlockHash",
-        singletonList(hash.toString()),
-        web3jService,
-        SignersBlockResponse.class);
-  }
 
   public static class ProposeResponse extends Response<Boolean> {}
 
@@ -86,28 +54,9 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
 
   public static class ProposalsResponse extends Response<Map<Address, Boolean>> {}
 
-  public Request<?, AddAccountsToWhitelistResponse> addAccountsToWhitelist(
-      final List<String> accounts) {
-    return new Request<>(
-        "perm_addAccountsToWhitelist",
-        Collections.singletonList(accounts),
-        web3jService,
-        AddAccountsToWhitelistResponse.class);
-  }
 
-  public Request<?, RemoveAccountsFromWhitelistResponse> removeAccountsFromWhitelist(
-      final List<String> accounts) {
-    return new Request<>(
-        "perm_removeAccountsFromWhitelist",
-        Collections.singletonList(accounts),
-        web3jService,
-        RemoveAccountsFromWhitelistResponse.class);
-  }
 
-  public Request<?, GetAccountsWhitelistResponse> getAccountsWhitelist() {
-    return new Request<>(
-        "perm_getAccountsWhitelist", null, web3jService, GetAccountsWhitelistResponse.class);
-  }
+
 
   public static class AddAccountsToWhitelistResponse extends Response<Boolean> {}
 
@@ -115,26 +64,7 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
 
   public static class GetAccountsWhitelistResponse extends Response<List<String>> {}
 
-  public Request<?, AddNodeResponse> addNodesToWhitelist(final List<String> enodeList) {
-    return new Request<>(
-        "perm_addNodesToWhitelist",
-        Collections.singletonList(enodeList),
-        web3jService,
-        AddNodeResponse.class);
-  }
 
-  public Request<?, RemoveNodeResponse> removeNodesFromWhitelist(final List<String> enodeList) {
-    return new Request<>(
-        "perm_removeNodesFromWhitelist",
-        Collections.singletonList(enodeList),
-        web3jService,
-        RemoveNodeResponse.class);
-  }
-
-  public Request<?, GetNodesWhitelistResponse> getNodesWhitelist() {
-    return new Request<>(
-        "perm_getNodesWhitelist", Lists.emptyList(), web3jService, GetNodesWhitelistResponse.class);
-  }
 
   public static class AddNodeResponse extends Response<Boolean> {}
 
