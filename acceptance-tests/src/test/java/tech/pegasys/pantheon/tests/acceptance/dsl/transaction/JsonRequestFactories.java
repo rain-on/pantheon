@@ -51,4 +51,8 @@ public class JsonRequestFactories {
   public PermissioningJsonRpcRequestFactory perm() {
     return perm;
   }
+
+  public void shutdown() {
+    netEth.shutdown();
+  }
 }

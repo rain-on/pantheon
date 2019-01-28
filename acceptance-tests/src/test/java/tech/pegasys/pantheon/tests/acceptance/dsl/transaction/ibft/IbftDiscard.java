@@ -14,11 +14,10 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.DiscardResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.DiscardResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class IbftDiscard implements Transaction<Boolean> {
   private final String address;

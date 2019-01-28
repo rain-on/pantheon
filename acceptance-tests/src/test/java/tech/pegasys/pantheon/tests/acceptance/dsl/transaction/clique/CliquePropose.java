@@ -14,11 +14,10 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.ProposeResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class CliquePropose implements Transaction<Boolean> {
   private final String address;

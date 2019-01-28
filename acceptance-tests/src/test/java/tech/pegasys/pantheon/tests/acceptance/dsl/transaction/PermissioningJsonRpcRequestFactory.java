@@ -12,19 +12,17 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.AddAccountsToWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.AddNodeResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.GetAccountsWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.GetNodesWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.RemoveAccountsFromWhitelistResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.RemoveNodeResponse;
-
 import java.util.Collections;
 import java.util.List;
-
 import org.assertj.core.util.Lists;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.AddAccountsToWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.AddNodeResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.GetAccountsWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.GetNodesWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.RemoveAccountsFromWhitelistResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.RemoveNodeResponse;
 
 public class PermissioningJsonRpcRequestFactory {
   private final Web3jService web3jService;

@@ -14,13 +14,12 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j.ProposalsResponse;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.util.Map;
+import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposalsResponse;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 public class CliqueProposals implements Transaction<Map<Address, Boolean>> {
 
