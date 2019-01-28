@@ -35,7 +35,9 @@ public class EthGetTransactionCountTransaction implements Transaction<BigInteger
   public BigInteger execute(final JsonRequestFactories node) {
     try {
       EthGetTransactionCount result =
-          node.eth().ethGetTransactionCount(accountAddress, DefaultBlockParameterName.LATEST).send();
+          node.eth()
+              .ethGetTransactionCount(accountAddress, DefaultBlockParameterName.LATEST)
+              .send();
       assertThat(result).isNotNull();
       return result.getTransactionCount();
     } catch (final IOException e) {

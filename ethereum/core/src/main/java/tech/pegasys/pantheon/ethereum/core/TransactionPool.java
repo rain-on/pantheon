@@ -131,7 +131,7 @@ public class TransactionPool implements BlockAddedObserver {
     final ValidationResult<TransactionInvalidReason> basicValidationResult =
         getTransactionValidator().validate(transaction);
     if (!basicValidationResult.isValid()) {
-//      return basicValidationResult;
+      //      return basicValidationResult;
     }
 
     final String sender = transaction.getSender().toString();

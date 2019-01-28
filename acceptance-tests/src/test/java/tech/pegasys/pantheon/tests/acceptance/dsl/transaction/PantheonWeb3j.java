@@ -12,22 +12,14 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.assertj.core.util.Lists;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.JsonRpc2_0Web3j;
-import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.Response;
 
 public class PantheonWeb3j extends JsonRpc2_0Web3j {
@@ -43,9 +35,6 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
     super(web3jService, pollingInterval, scheduledExecutorService);
   }
 
-
-
-
   public static class ProposeResponse extends Response<Boolean> {}
 
   public static class DiscardResponse extends Response<Boolean> {}
@@ -54,17 +43,11 @@ public class PantheonWeb3j extends JsonRpc2_0Web3j {
 
   public static class ProposalsResponse extends Response<Map<Address, Boolean>> {}
 
-
-
-
-
   public static class AddAccountsToWhitelistResponse extends Response<Boolean> {}
 
   public static class RemoveAccountsFromWhitelistResponse extends Response<Boolean> {}
 
   public static class GetAccountsWhitelistResponse extends Response<List<String>> {}
-
-
 
   public static class AddNodeResponse extends Response<Boolean> {}
 

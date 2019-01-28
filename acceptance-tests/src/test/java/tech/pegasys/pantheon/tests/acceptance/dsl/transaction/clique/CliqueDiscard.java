@@ -14,11 +14,12 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.web3j.protocol.core.Response;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+
+import org.web3j.protocol.core.Response;
 
 public class CliqueDiscard implements Transaction<Boolean> {
   private final String address;

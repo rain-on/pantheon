@@ -14,33 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.io.MoreFiles;
-import com.google.common.io.RecursiveDeleteOption;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.Logger;
-import org.awaitility.Awaitility;
-import org.awaitility.core.ConditionTimeoutException;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.JsonRpc2_0Web3j;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.protocol.websocket.WebSocketClient;
-import org.web3j.protocol.websocket.WebSocketListener;
-import org.web3j.protocol.websocket.WebSocketService;
-import org.web3j.utils.Async;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -56,9 +29,38 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcReque
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PantheonWeb3j;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PermJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.PermissioningJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.Transaction;
 import tech.pegasys.pantheon.tests.acceptance.dsl.waitcondition.WaitCondition;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
+import org.apache.logging.log4j.Logger;
+import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionTimeoutException;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
+import org.web3j.protocol.Web3jService;
+import org.web3j.protocol.core.JsonRpc2_0Web3j;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.protocol.websocket.WebSocketClient;
+import org.web3j.protocol.websocket.WebSocketListener;
+import org.web3j.protocol.websocket.WebSocketService;
+import org.web3j.utils.Async;
 
 public class PantheonNode implements Node, NodeConfiguration, RunnableNode, AutoCloseable {
 
@@ -164,14 +166,17 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
 
   private JsonRequestFactories jsonRequestFactories() {
     if (jsonRequestFactories == null) {
-      final Web3jService web3jService = jsonRpcBaseUrl().map(url -> new HttpService(url)).orElse(
-          new HttpService("http://" + LOCALHOST + ":8545"));
+      final Web3jService web3jService =
+          jsonRpcBaseUrl()
+              .map(url -> new HttpService(url))
+              .orElse(new HttpService("http://" + LOCALHOST + ":8545"));
 
-      jsonRequestFactories = new JsonRequestFactories(
-          new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
-          new CliqueJsonRpcRequestFactory(web3jService),
-          new IbftJsonRpcRequestFactory(web3jService),
-          new PermJsonRpcRequestFactory(web3jService));
+      jsonRequestFactories =
+          new JsonRequestFactories(
+              new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
+              new CliqueJsonRpcRequestFactory(web3jService),
+              new IbftJsonRpcRequestFactory(web3jService),
+              new PermissioningJsonRpcRequestFactory(web3jService));
     }
 
     return jsonRequestFactories;

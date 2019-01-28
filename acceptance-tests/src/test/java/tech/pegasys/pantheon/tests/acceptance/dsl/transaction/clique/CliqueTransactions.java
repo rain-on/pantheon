@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
 
 public class CliqueTransactions {
   public static final String LATEST = "latest";
