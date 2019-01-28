@@ -15,14 +15,16 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.transaction;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import java.util.Arrays;
-import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.core.Request;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.DiscardResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposalsResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.ProposeResponse;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ResponseTypes.SignersBlockResponse;
+
+import java.util.Arrays;
+
+import org.web3j.protocol.Web3jService;
+import org.web3j.protocol.core.Request;
 
 public class CliqueJsonRpcRequestFactory {
 
