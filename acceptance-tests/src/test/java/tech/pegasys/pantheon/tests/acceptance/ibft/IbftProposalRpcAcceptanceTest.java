@@ -35,8 +35,8 @@ public class IbftProposalRpcAcceptanceTest extends AcceptanceTestBase {
     validator2.execute(ibftTransactions.createRemoveProposal(validator3));
 
     validator1.verify(
-        ibft.proposalsEqual().addProposal(validator3).removeProposal(validator2).build());
-    validator2.verify(ibft.proposalsEqual().removeProposal(validator3).build());
+        ibft.pendingVotesEqual().addProposal(validator3).removeProposal(validator2).build());
+    validator2.verify(ibft.pendingVotesEqual().removeProposal(validator3).build());
     validator3.verify(ibft.noProposals());
   }
 }

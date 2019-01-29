@@ -43,6 +43,6 @@ public class IbftDiscardRpcAcceptanceTest extends AcceptanceTestBase {
     cluster.verify(ibft.validatorsEqual(validator1, validator2));
     validator1.verify(ibft.noProposals());
     validator2.verify(
-        ibft.proposalsEqual().removeProposal(validator2).addProposal(validator3).build());
+        ibft.pendingVotesEqual().removeProposal(validator2).addProposal(validator3).build());
   }
 }

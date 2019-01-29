@@ -44,7 +44,6 @@ import org.apache.logging.log4j.Logger;
  * <p>This class is safe for use across multiple threads.
  */
 public class TransactionPool implements BlockAddedObserver {
-
   private static final Logger LOG = getLogger();
   private final PendingTransactions pendingTransactions;
   private final ProtocolSchedule<?> protocolSchedule;

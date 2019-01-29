@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft.IbftTransactions.LATEST;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;

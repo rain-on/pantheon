@@ -57,24 +57,24 @@ public class Ibft {
     return new ExpectProposals(ibft, ImmutableMap.of());
   }
 
-  public ProposalsConfig proposalsEqual() {
-    return new ProposalsConfig(ibft);
+  public PendingVotesConfig pendingVotesEqual() {
+    return new PendingVotesConfig(ibft);
   }
 
-  public static class ProposalsConfig {
+  public static class PendingVotesConfig {
     private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
     private final IbftTransactions ibft;
 
-    public ProposalsConfig(final IbftTransactions ibft) {
+    public PendingVotesConfig(final IbftTransactions ibft) {
       this.ibft = ibft;
     }
 
-    public Ibft.ProposalsConfig addProposal(final PantheonNode node) {
+    public PendingVotesConfig addProposal(final PantheonNode node) {
       proposals.put(node, true);
       return this;
     }
 
-    public Ibft.ProposalsConfig removeProposal(final PantheonNode node) {
+    public PendingVotesConfig removeProposal(final PantheonNode node) {
       proposals.put(node, false);
       return this;
     }
