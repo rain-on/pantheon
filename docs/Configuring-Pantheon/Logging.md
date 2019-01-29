@@ -59,5 +59,5 @@ setting it before starting Pantheon.
     To set the debug logging and start Pantheon connected to the Rinkeby testnet:
 
     ```bash
-    $ LOG4J_CONFIGURATION_FILE=./debug.xml bin/pantheon --multicaster=rinkeby
+    $ LOG4J_CONFIGURATION_FILE=./debug.xml bin/pantheon --network=rinkeby
     ```

@@ -13,7 +13,7 @@ data-path="~/pantheondata"
 logging="INFO"
 node-private-key-file="./path/to/privateKey"
 
-# P2P multicaster
+# P2P network
 p2p-enabled=true
 discovery-enabled=false
 bootnodes=[
@@ -30,10 +30,10 @@ max-trailing-peers=5
 host-whitelist=["all"]
 
 # chain
-multicaster="MAINNET"
+network="MAINNET"
 genesis-file="~/genesis.json"
 sync-mode="fast"
-multicaster-id=303
+network-id=303
 
 # JSON-RPC
 rpc-http-enabled=false

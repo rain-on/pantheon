@@ -1,4 +1,4 @@
-description: Some use cases of creating transactions on a Pantheon multicaster
+description: Some use cases of creating transactions on a Pantheon network
 <!--- END of page meta data -->
 
 # Creating and Sending Transactions
@@ -28,10 +28,10 @@ Example Javascript scripts are provided to create signed raw transaction strings
 !!!attention
     [Node.js](https://nodejs.org/en/download/) must be installed to run these Javascript scripts. 
 
-You can use the example Javascript scripts to create and send raw transactions in the private multicaster created by the
+You can use the example Javascript scripts to create and send raw transactions in the private network created by the 
 [Private Network Quickstart](../Tutorials/Private-Network-Quickstart.md).
 
-You must update the `JSON-RPC endpoint` in the examples to the endpoint for the private multicaster displayed after running
+You must update the `JSON-RPC endpoint` in the examples to the endpoint for the private network displayed after running 
 the `run.sh` script.
 
 To create and display the transaction string, run the Javascript script.
@@ -151,7 +151,7 @@ You can interact with contracts using [eth_call](../Reference/JSON-RPC-API-Metho
 |eth_call  | eth_sendRawTransaction |
 |--------|--------|
 |Read-only | Write
-| Invokes contract function locally | Broadcasts to multicaster
+| Invokes contract function locally | Broadcasts to network
 | Does not change state of blockchain | Updates blockchain (for example, transfers ether between accounts)
 | Does not consume gas | Requires gas
 | Synchronous | Asynchronous  | 

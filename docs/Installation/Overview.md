@@ -15,4 +15,4 @@ You can install Pantheon by:
 ## Disk Space and RAM Requirements
 Your computer should have at least 4 GB RAM. 
 
-Disk space needed varies depending on the multicaster on which you run nodes. A small test multicaster might require 200 MB while a mainnet node might require 1.5TB. If syncing a node on mainnet, allow 1.5 TB to 2 TB for the full blockchain archive.
+Disk space needed varies depending on the network on which you run nodes. A small test network might require 200 MB while a mainnet node might require 1.5TB. If syncing a node on mainnet, allow 1.5 TB to 2 TB for the full blockchain archive.

@@ -18,19 +18,19 @@ Nodes can connect to the Ethereum mainnet, public testnets such as Ropsten, or p
 
 ## Local Block Data
 
-When connecting to a multicaster other than the multicaster previously connected to, you must either delete the local block data
+When connecting to a network other than the network previously connected to, you must either delete the local block data 
 or use the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option to specify a different data directory. 
 
 To delete the local block data, delete the `database` directory in the `pantheon/build/distribution/pantheon-<version>` directory.
 
 ## Genesis Configuration 
 
-Pantheon specifies the genesis configuration, and sets the multicaster ID and bootnodes when connecting
+Pantheon specifies the genesis configuration, and sets the network ID and bootnodes when connecting 
 to [Mainnet](#run-a-node-on-ethereum-mainnet), [Goerli](#run-a-node-on-goerli-testnet), [Rinkeby](#run-a-node-on-rinkeby-testnet), and [Ropsten](#run-a-node-on-ropsten-testnet). 
 
-When [`--multicaster=dev`](../Reference/Pantheon-CLI-Syntax.md#multicaster) is specified, Pantheon uses the
+When [`--network=dev`](../Reference/Pantheon-CLI-Syntax.md#network) is specified, Pantheon uses the 
 development mode genesis configuration associated to a low difficulty.
-The default bootnodes setting for dev multicaster is to have an empty bootnodes list.
+The default bootnodes setting for dev network is to have an empty bootnodes list.
 
 The genesis files defining the genesis configurations are in the [Pantheon source files](https://github.com/PegaSysEng/pantheon/tree/master/config/src/main/resources). 
 
@@ -44,7 +44,7 @@ call [JSON-RPC API methods](../Reference/JSON-RPC-API-Methods.md) to confirm the
 
 !!!example
 
-    * `eth_chainId` returns the chain ID of the multicaster.
+    * `eth_chainId` returns the chain ID of the network. 
     
         ```bash
         $ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' 127.0.0.1:8545
@@ -75,13 +75,13 @@ call [JSON-RPC API methods](../Reference/JSON-RPC-API-Methods.md) to confirm the
 To run a node that mines blocks at a rate suitable for testing purposes: 
 
 ```bash
-pantheon --multicaster=dev --miner-enabled --miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-cors-origins="all" --host-whitelist="all" --rpc-rpc-ws-enabled --rpc-http-enabled --data-path=/tmp/tmpDatdir
+pantheon --network=dev --miner-enabled --miner-coinbase=0xfe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-cors-origins="all" --host-whitelist="all" --rpc-rpc-ws-enabled --rpc-http-enabled --data-path=/tmp/tmpDatdir
 ```
 
 Alternatively, use the following [configuration file](../Configuring-Pantheon/Using-Configuration-File.md) 
 on the command line to start a node with the same options as above: 
 ```toml
-multicaster="dev"
+network="dev"
 miner-enabled=true
 miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
 rpc-cors-origins=["all"]
@@ -96,13 +96,13 @@ data-path="/tmp/tmpdata-path"
 To run a node on Ropsten: 
 
 ```bash
-pantheon --multicaster=ropsten
+pantheon --network=ropsten
 ```
 
 To run a node on Ropsten with the HTTP JSON-RPC service enabled and allow Remix to access the node: 
 
 ```bash
-pantheon  --multicaster=ropsten --rpc-http-enabled --rpc-http-cors-origins "http://remix.ethereum.org"
+pantheon  --network=ropsten --rpc-http-enabled --rpc-http-cors-origins "http://remix.ethereum.org"
 ```
     
 ## Run a Node on Rinkeby Testnet
@@ -110,7 +110,7 @@ pantheon  --multicaster=ropsten --rpc-http-enabled --rpc-http-cors-origins "http
 To run a node on Rinkeby specifying a data directory: 
 
 ```bash
-pantheon --multicaster=rinkeby --data-path=<path>/<rinkebydata-path>
+pantheon --network=rinkeby --data-path=<path>/<rinkebydata-path>
 ```
 Where `<path>` and `<rinkebydata-path>` are the path and directory where the Rinkeby chain data is to be saved.
 
@@ -119,7 +119,7 @@ Where `<path>` and `<rinkebydata-path>` are the path and directory where the Rin
 To run a node on [Goerli](https://github.com/goerli/testnet) specifying a data directory: 
 
 ```bash
-pantheon --multicaster=goerli --data-path=<path>/<goerlidata-path>
+pantheon --network=goerli --data-path=<path>/<goerlidata-path>
 ```
 
 Where `<path>` and `<goerlidata-path>` are the path and directory where the Goerli chain data is to be saved. 
