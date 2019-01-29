@@ -42,11 +42,11 @@ public class UniqueMessageMulticaster implements ValidatorMulticaster {
   }
 
   // Set that starts evicting members when it hits capacity
-  private final Set<Object> seenMessages =
+  private final Set<int> seenMessages =
       Collections.newSetFromMap(
-          new LinkedHashMap<Object, Boolean>() {
+          new LinkedHashMap<int, Boolean>() {
             @Override
-            protected boolean removeEldestEntry(final Map.Entry<Object, Boolean> eldest) {
+            protected boolean removeEldestEntry(final Map.Entry<int, Boolean> eldest) {
               return size() > maxSeenMessages;
             }
           });
@@ -58,7 +58,7 @@ public class UniqueMessageMulticaster implements ValidatorMulticaster {
 
   @Override
   public void send(final MessageData message, final Collection<Address> blackList) {
-    final Object uniqueID = message.hashCode();
+    final int uniqueID = message.hashCode();
     if (seenMessages.contains(uniqueID)) {
       return;
     }
