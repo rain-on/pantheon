@@ -176,6 +176,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             syncConfig,
             protocolSchedule,
             protocolContext,
+            worldStateStorage,
             ethProtocolManager.ethContext(),
             syncState,
             metricsSystem.createLabelledTimer(
