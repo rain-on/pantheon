@@ -108,7 +108,7 @@ public class IbftControllerTest {
     when(ibftFinalState.getValidators()).thenReturn(ImmutableList.of(validator));
     ibftController =
         new IbftController(
-            blockChain, ibftFinalState, blockHeightManagerFactory, ibftGossip, futureMessages);
+            blockChain, ibftFinalState, blockHeightManagerFactory, futureMessages, ibftGossip);
 
     when(chainHeadBlockHeader.getNumber()).thenReturn(1L);
     when(chainHeadBlockHeader.getHash()).thenReturn(Hash.ZERO);
