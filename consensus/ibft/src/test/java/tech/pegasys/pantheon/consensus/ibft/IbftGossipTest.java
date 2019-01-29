@@ -59,7 +59,7 @@ public class IbftGossipTest {
     final MessageData messageData = createMessageData.apply(payload);
     final Message message = new DefaultMessage(peerConnection, messageData);
 
-    ibftGossip.gossipMessage(message);
+    ibftGossip.send(message);
     verify(validatorMulticaster)
         .send(messageData, newArrayList(senderAddress, payload.getSender()));
   }

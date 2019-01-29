@@ -139,7 +139,7 @@ public class IbftController {
         signedPayload.getPayload().getMessageType(),
         signedPayload);
     if (processMessage(signedPayload, message)) {
-      gossiper.gossipMessage(message);
+      gossiper.send(message);
       handleMessage.accept(signedPayload);
     }
   }

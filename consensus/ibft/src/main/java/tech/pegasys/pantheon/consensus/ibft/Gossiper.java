@@ -16,5 +16,5 @@ import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 
 public interface Gossiper {
 
-  void gossipMessage(Message message);
+  void send(Message message);
 }

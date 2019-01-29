@@ -48,7 +48,7 @@ public class IbftGossip implements Gossiper {
    * @param message The raw message to be gossiped
    */
   @Override
-  public void gossipMessage(final Message message) {
+  public void send(final Message message) {
     final MessageData messageData = message.getData();
     final SignedData<?> signedData;
     switch (messageData.getCode()) {
