@@ -34,11 +34,11 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TransmittedMessageTrackerTest {
+public class UniqueMessageMulticasterTest {
 
   private final ValidatorMulticaster multicaster = mock(ValidatorMulticaster.class);
-  private final TransmittedMessageTracker messageTracker =
-      new TransmittedMessageTracker(multicaster, 5);
+  private final UniqueMessageMulticaster messageTracker =
+      new UniqueMessageMulticaster(multicaster, 5);
   private final RawMessage messageSent = new RawMessage(5, BytesValue.wrap(new byte[5]));
 
   @Test

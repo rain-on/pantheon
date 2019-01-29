@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
-import tech.pegasys.pantheon.consensus.ibft.TransmittedMessageTracker;
+import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
@@ -200,8 +200,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
     final ValidatorPeers peers =
         new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
-    final TransmittedMessageTracker transmittedMessageTracker =
-        new TransmittedMessageTracker(peers);
+    final UniqueMessageMulticaster uniqueMessageMulticaster = new UniqueMessageMulticaster(peers);
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
     minedBlockObservers.subscribe(ethProtocolManager);
@@ -214,7 +213,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             nodeKeys,
             Util.publicKeyToAddress(nodeKeys.getPublicKey()),
             proposerSelector,
-            transmittedMessageTracker,
+            uniqueMessageMulticaster,
             new RoundTimer(
                 ibftEventQueue,
                 ibftConfig.getRequestTimeoutSeconds(),

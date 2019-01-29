@@ -22,12 +22,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class TransmittedMessageTracker implements ValidatorMulticaster {
+public class UniqueMessageMulticaster implements ValidatorMulticaster {
 
   private final int maxSeenMessages;
   private final ValidatorMulticaster multicaster;
 
-  TransmittedMessageTracker(final ValidatorMulticaster multicaster, final int maxSeenMessages) {
+  UniqueMessageMulticaster(final ValidatorMulticaster multicaster, final int maxSeenMessages) {
     this.maxSeenMessages = maxSeenMessages;
     this.multicaster = multicaster;
   }
@@ -37,7 +37,7 @@ public class TransmittedMessageTracker implements ValidatorMulticaster {
    *
    * @param multicaster Network connections to the remote validators
    */
-  public TransmittedMessageTracker(final ValidatorMulticaster multicaster) {
+  public UniqueMessageMulticaster(final ValidatorMulticaster multicaster) {
     this(multicaster, 10_000);
   }
 
