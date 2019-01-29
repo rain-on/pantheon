@@ -15,7 +15,7 @@ For mainnet, Rinkeby, Ropsten, and Görli, Pantheon predefines a list of enode U
 
 ### Private Networks
 
-To start a bootnode for a private network:
+To start a bootnode for a private multicaster:
 
 1.  Export the public key to a file:
 
@@ -24,7 +24,7 @@ To start a bootnode for a private network:
         pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath export-pub-key bootnode
         ```
         Where `privateNetworkGenesis.json` and `nodeDataPath` are changed to the relevant values for 
-        your private network. 
+        your private multicaster.
         
         The node public key is exported to the `bootnode` file.
     
@@ -61,5 +61,5 @@ To start a node specifying the bootnode for P2P discovery:
 
 !!! example
     ```bash
-    pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath --p2p-host=127.0.0.1 --p2p-port=30301 --network-id=123 --bootnodes=enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb99bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303
+    pantheon --genesis-file=privateNetworkGenesis.json --data-path=nodeDataPath --p2p-host=127.0.0.1 --p2p-port=30301 --multicaster-id=123 --bootnodes=enode://c35c3ec90a8a51fd5703594c6303382f3ae6b2ecb99bab2c04b3794f2bc3fc2631dabb0c08af795787a6c004d8f532230ae6e9925cbbefb0b28b79295d615f@127.0.0.1:30303
     ``` 

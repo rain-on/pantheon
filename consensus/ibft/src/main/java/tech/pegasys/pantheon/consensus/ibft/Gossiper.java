@@ -12,15 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-
-import java.util.List;
 
 public interface Gossiper {
 
-  boolean gossipMessage(Message message);
-
-  boolean send(MessageData messageData, List<Address> excludeAddressesList);
+  void gossipMessage(Message message);
 }

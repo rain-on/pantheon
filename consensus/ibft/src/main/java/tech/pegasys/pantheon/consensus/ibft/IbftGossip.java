@@ -21,15 +21,10 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.google.common.collect.Lists;
 
@@ -38,31 +33,13 @@ public class IbftGossip implements Gossiper {
 
   private final ValidatorMulticaster multicaster;
 
-  // Size of the seenMessages cache, should end up utilising 65bytes * this number + some meta data
-  private final int maxSeenMessages;
-
-  // Set that starts evicting members when it hits capacity
-  private final Set<Hash> seenMessages =
-      Collections.newSetFromMap(
-          new LinkedHashMap<Hash, Boolean>() {
-            @Override
-            protected boolean removeEldestEntry(final Map.Entry<Hash, Boolean> eldest) {
-              return size() > maxSeenMessages;
-            }
-          });
-
-  IbftGossip(final ValidatorMulticaster multicaster, final int maxSeenMessages) {
-    this.maxSeenMessages = maxSeenMessages;
-    this.multicaster = multicaster;
-  }
-
   /**
    * Constructor that attaches gossip logic to a set of multicaster
    *
    * @param multicaster Network connections to the remote validators
    */
   public IbftGossip(final ValidatorMulticaster multicaster) {
-    this(multicaster, 10_000);
+    this.multicaster = multicaster;
   }
 
   /**
@@ -72,7 +49,7 @@ public class IbftGossip implements Gossiper {
    * @return Whether the message was rebroadcast or has been ignored as a repeat
    */
   @Override
-  public boolean gossipMessage(final Message message) {
+  public void gossipMessage(final Message message) {
     final MessageData messageData = message.getData();
     final SignedData<?> signedData;
     switch (messageData.getCode()) {
@@ -98,17 +75,6 @@ public class IbftGossip implements Gossiper {
     final List<Address> excludeAddressesList =
         Lists.newArrayList(message.getConnection().getPeer().getAddress(), signedData.getSender());
 
-    return send(messageData, excludeAddressesList);
-  }
-
-  @Override
-  public boolean send(final MessageData messageData, final List<Address> excludeAddressesList) {
-    Hash uniqueID = Hash.hash(messageData.getData());
-    if (seenMessages.contains(uniqueID)) {
-      return false;
-    }
     multicaster.send(messageData, excludeAddressesList);
-    seenMessages.add(uniqueID);
-    return true;
   }
 }

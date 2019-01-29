@@ -30,7 +30,7 @@ Properties of the remote node object are:
 * `version` - P2P protocol version
 * `name` - Client name
 * `caps` - List of Ethereum sub-protocol capabilities 
-* `network` - Addresses of local node and remote node
+* `multicaster` - Addresses of local node and remote node
 * `port` - Port on the remote node on which P2P peer discovery is listening
 * `id` - Node public key. Excluding the `0x` prefix, the node public key is the ID in the enode URL `enode://<id ex 0x>@<host>:<port>`. 
 
@@ -59,7 +59,7 @@ Properties of the remote node object are:
              "par/3",
              "pip/1"
           ],
-           "network": {
+           "multicaster": {
               "localAddress": "192.168.1.229:50115",
               "remoteAddress": "168.61.153.255:40303"
            },
@@ -178,7 +178,7 @@ None
 
 ### net_listening
 
-Indicates whether the client is actively listening for network connections.
+Indicates whether the client is actively listening for multicaster connections.
 
 **Parameters**
 
@@ -186,7 +186,7 @@ None
 
 **Returns**
 
-`result` (*BOOLEAN*) - `true` if the client is actively listening for network connections; otherwise `false`.
+`result` (*BOOLEAN*) - `true` if the client is actively listening for multicaster connections; otherwise `false`.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -248,7 +248,7 @@ None
 
 `result` : *Object|Boolean* - Object with synchronization status data or `false`, when not synchronizing:
 
-* `startingBlock` : *quantity* - Index of the highest block on the blockchain when the network synchronization starts.
+* `startingBlock` : *quantity* - Index of the highest block on the blockchain when the multicaster synchronization starts.
 
     If you start with an empty blockchain, the starting block is the beginning of the blockchain (`startingBlock` = 0).
 
@@ -256,7 +256,7 @@ None
 
 * `currentBlock` : *quantity* - Index of the latest block (also known as the best block) for the current node. This is the same index that [eth_blockNumber](#eth_blocknumber) returns.
 
-* `highestBlock`: *quantity* - Index of the highest known block in the peer network (that is, the highest block so far discovered among peer nodes). This is the same value as `currentBlock` if the current node has no peers.
+* `highestBlock`: *quantity* - Index of the highest known block in the peer multicaster (that is, the highest block so far discovered among peer nodes). This is the same value as `currentBlock` if the current node has no peers.
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -347,7 +347,7 @@ None
 
 ### eth_mining
 
-Indicates whether the client is actively mining new blocks. Mining is paused while the client synchronizes with the network regardless of command settings or methods called. 
+Indicates whether the client is actively mining new blocks. Mining is paused while the client synchronizes with the multicaster regardless of command settings or methods called.
 
 **Parameters**
 
@@ -852,7 +852,7 @@ The following example returns an estimate of 21000 wei (0x5208) for the transact
     }
     ```
 
-The following example request estimates the cost of deploying a simple storage smart contract to the network. The data field
+The following example request estimates the cost of deploying a simple storage smart contract to the multicaster. The data field
 contains the hash of the compiled contract to be deployed. (You can obtain the compiled contract hash from your IDE;
 for example, **Remix > Compile tab > details > WEB3DEPLOY**.) The result is 113355 wei.
 

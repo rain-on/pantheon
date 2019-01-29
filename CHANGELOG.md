@@ -70,7 +70,7 @@ When restarting your node with the v0.8.4 Docker image:
 - Documentation updates include:
   * Migrated to new [documentation site](https://docs.pantheon.pegasys.tech/en/latest/)  
   * Added [configuration file content](https://docs.pantheon.pegasys.tech/en/latest/Configuring-Pantheon/Using-Configuration-File/)
-  * Added [tutorial to create private network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Private-Network/)
+  * Added [tutorial to create private multicaster](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Private-Network/)
   * Added content on [enabling non-default APIs](https://docs.pantheon.pegasys.tech/en/latest/Reference/JSON-RPC-API-Methods/)
   
 ## Technical Improvements
@@ -214,10 +214,10 @@ Specify `*` or `all` for `--host-whitelist` to effectively disable host protecti
  - Removed `import-blockchain` command because nothing exports to the required format yet (PR [\#223](https://github.com/PegaSysEng/pantheon/pull/223))
 
 ### Bug Fixes
- - `io.netty.util.internal.OutOfDirectMemoryError` errors by removing reference counting from network messages.
+ - `io.netty.util.internal.OutOfDirectMemoryError` errors by removing reference counting from multicaster messages.
  - Log spam: endless loop in `nioEventLoopGroup` ([#248](https://github.com/PegaSysEng/pantheon/issues/248) thanks to [@5chdn](https://github.com/5chdn) for reporting) (PR [#261](https://github.com/PegaSysEng/pantheon/pull/261))
  - Rinkeby import can stall with too many fragments ([#228](https://github.com/PegaSysEng/pantheon/issues/228) thanks to [@steffenkux](https://github.com/steffenkux) and [@5chdn](https://github.com/5chdn) for reporting) (PR [#255](https://github.com/PegaSysEng/pantheon/pull/255))
- - Clique incorrectly used the chain ID instead of the network ID in ETH status messages (PR [#209](https://github.com/PegaSysEng/pantheon/pull/209))
+ - Clique incorrectly used the chain ID instead of the multicaster ID in ETH status messages (PR [#209](https://github.com/PegaSysEng/pantheon/pull/209))
  - Gradle deprecation warnings (PR [#246](https://github.com/PegaSysEng/pantheon/pull/246) with thanks to [@jvirtanen](https://github.com/jvirtanen))
  - Consensus issue on Ropsten:
     - Treat output length as a maximum length for CALL operations (PR [#236](https://github.com/PegaSysEng/pantheon/pull/236))

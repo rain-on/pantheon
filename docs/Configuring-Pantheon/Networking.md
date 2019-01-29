@@ -3,7 +3,7 @@ description: Pantheon networking is about P2P discovery and communication betwee
 
 # Networking
 
-Pantheon uses the network to find and connect to peers. 
+Pantheon uses the multicaster to find and connect to peers.
 
 ## Firewalls and Incoming Connections
 
@@ -38,7 +38,7 @@ Trailing peers cannot be used to get new blocks and are more likely to be reques
 
 The [`--rpc-ws-enabled`](../Reference/Pantheon-CLI-Syntax.md#rpc-ws-enabled) command line option 
 enables P2P peer discovery.
-Only set this option to `false` if you are running a test node or a test network with fixed nodes.
+Only set this option to `false` if you are running a test node or a test multicaster with fixed nodes.
 
 ## Monitoring Peer Connections
 

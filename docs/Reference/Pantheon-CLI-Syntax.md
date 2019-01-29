@@ -81,7 +81,7 @@ When connecting to MainNet or public testnets, the default is a predefined list 
 
 On custom networks defined by [`--genesis-file`](#genesis-file) option,
 an empty list of bootnodes is defined by default unless you define custom bootnodes as described in 
-[private network documentation](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes).
+[private multicaster documentation](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes).
 
 !!! note
     Specifying that a node is a [bootnode](../Configuring-Pantheon/Testing-Developing-Nodes.md#bootnodes) 
@@ -138,11 +138,11 @@ The default is `true`.
 
 ### genesis-file
 
-Genesis file is used to create a custom network.
+Genesis file is used to create a custom multicaster.
 
 !!!tip
-    To use a public Ethereum network such as Rinkeby, use the [`--network`](#network) option.
-    The network option defines the genesis file for public networks.
+    To use a public Ethereum multicaster such as Rinkeby, use the [`--multicaster`](#multicaster) option.
+    The multicaster option defines the genesis file for public networks.
 
 ```bash tab="Syntax"
 --genesis-file=<FILE>
@@ -159,7 +159,7 @@ genesis-file="/home/me/me_node/customGenesisFile.json"
 The path to the genesis file.
 
 !!!important
-    The [`--genesis-file`](#genesis-file) and [`--network`](#network) option can't be used at the same time.
+    The [`--genesis-file`](#genesis-file) and [`--multicaster`](#multicaster) option can't be used at the same time.
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
@@ -336,64 +336,64 @@ min-gas-price="1337"
 The minimum price that a transaction offers for it to be included in a mined block.
 The default is 1000.
 
-### network
+### multicaster
 
 ```bash tab="Syntax"
---network=<NETWORK>
+--multicaster=<NETWORK>
 ```
 
 ```bash tab="Example Command Line"
---network=rinkeby
+--multicaster=rinkeby
 ```
 
 ```bash tab="Example Configuration File"
-network="rinkeby"
+multicaster="rinkeby"
 ```
 
-Predefined network configuration.
+Predefined multicaster configuration.
 The default is `mainnet`.
 
 Possible values are :
 
 `mainnet`
-:   Main Ethereum network
+:   Main Ethereum multicaster
 
 `ropsten`
-:   PoW test network similar to current main Ethereum network. 
+:   PoW test multicaster similar to current main Ethereum multicaster.
 
 `rinkeby`
-:   PoA test network using Clique.
+:   PoA test multicaster using Clique.
 
 `goerli`
-:   PoA test network using Clique.
+:   PoA test multicaster using Clique.
 
 `dev`
-:   PoW development network with a very low difficulty to enable local CPU mining.
+:   PoW development multicaster with a very low difficulty to enable local CPU mining.
 
 !!!note
     Values are case insensitive, so either `mainnet` or `MAINNET` works.
     
 !!!important
-    The [`--network`](#network) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
+    The [`--multicaster`](#multicaster) and [`--genesis-file`](#genesis-file) option can't be used at the same time.
 
-### network-id
+### multicaster-id
 
 ```bash tab="Syntax"
---network-id=<INTEGER>
+--multicaster-id=<INTEGER>
 ```
 
 ```bash tab="Example Command Line"
---network-id=8675309
+--multicaster-id=8675309
 ```
 
 ```bash tab="Example Configuration File"
-network-id="8675309"
+multicaster-id="8675309"
 ```
 
-P2P network identifier.
+P2P multicaster identifier.
 
-This option can be used to override your current network ID.
-The default value is the current network chain ID which is defined in the genesis file.
+This option can be used to override your current multicaster ID.
+The default value is the current multicaster chain ID which is defined in the genesis file.
 
 ### node-private-key-file
 

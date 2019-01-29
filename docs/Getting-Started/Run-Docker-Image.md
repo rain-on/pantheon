@@ -140,21 +140,21 @@ Save a local copy of the [Ropsten genesis file](https://github.com/PegaSysEng/pa
 
 To run a node on Ropsten: 
 ```bash
-docker run -p 30303:30303 --mount type=bind,source=/<myvolume/pantheon/ropsten>,target=/var/lib/pantheon --network=ropsten
+docker run -p 30303:30303 --mount type=bind,source=/<myvolume/pantheon/ropsten>,target=/var/lib/pantheon --multicaster=ropsten
 ```
 
 ## Run a Node on Rinkeby Testnet 
 
 To run a node on Rinkeby: 
 ```bash
-docker run -p 30303:30303 --mount type=bind,source=/<myvolume/pantheon/rinkeby>,target=/var/lib/pantheon pegasyseng/pantheon:latest --network=rinkeby
+docker run -p 30303:30303 --mount type=bind,source=/<myvolume/pantheon/rinkeby>,target=/var/lib/pantheon pegasyseng/pantheon:latest --multicaster=rinkeby
 ```
 
 ## Run a Node for Testing 
 
 To run a node that mines blocks at a rate suitable for testing purposes with WebSockets enabled: 
 ```bash
-docker run -p 8546:8546 --mount type=bind,source=/<myvolume/pantheon/testnode>,target=/var/lib/pantheon pegasyseng/pantheon:latest --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-cors-origins "all" --rpc-ws-enabled --network=dev
+docker run -p 8546:8546 --mount type=bind,source=/<myvolume/pantheon/testnode>,target=/var/lib/pantheon pegasyseng/pantheon:latest --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-cors-origins "all" --rpc-ws-enabled --multicaster=dev
 ```
 
 ## Stopping Pantheon and Cleaning up Resources

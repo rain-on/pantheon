@@ -1,13 +1,13 @@
 # Creating a Private Network
 
-A private network provides a configurable network for testing. By configuring a low difficulty and enabling 
+A private multicaster provides a configurable multicaster for testing. By configuring a low difficulty and enabling
 mining, blocks are created quickly. 
 
-You can test multi-block and multi-user scenarios on a private network before moving to one of the public testnets. 
+You can test multi-block and multi-user scenarios on a private multicaster before moving to one of the public testnets.
 
 !!!important
-    An Ethereum private network created as described here is isolated but not protected or secure. 
-    We recommend running the private network behind a properly configured firewall.
+    An Ethereum private multicaster created as described here is isolated but not protected or secure.
+    We recommend running the private multicaster behind a properly configured firewall.
 
 ## Prerequisites 
 
@@ -17,20 +17,20 @@ You can test multi-block and multi-user scenarios on a private network before mo
 
 ## Steps
 
-To create a private network: 
+To create a private multicaster:
 
 1. [Create Folders](#1-create-folders)
 1. [Create Genesis File](#2-create-genesis-file)
 1. [Get Public Key of First Node](#3-get-public-key-of-first-node)
 1. [Start First Node as Bootnode](#4-restart-first-node-as-bootnode)
 1. [Start Additional Nodes](#5-start-additional-nodes)
-1. [Confirm Private Network Working](#6-confirm-private-network-working)
+1. [Confirm Private Network Working](#6-confirm-private-multicaster-working)
 
 ### 1. Create Folders 
 
 Each node requires a data directory for the blockchain data. When the node is started, the node key is saved in this directory. 
 
-Create directories for your private network, each of the three nodes, and a data directory for each node: 
+Create directories for your private multicaster, each of the three nodes, and a data directory for each node:
 
 ```bash
 Private-Network/
@@ -48,7 +48,7 @@ The genesis file defines the genesis block of the blockchain (that is, the start
 The genesis file includes entries for configuring the blockchain such as the mining difficulty and initial 
 accounts and balances.    
 
-All nodes in a network must use the same genesis file. 
+All nodes in a multicaster must use the same genesis file.
 
 Copy the following genesis definition to a file called `privateNetworkGenesis.json` and save it in the `Private-Network` directory: 
 
@@ -77,13 +77,13 @@ Copy the following genesis definition to a file called `privateNetworkGenesis.js
 ```
 
 !!! warning
-    Do not use the accounts in the genesis file above on mainnet or any public network except for testing.
+    Do not use the accounts in the genesis file above on mainnet or any public multicaster except for testing.
     The private keys are displayed so the accounts are not secure. 
    
 ### 3. Get Public Key of First Node
 
-To enable nodes to discover each other, a network requires one or more nodes to be bootnodes. 
-For this private network, we will use Node-1 as the bootnode. This requires obtaining the public key for the enode URL. 
+To enable nodes to discover each other, a multicaster requires one or more nodes to be bootnodes.
+For this private multicaster, we will use Node-1 as the bootnode. This requires obtaining the public key for the enode URL.
 
 In the `Node-1` directory, use the [`export-pub-key` subcommand](../Reference/Pantheon-CLI-Syntax.md#export-pub-key) to write 
 the [node public key](../Configuring-Pantheon/Node-Keys.md) to the specified file (`publicKeyNode1` in this example):
@@ -117,11 +117,11 @@ and [`--miner-coinbase` options](../Reference/Pantheon-CLI-Syntax.md#miner-coinb
 * JSON-RPC API is enabled using the [`--rpc-http-enabled` option](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled). 
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-1-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes --network-id 123 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled      
+pantheon --data-path=Node-1-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes --multicaster-id 123 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-1-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes --network-id 123 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled      
+pantheon --data-path=Node-1-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes --multicaster-id 123 --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-http-enabled
 ```
 
 !!! info
@@ -147,28 +147,28 @@ Start another terminal, change to the `Node-2` directory and start Node-2 specif
 * Different port to Node-1 for P2P peer discovery using the [`--p2p-port` option](../Reference/Pantheon-CLI-Syntax.md#p2p-port).
 * Enode URL for Node-1 using the [`--bootnodes` option](../Reference/Pantheon-CLI-Syntax.md#bootnodes).
 * Data directory for Node-2 using the [`--data-path` option](../Reference/Pantheon-CLI-Syntax.md#data-path).
-* Genesis file and network ID as for Node-1.  
+* Genesis file and multicaster ID as for Node-1.
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-2-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30304      
+pantheon --data-path=Node-2-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --multicaster-id 123 --p2p-port=30304
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-2-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30304      
+pantheon --data-path=Node-2-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --multicaster-id 123 --p2p-port=30304
 ```
 
 Start another terminal, change to the `Node-3` directory and start Node-3 specifying: 
  
  * Different port to Node-1 and Node-2 for P2P peer discovery.
  * Data directory for Node-3 using the [`--data-path` option](../Reference/Pantheon-CLI-Syntax.md#data-path).
- * Bootnode, genesis file, and network ID as for Node-2. 
+ * Bootnode, genesis file, and multicaster ID as for Node-2.
 
 ```bash tab="MacOS"
-pantheon --data-path=Node-3-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port30305      
+pantheon --data-path=Node-3-data-path --genesis-file=../privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --multicaster-id 123 --p2p-port30305
 ```
 
 ```bash tab="Windows"
-pantheon --data-path=Node-3-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --network-id 123 --p2p-port=30305      
+pantheon --data-path=Node-3-data-path --genesis-file=..\privateNetworkGenesis.json --bootnodes="enode://<node public key ex 0x>@127.0.0.1:30303" --multicaster-id 123 --p2p-port=30305
 ```
 
 ### 6. Confirm Private Network is Working 
@@ -203,7 +203,7 @@ Start a node with the `--rpc-ws-enabled` option and use the [RPC Pub/Sub API](..
 
 ## Stop Nodes
 
-When finished using the private network, stop all nodes using ++ctrl+c++ in each terminal window. 
+When finished using the private multicaster, stop all nodes using ++ctrl+c++ in each terminal window.
 
 !!!tip
-    To restart the private network in the future, start from [4. Restart First Node as Bootnode](#4-restart-first-node-as-bootnode). 
+    To restart the private multicaster in the future, start from [4. Restart First Node as Bootnode](#4-restart-first-node-as-bootnode).

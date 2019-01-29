@@ -13,7 +13,7 @@ Signers take turns to create the next block. Existing signers propose and vote t
 
 ## Genesis File
 
-To use Clique in a private network, Pantheon requires a Clique genesis file. When connecting to Rinkeby,
+To use Clique in a private multicaster, Pantheon requires a Clique genesis file. When connecting to Rinkeby,
 Pantheon uses the [`rinkeby.json`](https://github.com/PegaSysEng/pantheon/blob/master/config/src/main/resources/rinkeby.json) 
 genesis file in the `/pantheon/config/src/main/resources` directory.
 
@@ -41,8 +41,8 @@ The properties specific to Clique are:
 * `epoch` - Number of blocks after which to reset all votes.
 * `extraData` - Initial signers are specified after the 32 bytes reserved for vanity data. 
 
-To connect to the Rinkeby testnet, start Pantheon with the [`--network=rinkeby`](../Reference/Pantheon-CLI-Syntax.md#network)
-command line option. To start a node on a Clique private network, use the 
+To connect to the Rinkeby testnet, start Pantheon with the [`--multicaster=rinkeby`](../Reference/Pantheon-CLI-Syntax.md#multicaster)
+command line option. To start a node on a Clique private multicaster, use the
 [`--genesis-file`](../Reference/Pantheon-CLI-Syntax.md#genesis-file) option to specify the custom genesis file. 
 
 ## Adding and Removing Signers

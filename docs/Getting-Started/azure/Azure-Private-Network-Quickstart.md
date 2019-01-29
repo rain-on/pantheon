@@ -1,10 +1,10 @@
-description: Pantheon private network quickstart on Azure tutorial
+description: Pantheon private multicaster quickstart on Azure tutorial
 <!--- END of page meta data -->
 
 # Azure Private Network Quickstart tutorial
 
 This tutorial describes how to use the [Pantheon quickstart](https://github.com/PegaSysEng/pantheon-quickstart) 
-to run a private network of Pantheon nodes in a Docker container in a Linux Virtual 
+to run a private multicaster of Pantheon nodes in a Docker container in a Linux Virtual
 machine hosted on Microsoft Azure.
 
 ## Requirements
@@ -51,7 +51,7 @@ Then go up on the top of the page and switch to the **Guest config** step tab.
 
 ### Guest config
 This step aims at installing required software (Docker and Docker-compose) on your virtual machine 
-and retrieve and run the quickstart private network.
+and retrieve and run the quickstart private multicaster.
 
 To do so, click on the link named **Select an extension to install** and a new resource pane will
 appear on the right.
@@ -135,7 +135,7 @@ then click on the **Delete resource group** button.
 Then simply navigate in the Azure portal to your resource group, the one we named **pantheon-quickstart**
 then click on the virtual machine resource and click the **Delete** button.
 
-### I want to keep the VM but remove the nodes network.
+### I want to keep the VM but remove the nodes multicaster.
 Navigate to the VM in your Azure portal (click on **All services** in the left pane, then on 
 **Virtual machines** and click on the one you named **quickstart**) and click the **connect** 
 button that will give you the information to connect with SSH (see [Requirements](#requirements)).
@@ -149,20 +149,20 @@ then run the remove script
 ./remove.sh
 ```
 
-If you want to run the network again, then you can use the following script:
+If you want to run the multicaster again, then you can use the following script:
 ```bash
 ./run.sh -p 80
 ```
 
 Where 80 is the port number to use for Block Explorer and RPC connections.
  
-### I just want to stop the nodes network and be able to resume it.
-Connect to the VM using SSH like for "[I want to keep the VM but remove the nodes network.](#i-want-to-keep-the-vm-but-remove-the-nodes-network)"
+### I just want to stop the nodes multicaster and be able to resume it.
+Connect to the VM using SSH like for "[I want to keep the VM but remove the nodes multicaster.](#i-want-to-keep-the-vm-but-remove-the-nodes-multicaster)"
 but instead of running the remove script, run the stop script.
 ```bash
 ./stop.sh
 ```
-you will be then able to resume the network with
+you will be then able to resume the multicaster with
 ```bash
 ./resume.sh
 ```

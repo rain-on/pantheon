@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
 import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
+import tech.pegasys.pantheon.consensus.ibft.TransmittedMessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
@@ -97,7 +98,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
   private final IbftProtocolManager ibftProtocolManager;
   private final KeyPair keyPair;
   private final TransactionPool transactionPool;
-  private final IbftProcessor ibftProcessor;
   private final Runnable closer;
 
   IbftPantheonController(
@@ -109,7 +109,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
       final Synchronizer synchronizer,
       final KeyPair keyPair,
       final TransactionPool transactionPool,
-      final IbftProcessor ibftProcessor,
       final Runnable closer) {
 
     this.protocolSchedule = protocolSchedule;
@@ -120,7 +119,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
     this.synchronizer = synchronizer;
     this.keyPair = keyPair;
     this.transactionPool = transactionPool;
-    this.ibftProcessor = ibftProcessor;
     this.closer = closer;
   }
 
@@ -202,6 +200,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         new ProposerSelector(blockchain, voteTally, blockInterface, true);
     final ValidatorPeers peers =
         new ValidatorPeers(protocolContext.getConsensusState().getVoteTally());
+    final TransmittedMessageTracker transmittedMessageTracker =
+        new TransmittedMessageTracker(peers);
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
     minedBlockObservers.subscribe(ethProtocolManager);
@@ -214,7 +214,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             nodeKeys,
             Util.publicKeyToAddress(nodeKeys.getPublicKey()),
             proposerSelector,
-            peers,
+            transmittedMessageTracker,
             new RoundTimer(
                 ibftEventQueue,
                 ibftConfig.getRequestTimeoutSeconds(),
@@ -226,8 +226,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 Clock.systemUTC()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
-            Clock.systemUTC(),
-            gossiper);
+            Clock.systemUTC());
 
     final MessageValidatorFactory messageValidatorFactory =
         new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
@@ -279,7 +278,6 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
         synchronizer,
         nodeKeys,
         transactionPool,
-        ibftProcessor,
         closer);
   }
 

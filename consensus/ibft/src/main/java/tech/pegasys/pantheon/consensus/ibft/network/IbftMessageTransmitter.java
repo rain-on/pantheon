@@ -12,10 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.network;
 
-import static java.util.Collections.emptyList;
-
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.Gossiper;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.CommitMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
@@ -39,11 +36,12 @@ import java.util.Optional;
 public class IbftMessageTransmitter {
 
   private final MessageFactory messageFactory;
-  private final Gossiper network;
+  private final ValidatorMulticaster multicaster;
 
-  public IbftMessageTransmitter(final MessageFactory messageFactory, final Gossiper network) {
+  public IbftMessageTransmitter(
+      final MessageFactory messageFactory, final ValidatorMulticaster multicaster) {
     this.messageFactory = messageFactory;
-    this.network = network;
+    this.multicaster = multicaster;
   }
 
   public void multicastProposal(final ConsensusRoundIdentifier roundIdentifier, final Block block) {
@@ -52,7 +50,7 @@ public class IbftMessageTransmitter {
 
     final ProposalMessageData message = ProposalMessageData.create(signedPayload);
 
-    network.send(message, emptyList());
+    multicaster.send(message);
   }
 
   public void multicastPrepare(final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
@@ -61,7 +59,7 @@ public class IbftMessageTransmitter {
 
     final PrepareMessageData message = PrepareMessageData.create(signedPayload);
 
-    network.send(message, emptyList());
+    multicaster.send(message);
   }
 
   public void multicastCommit(
@@ -73,7 +71,7 @@ public class IbftMessageTransmitter {
 
     final CommitMessageData message = CommitMessageData.create(signedPayload);
 
-    network.send(message, emptyList());
+    multicaster.send(message);
   }
 
   public void multicastRoundChange(
@@ -85,7 +83,7 @@ public class IbftMessageTransmitter {
 
     final RoundChangeMessageData message = RoundChangeMessageData.create(signedPayload);
 
-    network.send(message, emptyList());
+    multicaster.send(message);
   }
 
   public void multicastNewRound(
@@ -99,6 +97,6 @@ public class IbftMessageTransmitter {
 
     final NewRoundMessageData message = NewRoundMessageData.create(signedPayload);
 
-    network.send(message, emptyList());
+    multicaster.send(message);
   }
 }

@@ -13,7 +13,7 @@ npm install truffle-privatekey-provider
 ```
 cd acceptance-tests/truffle-pet-shop-tutorial
 ```
-* here you will find truffle.js which has network configurations for 
+* here you will find truffle.js which has multicaster configurations for
   * development (Ganache) and 
   * devwallet (points to localhost:8545)
   * Note you don't need Ganache running unless you want to run the tests against it (see below)
@@ -29,24 +29,24 @@ cd $pantheon-working-dir
 ```
 * Run Truffle migrate
 ```
-truffle migrate --network devwallet
+truffle migrate --multicaster devwallet
 ```
 * Output should look something like:
 ```
-Using network 'devwallet'.
+Using multicaster 'devwallet'.
 
 Running migration: 1_initial_migration.js
   Deploying Migrations...
   ... 0x2c16dd43c0adfe0c697279e388f531581c2b722e7f0e968e3e65e4345bdeb502
   Migrations: 0xfb88de099e13c3ed21f80a7a1e49f8caecf10df6
-Saving successful migration to network...
+Saving successful migration to multicaster...
   ... 0x1135ea1dd6947f262d65dde8712d17b4b0ec0a36cc917772ce8acd7fe01ca8e2
 Saving artifacts...
 Running migration: 2_deploy_contracts.js
   Deploying Adoption...
   ... 0xa3d220639719b8e007a7aa8cb18e8caf3587337b77bac833959f4853b1695369
   Adoption: 0xf204a4ef082f5c04bb89f7d5e6568b796096735a
-Saving successful migration to network...
+Saving successful migration to multicaster...
   ... 0xd7245d7b1c0a7eb5a5198754f7edd7abdae3b806605b54ecc4716f9b4b05de61
 Saving artifacts...
 
@@ -55,11 +55,11 @@ If migrate works, try running the tests
 
 ```
 cd acceptance-tests/truffle-pet-shop-tutorial
-truffle test --network devwallet
+truffle test --multicaster devwallet
 ```
 * Output should look something like:
 ```
-Using network 'devwallet'.
+Using multicaster 'devwallet'.
 
 Compiling ./contracts/Adoption.sol...
 Compiling ./test/TestAdoption.sol...

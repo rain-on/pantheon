@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.support;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.mockito.Mockito.mock;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
@@ -156,8 +157,7 @@ public class TestContextBuilder {
     // Use a stubbed version of the multicaster, to prevent creating PeerConnections etc.
     final StubValidatorMulticaster multicaster = new StubValidatorMulticaster();
 
-    final Gossiper gossiper =
-        useGossip ? new IbftGossip(multicaster) : new StubbedGossiper(multicaster);
+    final Gossiper gossiper = useGossip ? new IbftGossip(multicaster) : mock(Gossiper.class);
 
     final ControllerAndState controllerAndState =
         createControllerAndFinalState(
@@ -283,8 +283,7 @@ public class TestContextBuilder {
                 Clock.systemUTC()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
-            clock,
-            gossiper);
+            clock);
 
     final MessageValidatorFactory messageValidatorFactory =
         new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);

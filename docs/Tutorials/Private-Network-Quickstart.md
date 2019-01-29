@@ -1,4 +1,4 @@
-description: Pantheon private network quickstart tutorial
+description: Pantheon private multicaster quickstart tutorial
 <!--- END of page meta data -->
 
 # Private Network Quickstart tutorial
@@ -7,7 +7,7 @@ description: Pantheon private network quickstart tutorial
     In v0.9, the Private Network Quickstart moved to the `pantheon-quickstart` repository. The previous version was removed from
     the `pantheon` repository.
 
-The Private Network Quickstart uses the Pantheon Docker image to run a private network of Pantheon nodes managed by Docker Compose.
+The Private Network Quickstart uses the Pantheon Docker image to run a private multicaster of Pantheon nodes managed by Docker Compose.
 
 ## Prerequisites
 
@@ -45,14 +45,14 @@ git clone --branch 0.8.5 https://github.com/PegaSysEng/pantheon-quickstart.git
 ## Build Docker Images and Start Services and Network
  
 This tutorial uses [Docker Compose](https://docs.docker.com/compose/) to assemble the images and 
-run the private network. To build the docker images and run the containers, go to the `pantheon-quickstart` directory and run:
+run the private multicaster. To build the docker images and run the containers, go to the `pantheon-quickstart` directory and run:
 
 ```bash tab="Linux/MacOS"
 ./run.sh
 ```
 
 The `run.sh` script builds the images, and runs the containers. It also scales the regular node 
-container to four containers to simulate a network with enough peers to synchronize.
+container to four containers to simulate a multicaster with enough peers to synchronize.
 
 When the process ends, it lists the running services:
 
@@ -99,10 +99,10 @@ This tutorial uses the [Alethio](https://aleth.io/) light block explorer.
 
 ### Run the Block Explorer
 
-Access the explorer by copying and pasting the `Web block explorer address` displayed when starting the private network
+Access the explorer by copying and pasting the `Web block explorer address` displayed when starting the private multicaster
 to your browser.
 
-The block explorer displays a summary of the private network:
+The block explorer displays a summary of the private multicaster:
 
 ![Block Explorer](../Getting-Started/ExplorerSummary.png)
 
@@ -126,7 +126,7 @@ You can run RPC requests on `rpcnode`, the node exposed to the host in order to 
 
 For the RPC URL, this tutorial uses the placeholder `http://localhost:<http-rpc-port>`. When you run the tutorial, 
 replace this placeholder with the JSON-RPC HTTP service endpoint provided when you list the endpoints. (For example,
-`http://localhost:32770/jsonrpc`.) The dynamic docker port mapping changes each time you run the network.
+`http://localhost:32770/jsonrpc`.) The dynamic docker port mapping changes each time you run the multicaster.
 
 
 ### Requesting the Node Version
@@ -227,7 +227,7 @@ to the RPC node using HTTP JSON-RPC, and displaying information on a web page.
 Now let's use [MetaMask](https://metamask.io/) to send transactions.
 
 Before sending transactions, you need to create an account or use one of the accounts below created during the genesis
-of this private test network.
+of this private test multicaster.
 
 {!global/test_accounts.md!}
 
@@ -235,19 +235,19 @@ of this private test network.
     Pantheon doesn't implement [account management](../Using-Pantheon/Account-Management.md). To create your own account, 
     you have to use a third-party tool such as MetaMask.
 
-After you sign in to MetaMask, connect to the private network RPC endpoint:
+After you sign in to MetaMask, connect to the private multicaster RPC endpoint:
 
-1. In the MetaMask network list, select **Custom RPC**.
-1. In the **New RPC URL** field, enter the JSON-RPC HTTP service endpoint displayed when you started the private network.
+1. In the MetaMask multicaster list, select **Custom RPC**.
+1. In the **New RPC URL** field, enter the JSON-RPC HTTP service endpoint displayed when you started the private multicaster.
 
-Save the configuration and return to the MetaMask main screen. Your current network is now set to the private network RPC node.
+Save the configuration and return to the MetaMask main screen. Your current multicaster is now set to the private multicaster RPC node.
 
 [Import one of the existing accounts above into MetaMask](https://metamask.zendesk.com/hc/en-us/articles/360015489331-Importing-an-Account-New-UI-)
 using the corresponding private key.
 
 !!!note
-    In this tutorial, we don't need to secure the keys, because we're using a private test network to send valueless 
-    Ether. However, be sure to secure your accounts in a real use case on the main Ethereum network (MainNet).
+    In this tutorial, we don't need to secure the keys, because we're using a private test multicaster to send valueless
+    Ether. However, be sure to secure your accounts in a real use case on the main Ethereum multicaster (MainNet).
 
 Once this is done, [create another account from scratch](https://metamask.zendesk.com/hc/en-us/articles/360015289452-Creating-Additional-MetaMask-Wallets-New-UI-)
 to send Ether to.
@@ -267,7 +267,7 @@ completed using MetaMask.
 
 ## Truffle Pet Shop Tutorial
 
-With a few modifications, we can use the private network in this tutorial as the blockchain for the 
+With a few modifications, we can use the private multicaster in this tutorial as the blockchain for the
 [PetShop tutorial on Truffle website](https://truffleframework.com/tutorials/pet-shop).
 
 #### Prerequisites
@@ -322,7 +322,7 @@ module.exports = {
     development: {
       host: "127.0.0.1",
       port: 7545,
-      network_id: "*" // Match any network id
+      network_id: "*" // Match any multicaster id
     },
     quickstartWallet: {
       provider: privateKeyProvider,
@@ -339,32 +339,32 @@ The private key is the miner address, which contains Ether.
 Once this is done, follow the [Truffle tutorial steps](https://truffleframework.com/tutorials/pet-shop#directory-structure)
 up to Step 3 in the [Migration section](https://truffleframework.com/tutorials/pet-shop#migration).
 
-We're using the private network instead of [Ganache](https://truffleframework.com/ganache), so skip steps 3, 4, and 5 in
+We're using the private multicaster instead of [Ganache](https://truffleframework.com/ganache), so skip steps 3, 4, and 5 in
 the [Migration section](https://truffleframework.com/tutorials/pet-shop#migration). 
 
-In step 4, specify the private network: 
+In step 4, specify the private multicaster:
 
 ```bash
-truffle migrate --network quickstartWallet
+truffle migrate --multicaster quickstartWallet
 ```
 
 Output similar to the following is displayed (your addresses will differ):
 
 ```log
-Using network 'quickstartWallet'.
+Using multicaster 'quickstartWallet'.
 
 Running migration: 1_initial_migration.js
   Deploying Migrations...
   ... 0xfc1dbc1eaa14fa283c2c4415364579da0d195b3f2f2fefd7e0edb600a6235bdb
   Migrations: 0x9a3dbca554e9f6b9257aaa24010da8377c57c17e
-Saving successful migration to network...
+Saving successful migration to multicaster...
   ... 0x77cc6e9966b886fb74268f118b3ff44cf973d32b616ed4f050b3eabf0a31a30e
 Saving artifacts...
 Running migration: 2_deploy_contracts.js
   Deploying Adoption...
   ... 0x5035fe3ea7dab1d81482acc1259450b8bf8fefecfbe1749212aca86dc765660a
   Adoption: 0x2e1f232a9439c3d459fceca0beef13acc8259dd8
-Saving successful migration to network...
+Saving successful migration to multicaster...
   ... 0xa7b5a36e0ebc9c25445ce29ff1339a19082d0dda516e5b72c06ee6b99a901ec0
 Saving artifacts...
 ```
@@ -374,15 +374,15 @@ Search for the deployed contracts and transactions in the block explorer using t
 Continue with the Truffle tutorial steps in the [Testing the smart contract](https://truffleframework.com/tutorials/pet-shop#testing-the-smart-contract) section.
 
 To run the tests in the [Running the tests](https://truffleframework.com/tutorials/pet-shop#running-the-tests) section,
-specify the private network: 
+specify the private multicaster:
 
 ```bash
-truffle test --network quickstartWallet
+truffle test --multicaster quickstartWallet
 ```
 
 Output similar to the following is displayed: 
 ```log
-Using network 'quickstartWallet'.
+Using multicaster 'quickstartWallet'.
 
 Compiling ./contracts/Adoption.sol...
 Compiling ./test/TestAdoption.sol...
@@ -401,7 +401,7 @@ Compiling truffle/DeployedAddresses.sol...
 
 Continue with the Truffle tutorial steps in the [Creating a user interface to interact with the smart contract](https://truffleframework.com/tutorials/pet-shop#creating-a-user-interface-to-interact-with-the-smart-contract) section.
 
-We've already connected the private network to MetaMask, so you can skip the [Installing and configuring MetaMask](https://truffleframework.com/tutorials/pet-shop#installing-and-configuring-metamask) section.
+We've already connected the private multicaster to MetaMask, so you can skip the [Installing and configuring MetaMask](https://truffleframework.com/tutorials/pet-shop#installing-and-configuring-metamask) section.
 
 Continue with the regular tutorial steps from the [Installing and configuring lite-server](https://truffleframework.com/tutorials/pet-shop#installing-and-configuring-lite-server)
 section and finish the tutorial.
@@ -411,7 +411,7 @@ When you adopt pets in the browser and approve the transaction in MetaMask, you'
 
 ## Stop / Restart Private Network without Removing Containers 
 
-To shut down the private network without deleting the containers:
+To shut down the private multicaster without deleting the containers:
 
 ```bash tab="Linux/MacOS"
 ./stop.sh
@@ -419,7 +419,7 @@ To shut down the private network without deleting the containers:
 
 This command stops the containers related to the services specified in the `docker-compose.yml` file.
 
-To restart the private network:
+To restart the private multicaster:
 
 ```bash tab="Linux/MacOS"
 ./start.sh
@@ -427,7 +427,7 @@ To restart the private network:
 
 ## Stop Private Network and Remove Containers
 
-To shut down the private network and delete all containers and images created during the quickstart:
+To shut down the private multicaster and delete all containers and images created during the quickstart:
 
 ```bash tab="Linux/MacOS"
 ./remove.sh

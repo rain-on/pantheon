@@ -10,7 +10,7 @@ Our key three areas for now are:
 * iBFT 2.0
 
 ### Permissioning
-We are implementing the key elements of an Enterprise Ethereum Permissioned network.  The initial version of this will be based around a JSON RPC API to manage the network. This will form the foundation for a smart contract based solution which will be developed in the `next` release (1.1)
+We are implementing the key elements of an Enterprise Ethereum Permissioned multicaster.  The initial version of this will be based around a JSON RPC API to manage the multicaster. This will form the foundation for a smart contract based solution which will be developed in the `next` release (1.1)
 
 ### First Class Client
 There is an ongoing piece of work underway enhancing the core performance of Pantheon, and ensuring that it behaves well as a first class client. The key elements of this are implementation of some performance benchmarks, finalising the options for the command line, and implementing an appropriate fast sync mechanism.
@@ -26,7 +26,7 @@ The key areas for next are:
 * iBFT 2.x
 
 ### Smart Contract based Permissioning
-Building on the Permissioning system  implemented in version 1.0 of Pantheon, we will use a smart contract to share this information across the network, giving a consistent set of permissions, and ensuring that all nodes in the network work consistently.
+Building on the Permissioning system  implemented in version 1.0 of Pantheon, we will use a smart contract to share this information across the multicaster, giving a consistent set of permissions, and ensuring that all nodes in the multicaster work consistently.
 
 ### Privacy
 The Enterprise Ethereum `restricted` privacy will be implemented.
