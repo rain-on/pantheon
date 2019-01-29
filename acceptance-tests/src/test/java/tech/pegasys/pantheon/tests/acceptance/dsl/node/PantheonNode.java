@@ -180,7 +180,7 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
               new CliqueJsonRpcRequestFactory(web3jService),
               new IbftJsonRpcRequestFactory(web3jService),
-              new PermissioningJsonRpcRequestFactory(web3jService));
+              new PermissioningJsonRpcRequestFactory(web3jService), admin);
     }
 
     return jsonRequestFactories;

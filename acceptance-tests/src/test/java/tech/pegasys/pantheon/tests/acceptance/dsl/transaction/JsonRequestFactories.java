@@ -20,16 +20,19 @@ public class JsonRequestFactories {
   private final CliqueJsonRpcRequestFactory clique;
   private final IbftJsonRpcRequestFactory ibft;
   private final PermissioningJsonRpcRequestFactory perm;
+  private final AdminJsonRpcRequestFactory admin;
 
   public JsonRequestFactories(
       final JsonRpc2_0Web3j netEth,
       final CliqueJsonRpcRequestFactory clique,
       final IbftJsonRpcRequestFactory ibft,
-      final PermissioningJsonRpcRequestFactory perm) {
+      final PermissioningJsonRpcRequestFactory perm,
+      final AdminJsonRpcRequestFactory admin) {
     this.netEth = netEth;
     this.clique = clique;
     this.ibft = ibft;
     this.perm = perm;
+    this.admin = admin;
   }
 
   public JsonRpc2_0Web3j eth() {
@@ -50,6 +53,10 @@ public class JsonRequestFactories {
 
   public PermissioningJsonRpcRequestFactory perm() {
     return perm;
+  }
+
+  public AdminJsonRpcRequestFactory admin() {
+    return admin;
   }
 
   public void shutdown() {
