@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.AdminJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.CliqueJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.IbftJsonRpcRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.JsonRequestFactories;
@@ -180,7 +181,8 @@ public class PantheonNode implements Node, NodeConfiguration, RunnableNode, Auto
               new JsonRpc2_0Web3j(web3jService, 2000, Async.defaultExecutorService()),
               new CliqueJsonRpcRequestFactory(web3jService),
               new IbftJsonRpcRequestFactory(web3jService),
-              new PermissioningJsonRpcRequestFactory(web3jService), admin);
+              new PermissioningJsonRpcRequestFactory(web3jService),
+              new AdminJsonRpcRequestFactory(web3jService));
     }
 
     return jsonRequestFactories;
