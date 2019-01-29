@@ -46,7 +46,6 @@ public class IbftGossip implements Gossiper {
    * Retransmit a given IBFT message to other known validators nodes
    *
    * @param message The raw message to be gossiped
-   * @return Whether the message was rebroadcast or has been ignored as a repeat
    */
   @Override
   public void gossipMessage(final Message message) {
