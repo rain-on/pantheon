@@ -124,7 +124,7 @@ public class IbftRound {
 
   private ProposalMessage createProposalFromPreparedCertificate(
       final PreparedCertificate preparedCertificate) {
-    final Block block = preparedCertificate.getProposalPayload().getPayload().getBlock();
+    final Block block = preparedCertificate.getProposalPayload().getBlock();
 
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
     final IbftExtraData extraDataToPublish =
