@@ -57,11 +57,13 @@ public class RoundChangeCertificateTest {
         TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
     final ProposalPayload proposalPayload = new ProposalPayload(ROUND_IDENTIFIER, block);
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
-    final ProposalMessage signedProposal = new ProposalMessage(SignedData.from(proposalPayload, signature));
+    final ProposalMessage signedProposal =
+        new ProposalMessage(SignedData.from(proposalPayload, signature));
 
     final PreparePayload preparePayload =
         new PreparePayload(ROUND_IDENTIFIER, Hash.fromHexStringLenient("0x8523ba6e7c5f59ae87"));
-    final PrepareMessage signedPrepare = new PrepareMessage(SignedData.from(preparePayload, signature));
+    final PrepareMessage signedPrepare =
+        new PrepareMessage(SignedData.from(preparePayload, signature));
 
     final PreparedCertificate preparedCert =
         new PreparedCertificate(signedProposal, Lists.newArrayList(signedPrepare));

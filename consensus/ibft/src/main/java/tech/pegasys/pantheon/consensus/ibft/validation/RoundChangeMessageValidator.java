@@ -12,15 +12,17 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import java.util.Collection;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.ethereum.core.Address;
+
+import java.util.Collection;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RoundChangeMessageValidator {
 
@@ -71,8 +73,7 @@ public class RoundChangeMessageValidator {
       final PreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
     final ProposalMessage proposalMessage = certificate.getProposalPayload();
 
-    final ConsensusRoundIdentifier proposalRoundIdentifier =
-        proposalMessage.getConsensusRound();
+    final ConsensusRoundIdentifier proposalRoundIdentifier = proposalMessage.getConsensusRound();
 
     if (!validatePreparedCertificateRound(proposalRoundIdentifier, roundChangeTarget)) {
       return false;

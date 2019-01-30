@@ -76,19 +76,15 @@ public class ValidatorPeer {
     return nodeKeys;
   }
 
-  public ProposalMessage injectProposal(
-      final ConsensusRoundIdentifier rId, final Block block) {
-    final ProposalMessage payload =
-        messageFactory.createSignedProposalPayload(rId, block);
+  public ProposalMessage injectProposal(final ConsensusRoundIdentifier rId, final Block block) {
+    final ProposalMessage payload = messageFactory.createSignedProposalPayload(rId, block);
 
     injectMessage(ProposalMessageData.create(payload));
     return payload;
   }
 
-  public PrepareMessage injectPrepare(
-      final ConsensusRoundIdentifier rId, final Hash digest) {
-    final PrepareMessage payload =
-        messageFactory.createSignedPreparePayload(rId, digest);
+  public PrepareMessage injectPrepare(final ConsensusRoundIdentifier rId, final Hash digest) {
+    final PrepareMessage payload = messageFactory.createSignedPreparePayload(rId, digest);
     injectMessage(PrepareMessageData.create(payload));
     return payload;
   }
@@ -97,8 +93,7 @@ public class ValidatorPeer {
     return SECP256K1.sign(digest, nodeKeys);
   }
 
-  public CommitMessage injectCommit(
-      final ConsensusRoundIdentifier rId, final Hash digest) {
+  public CommitMessage injectCommit(final ConsensusRoundIdentifier rId, final Hash digest) {
     final Signature commitSeal = SECP256K1.sign(digest, nodeKeys);
 
     return injectCommit(rId, digest, commitSeal);
@@ -106,8 +101,7 @@ public class ValidatorPeer {
 
   public CommitMessage injectCommit(
       final ConsensusRoundIdentifier rId, final Hash digest, final Signature commitSeal) {
-    final CommitMessage payload =
-        messageFactory.createSignedCommitPayload(rId, digest, commitSeal);
+    final CommitMessage payload = messageFactory.createSignedCommitPayload(rId, digest, commitSeal);
     injectMessage(CommitMessageData.create(payload));
     return payload;
   }

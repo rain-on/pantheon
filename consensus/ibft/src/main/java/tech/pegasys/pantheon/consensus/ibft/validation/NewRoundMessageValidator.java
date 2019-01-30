@@ -19,14 +19,10 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -119,8 +115,7 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    for (final RoundChangeMessage roundChangeMsg :
-        roundChangeCert.getRoundChangePayloads()) {
+    for (final RoundChangeMessage roundChangeMsg : roundChangeCert.getRoundChangePayloads()) {
       final RoundChangeMessageValidator roundChangeValidator =
           new RoundChangeMessageValidator(
               messageValidatorFactory,
@@ -140,8 +135,7 @@ public class NewRoundMessageValidator {
       final NewRoundMessage msg) {
 
     final RoundChangeCertificate roundChangeCert = msg.getRoundChangeCertificate();
-    final Collection<RoundChangeMessage> roundChangeMsgs =
-        roundChangeCert.getRoundChangePayloads();
+    final Collection<RoundChangeMessage> roundChangeMsgs = roundChangeCert.getRoundChangePayloads();
 
     final Optional<PreparedCertificate> latestPreparedCertificate =
         findLatestPreparedCertificate(roundChangeMsgs);
@@ -155,11 +149,7 @@ public class NewRoundMessageValidator {
     // Get the hash of the block in latest prepareCert, not including the Round field.
     final Hash roundAgnosticBlockHashPreparedCert =
         IbftBlockHashing.calculateHashOfIbftBlockOnChain(
-            latestPreparedCertificate
-                .get()
-                .getProposalPayload()
-                .getBlock()
-                .getHeader());
+            latestPreparedCertificate.get().getProposalPayload().getBlock().getHeader());
 
     final Hash roundAgnosticBlockHashProposal =
         IbftBlockHashing.calculateHashOfIbftBlockOnChain(

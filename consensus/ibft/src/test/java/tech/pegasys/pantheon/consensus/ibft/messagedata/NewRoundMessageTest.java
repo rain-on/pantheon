@@ -38,7 +38,8 @@ public class NewRoundMessageTest {
   @Test
   public void createMessageFromNewRoundChangeMessageData() {
     when(newRoundPayload.encode()).thenReturn(messageBytes);
-    NewRoundMessageData prepareMessage = NewRoundMessageData.create(new NewRoundMessage(newRoundPayload));
+    NewRoundMessageData prepareMessage =
+        NewRoundMessageData.create(new NewRoundMessage(newRoundPayload));
 
     assertThat(prepareMessage.getData()).isEqualTo(messageBytes);
     assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.NEW_ROUND);

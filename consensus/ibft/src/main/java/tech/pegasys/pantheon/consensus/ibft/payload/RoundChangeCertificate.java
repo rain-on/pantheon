@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
@@ -21,14 +20,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 
 public class RoundChangeCertificate {
   private final Collection<RoundChangeMessage> roundChangePayloads;
 
-  public RoundChangeCertificate(
-      final Collection<RoundChangeMessage> roundChangePayloads) {
+  public RoundChangeCertificate(final Collection<RoundChangeMessage> roundChangePayloads) {
     this.roundChangePayloads = roundChangePayloads;
   }
 
@@ -44,8 +43,9 @@ public class RoundChangeCertificate {
 
   public void writeTo(final RLPOutput rlpOutput) {
     rlpOutput.startList();
-    rlpOutput.writeList(roundChangePayloads.stream().map(payload -> payload.getRaw()).collect(
-        Collectors.toList()), SignedData::writeTo);
+    rlpOutput.writeList(
+        roundChangePayloads.stream().map(payload -> payload.getRaw()).collect(Collectors.toList()),
+        SignedData::writeTo);
     rlpOutput.endList();
   }
 

@@ -26,9 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -104,8 +102,7 @@ public class NewRoundMessageValidatorTest {
         messageCreator.createSignedProposalPayload(roundIdentifier, proposedBlock));
   }
 
-  private NewRoundMessage signPayload(
-      final NewRoundPayload payload, final KeyPair signingKey) {
+  private NewRoundMessage signPayload(final NewRoundPayload payload, final KeyPair signingKey) {
 
     final MessageFactory messageCreator = new MessageFactory(signingKey);
 

@@ -22,17 +22,12 @@ import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -98,7 +93,7 @@ public class IbftRound {
     transmitter.multicastProposal(roundState.getRoundIdentifier(), block);
 
     updateStateWithProposedBlock(
-            messageFactory.createSignedProposalPayload(roundState.getRoundIdentifier(), block));
+        messageFactory.createSignedProposalPayload(roundState.getRoundIdentifier(), block));
   }
 
   public void startRoundWith(
@@ -176,7 +171,8 @@ public class IbftRound {
     if (updateStateWithProposedBlock(msg)) {
       LOG.info("Sending prepare message.");
       transmitter.multicastPrepare(getRoundIdentifier(), block.getHash());
-      final PrepareMessage localPrepareMessage = messageFactory.createSignedPreparePayload(
+      final PrepareMessage localPrepareMessage =
+          messageFactory.createSignedPreparePayload(
               roundState.getRoundIdentifier(), block.getHash());
       peerIsPrepared(localPrepareMessage);
     }

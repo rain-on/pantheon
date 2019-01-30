@@ -15,10 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 
-import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
@@ -35,6 +31,11 @@ import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator.BlockOptions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class TestHelpers {
 
@@ -92,8 +93,7 @@ public class TestHelpers {
         Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0));
   }
 
-  public static RoundChangeMessage createSignedRoundChangePayload(
-      final KeyPair signerKeys) {
+  public static RoundChangeMessage createSignedRoundChangePayload(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);

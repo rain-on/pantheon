@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
@@ -91,10 +90,9 @@ public class RoundChangeManager {
    *
    * @param msg The signed round change message to add
    * @return Empty if the round change threshold hasn't been hit, otherwise a round change
-   * certificate
+   *     certificate
    */
-  public Optional<RoundChangeCertificate> appendRoundChangeMessage(
-      final RoundChangeMessage msg) {
+  public Optional<RoundChangeCertificate> appendRoundChangeMessage(final RoundChangeMessage msg) {
 
     if (!isMessageValid(msg)) {
       LOG.info("RoundChange message was invalid.");

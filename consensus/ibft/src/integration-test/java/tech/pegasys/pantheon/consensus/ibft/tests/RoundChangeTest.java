@@ -115,8 +115,7 @@ public class RoundChangeTest {
     final PrepareMessage localPrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(roundId, blockToPropose.getHash());
 
-    final ProposalMessage proposal =
-        peers.getProposer().injectProposal(roundId, blockToPropose);
+    final ProposalMessage proposal = peers.getProposer().injectProposal(roundId, blockToPropose);
     peers.clearReceivedMessages();
 
     final PrepareMessage p1 =
@@ -145,14 +144,10 @@ public class RoundChangeTest {
     final Block locallyProposedBlock =
         context.createBlockForProposalFromChainHead(targetRound.getRoundNumber(), blockTimeStamp);
 
-    final RoundChangeMessage rc1 =
-        peers.getNonProposing(0).injectRoundChange(targetRound, empty());
-    final RoundChangeMessage rc2 =
-        peers.getNonProposing(1).injectRoundChange(targetRound, empty());
-    final RoundChangeMessage rc3 =
-        peers.getNonProposing(2).injectRoundChange(targetRound, empty());
-    final RoundChangeMessage rc4 =
-        peers.getProposer().injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc1 = peers.getNonProposing(0).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc2 = peers.getNonProposing(1).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc3 = peers.getNonProposing(2).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc4 = peers.getProposer().injectRoundChange(targetRound, empty());
 
     final NewRoundMessage expectedNewRound =
         localNodeMessageFactory.createSignedNewRoundPayload(
@@ -181,8 +176,7 @@ public class RoundChangeTest {
 
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
 
-    final RoundChangeMessage rc1 =
-        peers.getNonProposing(0).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc1 = peers.getNonProposing(0).injectRoundChange(targetRound, empty());
 
     // Create a roundChange with a PreparedCertificate from an earlier Round (should not be used
     final RoundChangeMessage rc2 =
@@ -311,12 +305,9 @@ public class RoundChangeTest {
   public void illegallyConstructedRoundChangeMessageIsDiscarded() {
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
 
-    final RoundChangeMessage rc1 =
-        peers.getNonProposing(0).injectRoundChange(targetRound, empty());
-    final RoundChangeMessage rc2 =
-        peers.getNonProposing(1).injectRoundChange(targetRound, empty());
-    final RoundChangeMessage rc3 =
-        peers.getNonProposing(2).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc1 = peers.getNonProposing(0).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc2 = peers.getNonProposing(1).injectRoundChange(targetRound, empty());
+    final RoundChangeMessage rc3 = peers.getNonProposing(2).injectRoundChange(targetRound, empty());
 
     // create illegal RoundChangeMessage
     final PreparedCertificate illegalPreparedCertificate =

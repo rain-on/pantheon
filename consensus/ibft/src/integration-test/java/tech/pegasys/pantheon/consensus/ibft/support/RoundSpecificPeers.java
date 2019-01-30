@@ -182,8 +182,7 @@ public class RoundSpecificPeers {
     candidates.forEach(ValidatorPeer::clearReceivedMessages);
   }
 
-  private void verifyMessage(
-      final MessageData actual, final IbftMessage expectedMessage) {
+  private void verifyMessage(final MessageData actual, final IbftMessage expectedMessage) {
     IbftMessage actualSignedPayload = null;
 
     switch (expectedMessage.getMessageType()) {
@@ -206,7 +205,6 @@ public class RoundSpecificPeers {
         fail("Illegal IBFTV2 message type.");
         break;
     }
-    assertThat(expectedMessage)
-        .isEqualToComparingFieldByFieldRecursively(actualSignedPayload);
+    assertThat(expectedMessage).isEqualToComparingFieldByFieldRecursively(actualSignedPayload);
   }
 }

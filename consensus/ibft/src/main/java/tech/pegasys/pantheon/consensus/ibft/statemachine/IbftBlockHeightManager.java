@@ -142,7 +142,8 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
-    final RoundChangeMessage localRoundChange = messageFactory.createSignedRoundChangePayload(
+    final RoundChangeMessage localRoundChange =
+        messageFactory.createSignedRoundChangePayload(
             currentRound.getRoundIdentifier(), latestPreparedCertificate);
     transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), latestPreparedCertificate);
 
@@ -154,15 +155,13 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   @Override
   public void handleProposalPayload(final ProposalMessage msg) {
     LOG.debug("Received a Proposal Payload.");
-    actionOrBufferMessage(
-        msg, currentRound::handleProposalMessage, RoundState::setProposedBlock);
+    actionOrBufferMessage(msg, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
   @Override
   public void handlePreparePayload(final PrepareMessage msg) {
     LOG.debug("Received a Prepare Payload.");
-    actionOrBufferMessage(
-        msg, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
+    actionOrBufferMessage(msg, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
   @Override
@@ -172,9 +171,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   }
 
   private <T extends IbftMessage> void actionOrBufferMessage(
-      final T msg,
-      final Consumer<T> inRoundHandler,
-      final BiConsumer<RoundState, T> buffer) {
+      final T msg, final Consumer<T> inRoundHandler, final BiConsumer<RoundState, T> buffer) {
 
     final MessageAge messageAge = determineAgeOfPayload(msg);
     if (messageAge == CURRENT_ROUND) {
@@ -191,7 +188,8 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
   @Override
   public void handleRoundChangePayload(final RoundChangeMessage msg) {
-    final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(getChainHeight(), msg.getRound());
+    final ConsensusRoundIdentifier targetRound =
+        new ConsensusRoundIdentifier(getChainHeight(), msg.getRound());
     LOG.info("Received a RoundChange Payload for {}", targetRound.toString());
 
     final MessageAge messageAge = determineAgeOfPayload(msg);

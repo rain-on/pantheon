@@ -38,7 +38,8 @@ public class ProposalMessageTest {
   @Test
   public void createMessageFromPrePrepareMessageData() {
     when(proposalMessageData.encode()).thenReturn(messageBytes);
-    final ProposalMessageData proposalMessage = ProposalMessageData.create(new ProposalMessage(proposalMessageData));
+    final ProposalMessageData proposalMessage =
+        ProposalMessageData.create(new ProposalMessage(proposalMessageData));
 
     assertThat(proposalMessage.getData()).isEqualTo(messageBytes);
     assertThat(proposalMessage.getCode()).isEqualTo(IbftV2.PROPOSAL);

@@ -90,8 +90,7 @@ public class SignedData<M extends Payload> {
     return new CommitMessage(from(unsignedMessageData, signature));
   }
 
-  public static RoundChangeMessage readSignedRoundChangePayloadFrom(
-      final RLPInput rlpInput) {
+  public static RoundChangeMessage readSignedRoundChangePayloadFrom(final RLPInput rlpInput) {
 
     rlpInput.enterList();
     final RoundChangePayload unsignedMessageData = RoundChangePayload.readFrom(rlpInput);

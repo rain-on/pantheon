@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public class PreparedCertificate {
 
@@ -27,8 +27,7 @@ public class PreparedCertificate {
   private final Collection<PrepareMessage> preparePayloads;
 
   public PreparedCertificate(
-      final ProposalMessage proposalPayload,
-      final Collection<PrepareMessage> preparePayloads) {
+      final ProposalMessage proposalPayload, final Collection<PrepareMessage> preparePayloads) {
     this.proposalPayload = proposalPayload;
     this.preparePayloads = preparePayloads;
   }

@@ -110,7 +110,7 @@ public class NewRoundPayload implements Payload {
     private RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Collections.emptyList());
 
-    private ProposalMessage proposalPayload = null;
+    private ProposalMessage proposalMessage = null;
 
     public Builder(
         final ConsensusRoundIdentifier roundChangeIdentifier,
@@ -118,7 +118,7 @@ public class NewRoundPayload implements Payload {
         final ProposalMessage proposalMessage) {
       this.roundChangeIdentifier = roundChangeIdentifier;
       this.roundChangeCertificate = roundChangeCertificate;
-      this.proposalPayload = proposalPayload;
+      this.proposalMessage = proposalMessage;
     }
 
     public static Builder fromExisting(final NewRoundPayload payload) {
@@ -135,7 +135,7 @@ public class NewRoundPayload implements Payload {
     }
 
     public NewRoundPayload build() {
-      return new NewRoundPayload(roundChangeIdentifier, roundChangeCertificate, proposalPayload);
+      return new NewRoundPayload(roundChangeIdentifier, roundChangeCertificate, proposalMessage);
     }
   }
 }

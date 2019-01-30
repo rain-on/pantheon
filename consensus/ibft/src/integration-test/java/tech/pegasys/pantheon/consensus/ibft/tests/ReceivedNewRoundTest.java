@@ -62,8 +62,7 @@ public class ReceivedNewRoundTest {
         context.createBlockForProposalFromChainHead(nextRoundId.getRoundNumber(), 15);
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 1);
 
-    final List<RoundChangeMessage> roundChanges =
-        peers.createSignedRoundChangePayload(targetRound);
+    final List<RoundChangeMessage> roundChanges = peers.createSignedRoundChangePayload(targetRound);
 
     final ValidatorPeer nextProposer = context.roundSpecificPeers(nextRoundId).getProposer();
 
@@ -84,8 +83,7 @@ public class ReceivedNewRoundTest {
     final Block blockToPropose =
         context.createBlockForProposalFromChainHead(nextRoundId.getRoundNumber(), 15);
 
-    final List<RoundChangeMessage> roundChanges =
-        peers.createSignedRoundChangePayload(nextRoundId);
+    final List<RoundChangeMessage> roundChanges = peers.createSignedRoundChangePayload(nextRoundId);
 
     final ValidatorPeer illegalProposer =
         context.roundSpecificPeers(nextRoundId).getNonProposing(0);

@@ -28,8 +28,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.payload.IbftMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
@@ -132,9 +130,7 @@ public class IbftController {
   }
 
   private <P extends IbftMessage> void consumeMessage(
-      final Message message,
-      final P signedPayload,
-      final Consumer<P> handleMessage) {
+      final Message message, final P signedPayload, final Consumer<P> handleMessage) {
     LOG.debug(
         "Received IBFT message messageType={} payload={}",
         signedPayload.getMessageType(),

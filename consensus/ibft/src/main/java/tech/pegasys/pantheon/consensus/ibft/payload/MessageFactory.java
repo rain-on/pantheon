@@ -44,7 +44,7 @@ public class MessageFactory {
 
     final PreparePayload payload = new PreparePayload(roundIdentifier, digest);
 
-    return new PrepareMessage (createSignedMessage(payload));
+    return new PrepareMessage(createSignedMessage(payload));
   }
 
   public CommitMessage createSignedCommitPayload(

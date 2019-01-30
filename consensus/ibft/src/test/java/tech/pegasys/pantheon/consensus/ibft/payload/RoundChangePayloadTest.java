@@ -80,7 +80,8 @@ public class RoundChangePayloadTest {
 
     final PreparePayload preparePayload =
         new PreparePayload(ROUND_IDENTIFIER, Hash.fromHexStringLenient("0x8523ba6e7c5f59ae87"));
-    final PrepareMessage signedPrepare = new PrepareMessage(SignedData.from(preparePayload, SIGNATURE));
+    final PrepareMessage signedPrepare =
+        new PrepareMessage(SignedData.from(preparePayload, SIGNATURE));
     final PreparedCertificate preparedCert =
         new PreparedCertificate(signedProposal, Lists.newArrayList(signedPrepare));
 

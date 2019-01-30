@@ -38,7 +38,8 @@ public class PrepareMessageTest {
   @Test
   public void createMessageFromPrepareMessageData() {
     when(preparePayload.encode()).thenReturn(messageBytes);
-    PrepareMessageData prepareMessage = PrepareMessageData.create(new PrepareMessage(preparePayload));
+    PrepareMessageData prepareMessage =
+        PrepareMessageData.create(new PrepareMessage(preparePayload));
 
     assertThat(prepareMessage.getData()).isEqualTo(messageBytes);
     assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PREPARE);

@@ -12,10 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import java.util.Collection;
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
@@ -32,6 +28,12 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
+
+import java.util.Collection;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MessageValidator {
 
@@ -199,8 +201,7 @@ public class MessageValidator {
 
   private boolean validateBlockMatchesProposalRound(final ProposalMessage msg) {
     final int msgRound = msg.getRound();
-    final IbftExtraData extraData =
-        IbftExtraData.decode(msg.getBlock().getHeader().getExtraData());
+    final IbftExtraData extraData = IbftExtraData.decode(msg.getBlock().getHeader().getExtraData());
     if (extraData.getRound() != msgRound) {
       LOG.info("Invalid Proposal message, round number in block does not match that in message.");
       return false;

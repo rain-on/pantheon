@@ -20,13 +20,9 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -268,7 +264,6 @@ public class RoundStateTest {
     assertThat(roundState.isCommitted()).isTrue();
 
     assertThat(roundState.getCommitSeals())
-        .containsOnly(
-            firstCommit.getCommitSeal(), secondCommit.getCommitSeal());
+        .containsOnly(firstCommit.getCommitSeal(), secondCommit.getCommitSeal());
   }
 }

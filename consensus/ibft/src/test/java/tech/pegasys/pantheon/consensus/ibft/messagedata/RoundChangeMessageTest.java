@@ -38,7 +38,8 @@ public class RoundChangeMessageTest {
   @Test
   public void createMessageFromRoundChangeMessageData() {
     when(roundChangePayload.encode()).thenReturn(messageBytes);
-    RoundChangeMessageData roundChangeMessage = RoundChangeMessageData.create(new RoundChangeMessage(roundChangePayload));
+    RoundChangeMessageData roundChangeMessage =
+        RoundChangeMessageData.create(new RoundChangeMessage(roundChangePayload));
 
     assertThat(roundChangeMessage.getData()).isEqualTo(messageBytes);
     assertThat(roundChangeMessage.getCode()).isEqualTo(IbftV2.ROUND_CHANGE);

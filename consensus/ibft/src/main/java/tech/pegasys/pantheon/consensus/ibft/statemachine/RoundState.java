@@ -16,13 +16,9 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCou
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -127,10 +123,7 @@ public class RoundState {
   }
 
   public Collection<Signature> getCommitSeals() {
-    return commitPayloads
-        .stream()
-        .map(cp -> cp.getCommitSeal())
-        .collect(Collectors.toList());
+    return commitPayloads.stream().map(cp -> cp.getCommitSeal()).collect(Collectors.toList());
   }
 
   public Optional<PreparedCertificate> constructPreparedCertificate() {

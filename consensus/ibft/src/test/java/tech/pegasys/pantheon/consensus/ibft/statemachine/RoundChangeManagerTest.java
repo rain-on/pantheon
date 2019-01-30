@@ -23,13 +23,9 @@ import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -188,10 +184,8 @@ public class RoundChangeManagerTest {
 
   @Test
   public void becomesReadyAtThreshold() {
-    RoundChangeMessage roundChangeDataProposer =
-        makeRoundChangeMessage(proposerKey, ri2);
-    RoundChangeMessage roundChangeDataValidator1 =
-        makeRoundChangeMessage(validator1Key, ri2);
+    RoundChangeMessage roundChangeDataProposer = makeRoundChangeMessage(proposerKey, ri2);
+    RoundChangeMessage roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key, ri2);
     assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
         .isEqualTo(Optional.empty());
     assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1).isPresent()).isTrue();
@@ -199,10 +193,8 @@ public class RoundChangeManagerTest {
 
   @Test
   public void doesntReachReadyWhenSuppliedWithDifferentRounds() {
-    RoundChangeMessage roundChangeDataProposer =
-        makeRoundChangeMessage(proposerKey, ri2);
-    RoundChangeMessage roundChangeDataValidator1 =
-        makeRoundChangeMessage(validator1Key, ri3);
+    RoundChangeMessage roundChangeDataProposer = makeRoundChangeMessage(proposerKey, ri2);
+    RoundChangeMessage roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key, ri3);
     assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
         .isEqualTo(Optional.empty());
     assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1))
@@ -213,12 +205,9 @@ public class RoundChangeManagerTest {
 
   @Test
   public void discardsRoundPreviousToThatRequested() {
-    RoundChangeMessage roundChangeDataProposer =
-        makeRoundChangeMessage(proposerKey, ri1);
-    RoundChangeMessage roundChangeDataValidator1 =
-        makeRoundChangeMessage(validator1Key, ri2);
-    RoundChangeMessage roundChangeDataValidator2 =
-        makeRoundChangeMessage(validator2Key, ri3);
+    RoundChangeMessage roundChangeDataProposer = makeRoundChangeMessage(proposerKey, ri1);
+    RoundChangeMessage roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key, ri2);
+    RoundChangeMessage roundChangeDataValidator2 = makeRoundChangeMessage(validator2Key, ri3);
     assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
         .isEqualTo(Optional.empty());
     assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1))
@@ -233,12 +222,9 @@ public class RoundChangeManagerTest {
 
   @Test
   public void stopsAcceptingMessagesAfterReady() {
-    RoundChangeMessage roundChangeDataProposer =
-        makeRoundChangeMessage(proposerKey, ri2);
-    RoundChangeMessage roundChangeDataValidator1 =
-        makeRoundChangeMessage(validator1Key, ri2);
-    RoundChangeMessage roundChangeDataValidator2 =
-        makeRoundChangeMessage(validator2Key, ri2);
+    RoundChangeMessage roundChangeDataProposer = makeRoundChangeMessage(proposerKey, ri2);
+    RoundChangeMessage roundChangeDataValidator1 = makeRoundChangeMessage(validator1Key, ri2);
+    RoundChangeMessage roundChangeDataValidator2 = makeRoundChangeMessage(validator2Key, ri2);
     assertThat(manager.appendRoundChangeMessage(roundChangeDataProposer))
         .isEqualTo(Optional.empty());
     assertThat(manager.appendRoundChangeMessage(roundChangeDataValidator1).isPresent()).isTrue();

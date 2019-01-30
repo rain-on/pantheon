@@ -86,9 +86,7 @@ public class VoteProposer {
     } else if (!validators.contains(voteAddress) && !votedAuth && vote == VoteType.ADD) {
       return true;
       // or if we've previously voted to drop them and we want to see them authed
-    } else
-      return votedDrop && vote == VoteType.ADD;
-
+    } else return votedDrop && vote == VoteType.ADD;
   }
 
   /**
