@@ -56,9 +56,6 @@ public class CliqueMiningCoordinator
     final boolean nodeIsMining = miningTracker.canMakeBlockNextRound(parentHeader);
     final boolean nodeIsInTurn = miningTracker.isProposerAfter(parentHeader);
 
-    if (nodeIsMining && nodeIsInTurn) {
-      return false;
-    }
-    return true;
+    return !nodeIsMining || !nodeIsInTurn;
   }
 }

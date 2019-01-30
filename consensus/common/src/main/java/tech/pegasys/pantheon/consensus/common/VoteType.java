@@ -18,5 +18,5 @@ package tech.pegasys.pantheon.consensus.common;
  */
 public enum VoteType {
   ADD,
-  DROP;
+  DROP
 }

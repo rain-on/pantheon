@@ -69,7 +69,7 @@ public class MessageFactory {
   public SignedData<NewRoundPayload> createSignedNewRoundPayload(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final ProposalMessage proposalPayload) {
 
     final NewRoundPayload payload =
         new NewRoundPayload(roundIdentifier, roundChangeCertificate, proposalPayload);
