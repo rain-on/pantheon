@@ -18,8 +18,10 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCou
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
@@ -57,29 +59,28 @@ public class NewRoundMessageValidator {
     this.chainHeight = chainHeight;
   }
 
-  public boolean validateNewRoundMessage(final SignedData<NewRoundPayload> msg) {
+  public boolean validateNewRoundMessage(final NewRoundMessage msg) {
 
-    final NewRoundPayload payload = msg.getPayload();
-    final ConsensusRoundIdentifier rootRoundIdentifier = payload.getRoundIdentifier();
+    final ConsensusRoundIdentifier rootRoundIdentifier = msg.getConsensusRound();
     final Address expectedProposer = proposerSelector.selectProposerForRound(rootRoundIdentifier);
-    final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
+    final RoundChangeCertificate roundChangeCert = msg.getRoundChangeCertificate();
 
-    if (!expectedProposer.equals(msg.getSender())) {
+    if (!expectedProposer.equals(msg.getAuthor())) {
       LOG.info("Invalid NewRound message, did not originate from expected proposer.");
       return false;
     }
 
-    if (msg.getPayload().getRoundIdentifier().getSequenceNumber() != chainHeight) {
+    if (msg.getSequence() != chainHeight) {
       LOG.info("Invalid NewRound message, not valid for local chain height.");
       return false;
     }
 
-    if (msg.getPayload().getRoundIdentifier().getRoundNumber() == 0) {
+    if (msg.getRound() == 0) {
       LOG.info("Invalid NewRound message, illegally targets a new round of 0.");
       return false;
     }
 
-    final SignedData<ProposalPayload> proposalPayload = payload.getProposalPayload();
+    final ProposalMessage proposalPayload = msg.getProposalMessage();
     final MessageValidator proposalValidator =
         messageValidatorFactory.createAt(rootRoundIdentifier);
     if (!proposalValidator.addSignedProposalPayload(proposalPayload)) {
@@ -92,7 +93,7 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    return validateProposalMessageMatchesLatestPrepareCertificate(payload);
+    return validateProposalMessageMatchesLatestPrepareCertificate(msg);
   }
 
   private boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
@@ -136,9 +137,9 @@ public class NewRoundMessageValidator {
   }
 
   private boolean validateProposalMessageMatchesLatestPrepareCertificate(
-      final NewRoundPayload payload) {
+      final NewRoundMessage msg) {
 
-    final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
+    final RoundChangeCertificate roundChangeCert = msg.getRoundChangeCertificate();
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
         roundChangeCert.getRoundChangePayloads();
 
@@ -163,7 +164,7 @@ public class NewRoundMessageValidator {
 
     final Hash roundAgnosticBlockHashProposal =
         IbftBlockHashing.calculateHashOfIbftBlockOnChain(
-            payload.getProposalPayload().getPayload().getBlock().getHeader());
+            msg.getProposalMessage().getBlock().getHeader());
 
     if (!roundAgnosticBlockHashPreparedCert.equals(roundAgnosticBlockHashProposal)) {
       LOG.info(
