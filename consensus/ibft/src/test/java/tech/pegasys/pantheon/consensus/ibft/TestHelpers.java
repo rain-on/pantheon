@@ -60,11 +60,11 @@ public class TestHelpers {
     return new BlockDataGenerator().block(blockOptions);
   }
 
-  public static ProposalMessage createSignedProposalPayload(final KeyPair signerKeys) {
-    return createSignedProposalPayloadWithRound(signerKeys, 0xFEDCBA98);
+  public static ProposalMessage createProposalMessage(final KeyPair signerKeys) {
+    return createProposalMessageWithRound(signerKeys, 0xFEDCBA98);
   }
 
-  public static ProposalMessage createSignedProposalPayloadWithRound(
+  public static ProposalMessage createProposalMessageWithRound(
       final KeyPair signerKeys, final int round) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
@@ -104,7 +104,7 @@ public class TestHelpers {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    final ProposalMessage proposalPayload = createSignedProposalPayload(signerKeys);
+    final ProposalMessage proposalPayload = createProposalMessage(signerKeys);
     return messageFactory.createSignedNewRoundPayload(
         roundIdentifier, new RoundChangeCertificate(newArrayList()), proposalPayload);
   }

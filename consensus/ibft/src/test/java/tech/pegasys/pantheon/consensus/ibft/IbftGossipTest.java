@@ -20,7 +20,9 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.network.MockPeerFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
+import tech.pegasys.pantheon.consensus.ibft.payload.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -40,8 +42,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IbftGossipTest {
+
   private IbftGossip ibftGossip;
-  @Mock private ValidatorMulticaster validatorMulticaster;
+  @Mock
+  private ValidatorMulticaster validatorMulticaster;
   private PeerConnection peerConnection;
   private static final Address senderAddress = AddressHelpers.ofValue(9);
 
@@ -51,23 +55,23 @@ public class IbftGossipTest {
     peerConnection = MockPeerFactory.create(senderAddress);
   }
 
-  private <P extends Payload> void assertRebroadcastToAllExceptSignerAndSender(
-      final Function<KeyPair, SignedData<P>> createPayload,
-      final Function<SignedData<P>, MessageData> createMessageData) {
+  private <M extends IbftMessage> void assertRebroadcastToAllExceptSignerAndSender(
+      final Function<KeyPair, M> createMessage,
+      final Function<M, MessageData> createMessageData) {
     final KeyPair keypair = KeyPair.generate();
-    final SignedData<P> payload = createPayload.apply(keypair);
-    final MessageData messageData = createMessageData.apply(payload);
+    final M ibftMessage = createMessage.apply(keypair);
+    final MessageData messageData = createMessageData.apply(ibftMessage);
     final Message message = new DefaultMessage(peerConnection, messageData);
 
     ibftGossip.send(message);
     verify(validatorMulticaster)
-        .send(messageData, newArrayList(senderAddress, payload.getSender()));
+        .send(messageData, newArrayList(senderAddress, ibftMessage.getAuthor()));
   }
 
   @Test
   public void assertRebroadcastsProposalToAllExceptSignerAndSender() {
     assertRebroadcastToAllExceptSignerAndSender(
-        TestHelpers::createSignedProposalPayload, ProposalMessageData::create);
+        TestHelpers::createProposalMessage, ProposalMessageData::create);
   }
 
   @Test

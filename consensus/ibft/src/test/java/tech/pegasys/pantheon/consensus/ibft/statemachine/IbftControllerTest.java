@@ -34,10 +34,15 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -68,27 +73,27 @@ public class IbftControllerTest {
   @Mock private BlockHeader nextBlock;
   @Mock private BlockHeightManager blockHeightManager;
 
-  @Mock private SignedData<ProposalPayload> signedProposal;
+  @Mock private ProposalMessage signedProposal;
   private Message proposalMessage;
   @Mock private ProposalMessageData proposalMessageData;
   @Mock private ProposalPayload proposalPayload;
 
-  @Mock private SignedData<PreparePayload> signedPrepare;
+  @Mock private PrepareMessage signedPrepare;
   private Message prepareMessage;
   @Mock private PrepareMessageData prepareMessageData;
   @Mock private PreparePayload preparePayload;
 
-  @Mock private SignedData<CommitPayload> signedCommit;
+  @Mock private CommitMessage signedCommit;
   private Message commitMessage;
   @Mock private CommitMessageData commitMessageData;
   @Mock private CommitPayload commitPayload;
 
-  @Mock private SignedData<NewRoundPayload> signedNewRound;
+  @Mock private NewRoundMessage signedNewRound;
   private Message newRoundMessage;
   @Mock private NewRoundMessageData newRoundMessageData;
   @Mock private NewRoundPayload newRoundPayload;
 
-  @Mock private SignedData<RoundChangePayload> signedRoundChange;
+  @Mock private RoundChangeMessage signedRoundChange;
   private Message roundChangeMessage;
   @Mock private RoundChangeMessageData roundChangeMessageData;
   @Mock private RoundChangePayload roundChangePayload;
@@ -452,9 +457,8 @@ public class IbftControllerTest {
 
   private void setupProposal(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedProposal.getPayload()).thenReturn(proposalPayload);
-    when(signedProposal.getSender()).thenReturn(validator);
-    when(proposalPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(signedProposal.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedProposal.getAuthor()).thenReturn(validator);
     when(proposalMessageData.getCode()).thenReturn(IbftV2.PROPOSAL);
     when(proposalMessageData.decode()).thenReturn(signedProposal);
     proposalMessage = new DefaultMessage(null, proposalMessageData);
@@ -462,9 +466,8 @@ public class IbftControllerTest {
 
   private void setupPrepare(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedPrepare.getPayload()).thenReturn(preparePayload);
-    when(signedPrepare.getSender()).thenReturn(validator);
-    when(preparePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(signedPrepare.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedPrepare.getAuthor()).thenReturn(validator);
     when(prepareMessageData.getCode()).thenReturn(IbftV2.PREPARE);
     when(prepareMessageData.decode()).thenReturn(signedPrepare);
     prepareMessage = new DefaultMessage(null, prepareMessageData);
@@ -472,9 +475,8 @@ public class IbftControllerTest {
 
   private void setupCommit(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedCommit.getPayload()).thenReturn(commitPayload);
-    when(signedCommit.getSender()).thenReturn(validator);
-    when(commitPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(signedCommit.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedCommit.getAuthor()).thenReturn(validator);
     when(commitMessageData.getCode()).thenReturn(IbftV2.COMMIT);
     when(commitMessageData.decode()).thenReturn(signedCommit);
     commitMessage = new DefaultMessage(null, commitMessageData);
@@ -482,9 +484,8 @@ public class IbftControllerTest {
 
   private void setupNewRound(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedNewRound.getPayload()).thenReturn(newRoundPayload);
-    when(signedNewRound.getSender()).thenReturn(validator);
-    when(newRoundPayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(signedNewRound.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedNewRound.getAuthor()).thenReturn(validator);
     when(newRoundMessageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
     when(newRoundMessageData.decode()).thenReturn(signedNewRound);
     newRoundMessage = new DefaultMessage(null, newRoundMessageData);
@@ -492,9 +493,8 @@ public class IbftControllerTest {
 
   private void setupRoundChange(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedRoundChange.getPayload()).thenReturn(roundChangePayload);
-    when(signedRoundChange.getSender()).thenReturn(validator);
-    when(roundChangePayload.getRoundIdentifier()).thenReturn(roundIdentifier);
+    when(signedRoundChange.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedRoundChange.getAuthor()).thenReturn(validator);
     when(roundChangeMessageData.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
     when(roundChangeMessageData.decode()).thenReturn(signedRoundChange);
     roundChangeMessage = new DefaultMessage(null, roundChangeMessageData);
