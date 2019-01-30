@@ -65,7 +65,7 @@ public class NewRoundPayload implements Payload {
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
     final RoundChangeCertificate roundChangeCertificate = RoundChangeCertificate.readFrom(rlpInput);
     final SignedData<ProposalPayload> proposalPayload =
-        SignedData.readSignedProposalPayloadFrom(rlpInput);
+        SignedData.readSignedProposalPayloadFrom(rlpInput)
     rlpInput.leaveList();
 
     return new NewRoundPayload(roundIdentifier, roundChangeCertificate, proposalPayload);

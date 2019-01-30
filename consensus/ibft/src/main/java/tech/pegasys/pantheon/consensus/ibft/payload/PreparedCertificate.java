@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
@@ -21,19 +22,20 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class PreparedCertificate {
-  private final SignedData<ProposalPayload> proposalPayload;
-  private final Collection<SignedData<PreparePayload>> preparePayloads;
+
+  private final ProposalMessage proposalPayload;
+  private final Collection<PrepareMessage> preparePayloads;
 
   public PreparedCertificate(
-      final SignedData<ProposalPayload> proposalPayload,
-      final Collection<SignedData<PreparePayload>> preparePayloads) {
+      final ProposalMessage proposalPayload,
+      final Collection<PrepareMessage> preparePayloads) {
     this.proposalPayload = proposalPayload;
     this.preparePayloads = preparePayloads;
   }
 
   public static PreparedCertificate readFrom(final RLPInput rlpInput) {
-    final SignedData<ProposalPayload> proposalMessage;
-    final Collection<SignedData<PreparePayload>> prepareMessages;
+    final ProposalMessage proposalMessage;
+    final Collection<PrepareMessage> prepareMessages;
 
     rlpInput.enterList();
     proposalMessage = SignedData.readSignedProposalPayloadFrom(rlpInput);
@@ -45,16 +47,18 @@ public class PreparedCertificate {
 
   public void writeTo(final RLPOutput rlpOutput) {
     rlpOutput.startList();
-    proposalPayload.writeTo(rlpOutput);
-    rlpOutput.writeList(preparePayloads, SignedData::writeTo);
+    proposalPayload.getRaw().writeTo(rlpOutput);
+    rlpOutput.writeList(
+        preparePayloads.stream().map(payload -> payload.getRaw()).collect(Collectors.toList()),
+        SignedData::writeTo);
     rlpOutput.endList();
   }
 
-  public SignedData<ProposalPayload> getProposalPayload() {
+  public ProposalMessage getProposalPayload() {
     return proposalPayload;
   }
 
-  public Collection<SignedData<PreparePayload>> getPreparePayloads() {
+  public Collection<PrepareMessage> getPreparePayloads() {
     return preparePayloads;
   }
 

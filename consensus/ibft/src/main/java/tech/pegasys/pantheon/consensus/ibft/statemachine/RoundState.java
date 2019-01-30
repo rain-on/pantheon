@@ -38,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 
 // Data items used to define how a round will operate
 public class RoundState {
+
   private static final Logger LOG = LogManager.getLogger();
 
   private final ConsensusRoundIdentifier roundIdentifier;
@@ -48,7 +49,7 @@ public class RoundState {
 
   // Must track the actual Prepare message, not just the sender, as these may need to be reused
   // to send out in a PrepareCertificate.
-  private final Set<SignedData<PreparePayload>> preparePayloads = Sets.newLinkedHashSet();
+  private final Set<PrepareMessage> preparePayloads = Sets.newLinkedHashSet();
   private final Set<CommitMessage> commitPayloads = Sets.newLinkedHashSet();
 
   private boolean prepared = false;
@@ -134,7 +135,8 @@ public class RoundState {
 
   public Optional<PreparedCertificate> constructPreparedCertificate() {
     if (isPrepared()) {
-      return Optional.of(new PreparedCertificate(proposalMessage.get(), preparePayloads));
+      return Optional.of(new PreparedCertificate(proposalMessage.get(),
+          preparePayloads.stream().map(payload -> payload.getRaw()).collect(Collectors.toList())));
     }
     return Optional.empty();
   }

@@ -42,4 +42,6 @@ public class ProposalMessage implements Message {
   public Block getBlock() {
     return underlyingPayload.getPayload().getBlock();
   }
+
+  public SignedData<ProposalPayload> getRaw() { return underlyingPayload; }
 }
