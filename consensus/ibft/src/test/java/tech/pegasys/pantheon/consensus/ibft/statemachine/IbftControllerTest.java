@@ -456,7 +456,7 @@ public class IbftControllerTest {
 
   private void setupProposal(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedProposal.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedProposal.getSequence()).thenReturn(roundIdentifier.getSequenceNumber());
     when(signedProposal.getAuthor()).thenReturn(validator);
     when(proposalMessageData.getCode()).thenReturn(IbftV2.PROPOSAL);
     when(proposalMessageData.decode()).thenReturn(signedProposal);
@@ -465,7 +465,7 @@ public class IbftControllerTest {
 
   private void setupPrepare(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedPrepare.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedPrepare.getSequence()).thenReturn(roundIdentifier.getSequenceNumber());
     when(signedPrepare.getAuthor()).thenReturn(validator);
     when(prepareMessageData.getCode()).thenReturn(IbftV2.PREPARE);
     when(prepareMessageData.decode()).thenReturn(signedPrepare);
@@ -474,7 +474,7 @@ public class IbftControllerTest {
 
   private void setupCommit(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedCommit.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedCommit.getSequence()).thenReturn(roundIdentifier.getSequenceNumber());
     when(signedCommit.getAuthor()).thenReturn(validator);
     when(commitMessageData.getCode()).thenReturn(IbftV2.COMMIT);
     when(commitMessageData.decode()).thenReturn(signedCommit);
@@ -483,7 +483,7 @@ public class IbftControllerTest {
 
   private void setupNewRound(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedNewRound.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedNewRound.getSequence()).thenReturn(roundIdentifier.getSequenceNumber());
     when(signedNewRound.getAuthor()).thenReturn(validator);
     when(newRoundMessageData.getCode()).thenReturn(IbftV2.NEW_ROUND);
     when(newRoundMessageData.decode()).thenReturn(signedNewRound);
@@ -492,7 +492,7 @@ public class IbftControllerTest {
 
   private void setupRoundChange(
       final ConsensusRoundIdentifier roundIdentifier, final Address validator) {
-    when(signedRoundChange.getConsensusRound()).thenReturn(roundIdentifier);
+    when(signedRoundChange.getSequence()).thenReturn(roundIdentifier.getSequenceNumber());
     when(signedRoundChange.getAuthor()).thenReturn(validator);
     when(roundChangeMessageData.getCode()).thenReturn(IbftV2.ROUND_CHANGE);
     when(roundChangeMessageData.decode()).thenReturn(signedRoundChange);
