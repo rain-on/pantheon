@@ -50,10 +50,7 @@ public class NewRoundPayloadTest {
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Collections.emptyList());
     final NewRoundPayload expectedNewRoundPayload =
-        new NewRoundPayload(
-            ROUND_IDENTIFIER,
-            roundChangeCertificate,
-            proposalPayloadSignedData);
+        new NewRoundPayload(ROUND_IDENTIFIER, roundChangeCertificate, proposalPayloadSignedData);
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     expectedNewRoundPayload.writeTo(rlpOut);
 
