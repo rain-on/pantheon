@@ -15,12 +15,17 @@ package tech.pegasys.pantheon.consensus.ibft;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -62,11 +67,11 @@ public class TestHelpers {
     return new BlockDataGenerator().block(blockOptions);
   }
 
-  public static SignedData<ProposalPayload> createSignedProposalPayload(final KeyPair signerKeys) {
+  public static ProposalMessage createSignedProposalPayload(final KeyPair signerKeys) {
     return createSignedProposalPayloadWithRound(signerKeys, 0xFEDCBA98);
   }
 
-  public static SignedData<ProposalPayload> createSignedProposalPayloadWithRound(
+  public static ProposalMessage createSignedProposalPayloadWithRound(
       final KeyPair signerKeys, final int round) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
@@ -76,7 +81,7 @@ public class TestHelpers {
     return messageFactory.createSignedProposalPayload(roundIdentifier, block);
   }
 
-  public static SignedData<PreparePayload> createSignedPreparePayload(final KeyPair signerKeys) {
+  public static PrepareMessage createSignedPreparePayload(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
@@ -84,7 +89,7 @@ public class TestHelpers {
         roundIdentifier, Hash.fromHexStringLenient("0"));
   }
 
-  public static SignedData<CommitPayload> createSignedCommitPayload(final KeyPair signerKeys) {
+  public static CommitMessage createSignedCommitPayload(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
@@ -94,7 +99,7 @@ public class TestHelpers {
         Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0));
   }
 
-  public static SignedData<RoundChangePayload> createSignedRoundChangePayload(
+  public static RoundChangeMessage createSignedRoundChangePayload(
       final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
@@ -102,11 +107,11 @@ public class TestHelpers {
     return messageFactory.createSignedRoundChangePayload(roundIdentifier, Optional.empty());
   }
 
-  public static SignedData<NewRoundPayload> createSignedNewRoundPayload(final KeyPair signerKeys) {
+  public static NewRoundMessage createSignedNewRoundPayload(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    final SignedData<ProposalPayload> proposalPayload = createSignedProposalPayload(signerKeys);
+    final ProposalMessage proposalPayload = createSignedProposalPayload(signerKeys);
     return messageFactory.createSignedNewRoundPayload(
         roundIdentifier, new RoundChangeCertificate(newArrayList()), proposalPayload);
   }
