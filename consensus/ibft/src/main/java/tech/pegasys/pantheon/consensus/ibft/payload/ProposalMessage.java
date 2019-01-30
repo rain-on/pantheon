@@ -5,7 +5,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
-public class ProposalMessage implements Message {
+public class ProposalMessage implements IbftMessage {
 
   private final SignedData<ProposalPayload> underlyingPayload;
 
@@ -44,4 +44,6 @@ public class ProposalMessage implements Message {
   }
 
   public SignedData<ProposalPayload> getRaw() { return underlyingPayload; }
+
+  public long getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
 }

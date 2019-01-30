@@ -4,7 +4,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
-public interface Message {
+public interface IbftMessage {
 
   ///////////// EXPOSED ON BASE INTERFACE
   int getRound();
@@ -16,4 +16,6 @@ public interface Message {
   Address getAuthor();
 
   Signature getSignature();
+
+  long getMessageType();
 }

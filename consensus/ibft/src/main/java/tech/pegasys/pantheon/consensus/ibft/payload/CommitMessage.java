@@ -5,7 +5,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
-public class CommitMessage implements Message { //implement (expose RoundChange and
+public class CommitMessage implements IbftMessage { //implement (expose RoundChange and
 
   private final SignedData<CommitPayload> underlyingPayload;
 
@@ -47,5 +47,7 @@ public class CommitMessage implements Message { //implement (expose RoundChange 
   public Signature getCommitSeal() {
     return underlyingPayload.getPayload().getCommitSeal();
   }
+
+  public long getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
 
 }

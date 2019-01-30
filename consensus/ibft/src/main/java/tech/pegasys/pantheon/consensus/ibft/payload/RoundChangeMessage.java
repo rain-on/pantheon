@@ -5,7 +5,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
-public class RoundChangeMessage implements Message {
+public class RoundChangeMessage implements IbftMessage {
 
   private final SignedData<RoundChangePayload> underlyingPayload;
 
@@ -44,4 +44,6 @@ public class RoundChangeMessage implements Message {
   }
 
   public SignedData<RoundChangePayload> getRaw() { return underlyingPayload; }
+
+  public long getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
 }

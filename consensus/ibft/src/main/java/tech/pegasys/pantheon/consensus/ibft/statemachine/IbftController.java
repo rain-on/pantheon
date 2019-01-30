@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
+import tech.pegasys.pantheon.consensus.ibft.payload.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -130,13 +131,13 @@ public class IbftController {
     }
   }
 
-  private <P extends Message> void consumeMessage(
+  private <P extends IbftMessage> void consumeMessage(
       final Message message,
-      final SignedData<P> signedPayload,
-      final Consumer<SignedData<P>> handleMessage) {
+      final P signedPayload,
+      final Consumer<P> handleMessage) {
     LOG.debug(
         "Received IBFT message messageType={} payload={}",
-        signedPayload.getPayload().getMessageType(),
+        signedPayload.getMessageType(),
         signedPayload);
     if (processMessage(signedPayload, message)) {
       gossiper.send(message);
@@ -174,7 +175,7 @@ public class IbftController {
 
   public void handleBlockTimerExpiry(final BlockTimerExpiry blockTimerExpiry) {
     final ConsensusRoundIdentifier roundIndentifier = blockTimerExpiry.getRoundIndentifier();
-    if (isMsgForCurrentHeight(roundIndentifier)) {
+    if (isMsgForCurrentHeight(roundIndentifier.getSequenceNumber())) {
       currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
       LOG.debug(
@@ -185,7 +186,7 @@ public class IbftController {
   }
 
   public void handleRoundExpiry(final RoundExpiry roundExpiry) {
-    if (isMsgForCurrentHeight(roundExpiry.getView())) {
+    if (isMsgForCurrentHeight(roundExpiry.getView().getSequenceNumber())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
       LOG.debug(
@@ -203,32 +204,32 @@ public class IbftController {
     futureMessages.remove(newChainHeight);
   }
 
-  private boolean processMessage(final SignedData<? extends Payload> msg, final Message rawMsg) {
-    final ConsensusRoundIdentifier msgRoundIdentifier = msg.getPayload().getRoundIdentifier();
-    if (isMsgForCurrentHeight(msgRoundIdentifier)) {
+  private boolean processMessage(final IbftMessage msg, final Message rawMsg) {
+    final long msgSequence = msg.getSequence();
+    if (isMsgForCurrentHeight(msgSequence)) {
       return isMsgFromKnownValidator(msg) && ibftFinalState.isLocalNodeValidator();
-    } else if (isMsgForFutureChainHeight(msgRoundIdentifier)) {
-      addMessageToFutureMessageBuffer(msgRoundIdentifier.getSequenceNumber(), rawMsg);
+    } else if (isMsgForFutureChainHeight(msgSequence)) {
+      addMessageToFutureMessageBuffer(msgSequence, rawMsg);
     } else {
       LOG.debug(
           "IBFT message discarded as it is from a previous block height messageType={} chainHeight={} eventHeight={}",
-          msg.getPayload().getMessageType(),
+          msg.getMessageType(),
           currentHeightManager.getChainHeight(),
-          msgRoundIdentifier.getSequenceNumber());
+          msgSequence);
     }
     return false;
   }
 
-  private boolean isMsgFromKnownValidator(final SignedData<? extends Payload> msg) {
-    return ibftFinalState.getValidators().contains(msg.getSender());
+  private boolean isMsgFromKnownValidator(final IbftMessage msg) {
+    return ibftFinalState.getValidators().contains(msg.getAuthor());
   }
 
-  private boolean isMsgForCurrentHeight(final ConsensusRoundIdentifier roundIdentifier) {
-    return roundIdentifier.getSequenceNumber() == currentHeightManager.getChainHeight();
+  private boolean isMsgForCurrentHeight(final long sequenceNumber) {
+    return sequenceNumber == currentHeightManager.getChainHeight();
   }
 
-  private boolean isMsgForFutureChainHeight(final ConsensusRoundIdentifier roundIdentifier) {
-    return roundIdentifier.getSequenceNumber() > currentHeightManager.getChainHeight();
+  private boolean isMsgForFutureChainHeight(final long sequenceNumber) {
+    return sequenceNumber > currentHeightManager.getChainHeight();
   }
 
   private void addMessageToFutureMessageBuffer(final long chainHeight, final Message rawMsg) {

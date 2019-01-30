@@ -4,7 +4,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
-public class NewRoundMessage implements Message {
+public class NewRoundMessage implements IbftMessage {
 
   private final SignedData<NewRoundPayload> underlyingPayload;
 
@@ -47,4 +47,6 @@ public class NewRoundMessage implements Message {
   }
 
   public SignedData<NewRoundPayload> getRaw() { return underlyingPayload; }
+
+  public long getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
 }

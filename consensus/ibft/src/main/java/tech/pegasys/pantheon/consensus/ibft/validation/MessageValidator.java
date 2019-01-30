@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.Message;
+import tech.pegasys.pantheon.consensus.ibft.payload.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
@@ -157,7 +157,7 @@ public class MessageValidator {
   }
 
   private boolean isMessageForCurrentRoundFromValidatorAndProposalAvailable(
-      final Message msg, final String msgType) {
+      final IbftMessage msg, final String msgType) {
 
     if (!msg.getConsensusRound().equals(roundIdentifier)) {
       LOG.info("Invalid {} message, does not match current round.", msgType);

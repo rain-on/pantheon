@@ -22,21 +22,14 @@ import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.Message;
+import tech.pegasys.pantheon.consensus.ibft.payload.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -179,7 +172,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     actionOrBufferMessage(msg, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
-  private <T extends Message> void actionOrBufferMessage(
+  private <T extends IbftMessage> void actionOrBufferMessage(
       final T msg,
       final Consumer<T> inRoundHandler,
       final BiConsumer<RoundState, T> buffer) {
@@ -264,7 +257,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     return parentHeader;
   }
 
-  private MessageAge determineAgeOfPayload(final Message message) {
+  private MessageAge determineAgeOfPayload(final IbftMessage message) {
     final int messageRoundNumber = message.getRound();
     final int currentRoundNumber = currentRound.getRoundIdentifier().getRoundNumber();
     if (messageRoundNumber > currentRoundNumber) {
