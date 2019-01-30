@@ -50,7 +50,8 @@ public class NewRoundPayloadTest {
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Collections.emptyList());
     final NewRoundPayload expectedNewRoundPayload =
-        new NewRoundPayload(ROUND_IDENTIFIER, roundChangeCertificate, proposalPayloadSignedData);
+        new NewRoundPayload(ROUND_IDENTIFIER, roundChangeCertificate,
+            new ProposalMessage(proposalPayloadSignedData));
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     expectedNewRoundPayload.writeTo(rlpOut);
 
@@ -68,18 +69,20 @@ public class NewRoundPayloadTest {
         TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
     final ProposalPayload proposalPayload = new ProposalPayload(ROUND_IDENTIFIER, block);
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
-    final SignedData<ProposalPayload> signedProposal = SignedData.from(proposalPayload, signature);
+    final ProposalMessage signedProposal =
+        new ProposalMessage(SignedData.from(proposalPayload, signature));
 
     final PreparePayload preparePayload =
         new PreparePayload(ROUND_IDENTIFIER, Hash.fromHexStringLenient("0x8523ba6e7c5f59ae87"));
-    final SignedData<PreparePayload> signedPrepare = SignedData.from(preparePayload, signature);
+    final PrepareMessage signedPrepare =
+        new PrepareMessage(SignedData.from(preparePayload, signature));
     final PreparedCertificate preparedCert =
         new PreparedCertificate(signedProposal, Lists.newArrayList(signedPrepare));
 
     final RoundChangePayload roundChangePayload =
         new RoundChangePayload(ROUND_IDENTIFIER, Optional.of(preparedCert));
-    SignedData<RoundChangePayload> signedRoundChange =
-        SignedData.from(roundChangePayload, signature);
+    final RoundChangeMessage signedRoundChange =
+        new RoundChangeMessage(SignedData.from(roundChangePayload, signature));
 
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Lists.list(signedRoundChange));
