@@ -48,6 +48,8 @@ public class CommitMessage implements IbftMessage { //implement (expose RoundCha
     return underlyingPayload.getPayload().getCommitSeal();
   }
 
+  public SignedData<CommitPayload> getRaw() { return underlyingPayload; }
+
   public long getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
 
 }

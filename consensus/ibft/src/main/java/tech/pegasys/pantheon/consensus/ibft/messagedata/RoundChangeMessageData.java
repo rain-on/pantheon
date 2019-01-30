@@ -36,9 +36,9 @@ public class RoundChangeMessageData extends AbstractIbftMessageData {
     return SignedData.readSignedRoundChangePayloadFrom(RLP.input(data));
   }
 
-  public static RoundChangeMessageData create(final SignedData<RoundChangePayload> signedPayload) {
+  public static RoundChangeMessageData create(final RoundChangeMessage signedPayload) {
 
-    return new RoundChangeMessageData(signedPayload.encode());
+    return new RoundChangeMessageData(signedPayload.getRaw().encode());
   }
 
   @Override

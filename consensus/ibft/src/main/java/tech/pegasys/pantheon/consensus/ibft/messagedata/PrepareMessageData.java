@@ -36,9 +36,9 @@ public class PrepareMessageData extends AbstractIbftMessageData {
     return SignedData.readSignedPreparePayloadFrom(RLP.input(data));
   }
 
-  public static PrepareMessageData create(final SignedData<PreparePayload> signedPayload) {
+  public static PrepareMessageData create(final PrepareMessage signedPayload) {
 
-    return new PrepareMessageData(signedPayload.encode());
+    return new PrepareMessageData(signedPayload.getRaw().encode());
   }
 
   @Override

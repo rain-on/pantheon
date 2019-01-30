@@ -36,9 +36,9 @@ public class CommitMessageData extends AbstractIbftMessageData {
     return SignedData.readSignedCommitPayloadFrom(RLP.input(data));
   }
 
-  public static CommitMessageData create(final SignedData<CommitPayload> signedPayload) {
+  public static CommitMessageData create(final CommitMessage signedPayload) {
 
-    return new CommitMessageData(signedPayload.encode());
+    return new CommitMessageData(signedPayload.getRaw().encode());
   }
 
   @Override

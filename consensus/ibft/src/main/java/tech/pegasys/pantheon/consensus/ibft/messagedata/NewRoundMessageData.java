@@ -36,9 +36,9 @@ public class NewRoundMessageData extends AbstractIbftMessageData {
     return SignedData.readSignedNewRoundPayloadFrom(RLP.input(data));
   }
 
-  public static NewRoundMessageData create(final SignedData<NewRoundPayload> signedPayload) {
+  public static NewRoundMessageData create(final NewRoundMessage signedPayload) {
 
-    return new NewRoundMessageData(signedPayload.encode());
+    return new NewRoundMessageData(signedPayload.getRaw().encode());
   }
 
   @Override

@@ -36,9 +36,9 @@ public class ProposalMessageData extends AbstractIbftMessageData {
     return SignedData.readSignedProposalPayloadFrom(RLP.input(data));
   }
 
-  public static ProposalMessageData create(final SignedData<ProposalPayload> signedPayload) {
+  public static ProposalMessageData create(final ProposalMessage signedPayload) {
 
-    return new ProposalMessageData(signedPayload.encode());
+    return new ProposalMessageData(signedPayload.getRaw().encode());
   }
 
   @Override
