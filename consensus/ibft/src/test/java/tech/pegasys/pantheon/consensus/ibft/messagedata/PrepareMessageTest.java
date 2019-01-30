@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -37,7 +38,7 @@ public class PrepareMessageTest {
   @Test
   public void createMessageFromPrepareMessageData() {
     when(preparePayload.encode()).thenReturn(messageBytes);
-    PrepareMessageData prepareMessage = PrepareMessageData.create(preparePayload);
+    PrepareMessageData prepareMessage = PrepareMessageData.create(new PrepareMessage(preparePayload));
 
     assertThat(prepareMessage.getData()).isEqualTo(messageBytes);
     assertThat(prepareMessage.getCode()).isEqualTo(IbftV2.PREPARE);

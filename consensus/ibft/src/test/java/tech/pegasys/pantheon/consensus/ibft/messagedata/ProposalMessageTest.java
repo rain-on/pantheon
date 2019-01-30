@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -37,7 +38,7 @@ public class ProposalMessageTest {
   @Test
   public void createMessageFromPrePrepareMessageData() {
     when(proposalMessageData.encode()).thenReturn(messageBytes);
-    final ProposalMessageData proposalMessage = ProposalMessageData.create(proposalMessageData);
+    final ProposalMessageData proposalMessage = ProposalMessageData.create(new ProposalMessage(proposalMessageData));
 
     assertThat(proposalMessage.getData()).isEqualTo(messageBytes);
     assertThat(proposalMessage.getCode()).isEqualTo(IbftV2.PROPOSAL);

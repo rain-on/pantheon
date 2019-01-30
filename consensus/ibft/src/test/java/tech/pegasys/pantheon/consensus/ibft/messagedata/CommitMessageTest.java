@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -37,7 +38,7 @@ public class CommitMessageTest {
   @Test
   public void createMessageFromCommitMessageData() {
     when(commitPayload.encode()).thenReturn(messageBytes);
-    CommitMessageData commitMessage = CommitMessageData.create(commitPayload);
+    CommitMessageData commitMessage = CommitMessageData.create(new CommitMessage(commitPayload));
 
     assertThat(commitMessage.getData()).isEqualTo(messageBytes);
     assertThat(commitMessage.getCode()).isEqualTo(IbftV2.COMMIT);
