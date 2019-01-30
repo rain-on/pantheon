@@ -25,12 +25,12 @@ public class NewRoundPayload implements Payload {
   private static final int TYPE = IbftV2.NEW_ROUND;
   private final ConsensusRoundIdentifier roundChangeIdentifier;
   private final RoundChangeCertificate roundChangeCertificate;
-  private final SignedData<ProposalPayload> proposalPayload;
+  private final ProposalMessage proposalPayload;
 
   public NewRoundPayload(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final ProposalMessage proposalPayload) {
     this.roundChangeIdentifier = roundIdentifier;
     this.roundChangeCertificate = roundChangeCertificate;
     this.proposalPayload = proposalPayload;
@@ -55,7 +55,7 @@ public class NewRoundPayload implements Payload {
     rlpOutput.startList();
     roundChangeIdentifier.writeTo(rlpOutput);
     roundChangeCertificate.writeTo(rlpOutput);
-    proposalPayload.writeTo(rlpOutput);
+    proposalPayload.getRaw().writeTo(rlpOutput);
     rlpOutput.endList();
   }
 
@@ -64,8 +64,7 @@ public class NewRoundPayload implements Payload {
     rlpInput.enterList();
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
     final RoundChangeCertificate roundChangeCertificate = RoundChangeCertificate.readFrom(rlpInput);
-    final SignedData<ProposalPayload> proposalPayload =
-        SignedData.readSignedProposalPayloadFrom(rlpInput)
+    final ProposalMessage proposalPayload = SignedData.readSignedProposalPayloadFrom(rlpInput);
     rlpInput.leaveList();
 
     return new NewRoundPayload(roundIdentifier, roundChangeCertificate, proposalPayload);
@@ -116,7 +115,7 @@ public class NewRoundPayload implements Payload {
     public Builder(
         final ConsensusRoundIdentifier roundChangeIdentifier,
         final RoundChangeCertificate roundChangeCertificate,
-        final SignedData<ProposalPayload> proposalPayload) {
+        final ProposalMessage proposalMessage) {
       this.roundChangeIdentifier = roundChangeIdentifier;
       this.roundChangeCertificate = roundChangeCertificate;
       this.proposalPayload = proposalPayload;
