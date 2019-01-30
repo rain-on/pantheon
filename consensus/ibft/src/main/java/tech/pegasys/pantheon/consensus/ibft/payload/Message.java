@@ -1,5 +1,6 @@
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
@@ -9,6 +10,8 @@ public interface Message {
   int getRound();
 
   long getSequence();
+
+  ConsensusRoundIdentifier getConsensusRound();
 
   Address getAuthor();
 

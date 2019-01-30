@@ -1,6 +1,7 @@
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
 import java.util.Optional;
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
@@ -21,6 +22,11 @@ public class RoundChangeMessage implements Message {
   @Override
   public long getSequence() {
     return underlyingPayload.getPayload().getRoundIdentifier().getSequenceNumber();
+  }
+
+  @Override
+  public ConsensusRoundIdentifier getConsensusRound() {
+    return underlyingPayload.getPayload().getRoundIdentifier();
   }
 
   @Override

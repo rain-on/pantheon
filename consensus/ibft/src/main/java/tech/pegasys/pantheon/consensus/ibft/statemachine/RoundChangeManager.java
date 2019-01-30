@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 
@@ -119,8 +117,7 @@ public class RoundChangeManager {
   }
 
   private RoundChangeStatus storeRoundChangeMessage(final RoundChangeMessage msg) {
-    final ConsensusRoundIdentifier msgTargetRound =
-        new ConsensusRoundIdentifier(msg.getSequence(), msg.getRound());
+    final ConsensusRoundIdentifier msgTargetRound = msg.getConsensusRound();
 
     final RoundChangeStatus roundChangeStatus =
         roundChangeCache.computeIfAbsent(msgTargetRound, ignored -> new RoundChangeStatus(quorum));

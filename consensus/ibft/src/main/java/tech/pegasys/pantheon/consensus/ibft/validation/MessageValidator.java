@@ -15,9 +15,13 @@ package tech.pegasys.pantheon.consensus.ibft.validation;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.Message;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
@@ -47,7 +51,7 @@ public class MessageValidator {
   private final ProtocolContext<IbftContext> protocolContext;
   private final BlockHeader parentHeader;
 
-  private Optional<SignedData<ProposalPayload>> proposal = Optional.empty();
+  private Optional<ProposalMessage> proposal = Optional.empty();
 
   public MessageValidator(
       final Collection<Address> validators,
@@ -64,7 +68,7 @@ public class MessageValidator {
     this.parentHeader = parentHeader;
   }
 
-  public boolean addSignedProposalPayload(final SignedData<ProposalPayload> msg) {
+  public boolean addSignedProposalPayload(final ProposalMessage msg) {
 
     if (proposal.isPresent()) {
       return handleSubsequentProposal(proposal.get(), msg);
@@ -74,7 +78,7 @@ public class MessageValidator {
       return false;
     }
 
-    if (!validateBlockMatchesProposalRound(msg.getPayload())) {
+    if (!validateBlockMatchesProposalRound(msg)) {
       return false;
     }
 
@@ -82,21 +86,21 @@ public class MessageValidator {
     return true;
   }
 
-  private boolean validateSignedProposalPayload(final SignedData<ProposalPayload> msg) {
+  private boolean validateSignedProposalPayload(final ProposalMessage msg) {
 
-    if (!msg.getPayload().getRoundIdentifier().equals(roundIdentifier)) {
+    if (!msg.getConsensusRound().equals(roundIdentifier)) {
       LOG.info("Invalid Proposal message, does not match current round.");
       return false;
     }
 
-    if (!msg.getSender().equals(expectedProposer)) {
+    if (!msg.getAuthor().equals(expectedProposer)) {
       LOG.info(
           "Invalid Proposal message, was not created by the proposer expected for the "
               + "associated round.");
       return false;
     }
 
-    final Block proposedBlock = msg.getPayload().getBlock();
+    final Block proposedBlock = msg.getBlock();
 
     final Optional<BlockProcessingOutputs> validationResult =
         blockValidator.validateAndProcessBlock(
@@ -111,16 +115,13 @@ public class MessageValidator {
   }
 
   private boolean handleSubsequentProposal(
-      final SignedData<ProposalPayload> existingMsg, final SignedData<ProposalPayload> newMsg) {
-    if (!existingMsg.getSender().equals(newMsg.getSender())) {
+      final ProposalMessage existingMsg, final ProposalMessage newMsg) {
+    if (!existingMsg.getAuthor().equals(newMsg.getAuthor())) {
       LOG.debug("Received subsequent invalid Proposal message; sender differs from original.");
       return false;
     }
 
-    final ProposalPayload existingData = existingMsg.getPayload();
-    final ProposalPayload newData = newMsg.getPayload();
-
-    if (!proposalMessagesAreIdentical(existingData, newData)) {
+    if (!proposalMessagesAreIdentical(existingMsg, newMsg)) {
       LOG.debug("Received subsequent invalid Proposal message; content differs from original.");
       return false;
     }
@@ -128,49 +129,49 @@ public class MessageValidator {
     return true;
   }
 
-  public boolean validatePrepareMessage(final SignedData<PreparePayload> msg) {
+  public boolean validatePrepareMessage(final PrepareMessage msg) {
     final String msgType = "Prepare";
 
     if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, msgType)) {
       return false;
     }
 
-    if (msg.getSender().equals(expectedProposer)) {
+    if (msg.getAuthor().equals(expectedProposer)) {
       LOG.info("Illegal Prepare message; was sent by the round's proposer.");
       return false;
     }
 
-    return validateDigestMatchesProposal(msg.getPayload().getDigest(), msgType);
+    return validateDigestMatchesProposal(msg.getDigest(), msgType);
   }
 
-  public boolean validateCommmitMessage(final SignedData<CommitPayload> msg) {
+  public boolean validateCommmitMessage(final CommitMessage msg) {
     final String msgType = "Commit";
 
     if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, msgType)) {
       return false;
     }
 
-    final Block proposedBlock = proposal.get().getPayload().getBlock();
+    final Block proposedBlock = proposal.get().getBlock();
     final Address commitSealCreator =
-        Util.signatureToAddress(msg.getPayload().getCommitSeal(), proposedBlock.getHash());
+        Util.signatureToAddress(msg.getCommitSeal(), proposedBlock.getHash());
 
-    if (!commitSealCreator.equals(msg.getSender())) {
+    if (!commitSealCreator.equals(msg.getAuthor())) {
       LOG.info("Invalid Commit message. Seal was not created by the message transmitter.");
       return false;
     }
 
-    return validateDigestMatchesProposal(msg.getPayload().getDigest(), msgType);
+    return validateDigestMatchesProposal(msg.getDigest(), msgType);
   }
 
   private boolean isMessageForCurrentRoundFromValidatorAndProposalAvailable(
-      final SignedData<? extends Payload> msg, final String msgType) {
+      final Message msg, final String msgType) {
 
-    if (!msg.getPayload().getRoundIdentifier().equals(roundIdentifier)) {
+    if (!msg.getConsensusRound().equals(roundIdentifier)) {
       LOG.info("Invalid {} message, does not match current round.", msgType);
       return false;
     }
 
-    if (!validators.contains(msg.getSender())) {
+    if (!validators.contains(msg.getAuthor())) {
       LOG.info(
           "Invalid {} message, was not transmitted by a validator for the " + "associated round.",
           msgType);
@@ -188,7 +189,7 @@ public class MessageValidator {
   }
 
   private boolean validateDigestMatchesProposal(final Hash digest, final String msgType) {
-    final Block proposedBlock = proposal.get().getPayload().getBlock();
+    final Block proposedBlock = proposal.get().getBlock();
     if (!digest.equals(proposedBlock.getHash())) {
       LOG.info(
           "Illegal {} message, digest does not match the block in the Prepare Message.", msgType);
@@ -198,16 +199,16 @@ public class MessageValidator {
   }
 
   private boolean proposalMessagesAreIdentical(
-      final ProposalPayload right, final ProposalPayload left) {
+      final ProposalMessage right, final ProposalMessage left) {
     return right.getBlock().getHash().equals(left.getBlock().getHash())
-        && right.getRoundIdentifier().equals(left.getRoundIdentifier());
+        && right.getConsensusRound().equals(left.getConsensusRound());
   }
 
-  private boolean validateBlockMatchesProposalRound(final ProposalPayload payload) {
-    final ConsensusRoundIdentifier msgRound = payload.getRoundIdentifier();
+  private boolean validateBlockMatchesProposalRound(final ProposalMessage msg) {
+    final int msgRound = msg.getRound();
     final IbftExtraData extraData =
-        IbftExtraData.decode(payload.getBlock().getHeader().getExtraData());
-    if (extraData.getRound() != msgRound.getRoundNumber()) {
+        IbftExtraData.decode(msg.getBlock().getHeader().getExtraData());
+    if (extraData.getRound() != msgRound) {
       LOG.info("Invalid Proposal message, round number in block does not match that in message.");
       return false;
     }
