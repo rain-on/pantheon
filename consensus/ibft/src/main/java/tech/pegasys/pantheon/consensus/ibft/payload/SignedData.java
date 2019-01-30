@@ -60,24 +60,24 @@ public class SignedData<M extends Payload> {
     return rlpEncode.encoded();
   }
 
-  public static SignedData<ProposalPayload> readSignedProposalPayloadFrom(final RLPInput rlpInput) {
+  public static ProposalMessage readSignedProposalPayloadFrom(final RLPInput rlpInput) {
 
     rlpInput.enterList();
     final ProposalPayload unsignedMessageData = ProposalPayload.readFrom(rlpInput);
     final Signature signature = readSignature(rlpInput);
     rlpInput.leaveList();
 
-    return from(unsignedMessageData, signature);
+    return new ProposalMessage(from(unsignedMessageData, signature));
   }
 
-  public static SignedData<PreparePayload> readSignedPreparePayloadFrom(final RLPInput rlpInput) {
+  public static PrepareMessage readSignedPreparePayloadFrom(final RLPInput rlpInput) {
 
     rlpInput.enterList();
     final PreparePayload unsignedMessageData = PreparePayload.readFrom(rlpInput);
     final Signature signature = readSignature(rlpInput);
     rlpInput.leaveList();
 
-    return from(unsignedMessageData, signature);
+    return new PrepareMessage(from(unsignedMessageData, signature));
   }
 
   public static CommitMessage readSignedCommitPayloadFrom(final RLPInput rlpInput) {
@@ -90,7 +90,7 @@ public class SignedData<M extends Payload> {
     return new CommitMessage(from(unsignedMessageData, signature));
   }
 
-  public static SignedData<RoundChangePayload> readSignedRoundChangePayloadFrom(
+  public static RoundChangeMessage readSignedRoundChangePayloadFrom(
       final RLPInput rlpInput) {
 
     rlpInput.enterList();
@@ -98,17 +98,17 @@ public class SignedData<M extends Payload> {
     final Signature signature = readSignature(rlpInput);
     rlpInput.leaveList();
 
-    return from(unsignedMessageData, signature);
+    return new RoundChangeMessage(from(unsignedMessageData, signature));
   }
 
-  public static SignedData<NewRoundPayload> readSignedNewRoundPayloadFrom(final RLPInput rlpInput) {
+  public static NewRoundMessage readSignedNewRoundPayloadFrom(final RLPInput rlpInput) {
 
     rlpInput.enterList();
     final NewRoundPayload unsignedMessageData = NewRoundPayload.readFrom(rlpInput);
     final Signature signature = readSignature(rlpInput);
     rlpInput.leaveList();
 
-    return from(unsignedMessageData, signature);
+    return new NewRoundMessage(from(unsignedMessageData, signature));
   }
 
   protected static <M extends Payload> SignedData<M> from(
