@@ -80,14 +80,14 @@ public class SignedData<M extends Payload> {
     return from(unsignedMessageData, signature);
   }
 
-  public static SignedData<CommitPayload> readSignedCommitPayloadFrom(final RLPInput rlpInput) {
+  public static CommitMessage readSignedCommitPayloadFrom(final RLPInput rlpInput) {
 
     rlpInput.enterList();
     final CommitPayload unsignedMessageData = CommitPayload.readFrom(rlpInput);
     final Signature signature = readSignature(rlpInput);
     rlpInput.leaveList();
 
-    return from(unsignedMessageData, signature);
+    return new CommitMessage(from(unsignedMessageData, signature));
   }
 
   public static SignedData<RoundChangePayload> readSignedRoundChangePayloadFrom(
