@@ -17,8 +17,10 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCou
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
@@ -42,7 +44,7 @@ public class RoundState {
   private final MessageValidator validator;
   private final long quorum;
 
-  private Optional<SignedData<ProposalPayload>> proposalMessage = Optional.empty();
+  private Optional<ProposalMessage> proposalMessage = Optional.empty();
 
   // Must track the actual Prepare message, not just the sender, as these may need to be reused
   // to send out in a PrepareCertificate.
@@ -65,7 +67,7 @@ public class RoundState {
     return roundIdentifier;
   }
 
-  public boolean setProposedBlock(final SignedData<ProposalPayload> msg) {
+  public boolean setProposedBlock(final ProposalMessage msg) {
 
     if (!proposalMessage.isPresent()) {
       if (validator.addSignedProposalPayload(msg)) {
@@ -80,7 +82,7 @@ public class RoundState {
     return false;
   }
 
-  public void addPrepareMessage(final SignedData<PreparePayload> msg) {
+  public void addPrepareMessage(final PrepareMessage msg) {
     if (!proposalMessage.isPresent() || validator.validatePrepareMessage(msg)) {
       preparePayloads.add(msg);
       LOG.debug("Round state added prepare message prepare={}", msg);

@@ -25,12 +25,16 @@ import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.Message;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
@@ -156,55 +160,56 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   }
 
   @Override
-  public void handleProposalPayload(final SignedData<ProposalPayload> signedPayload) {
+  public void handleProposalPayload(final ProposalMessage msg) {
     LOG.debug("Received a Proposal Payload.");
     actionOrBufferMessage(
-        signedPayload, currentRound::handleProposalMessage, RoundState::setProposedBlock);
+        msg, currentRound::handleProposalMessage, RoundState::setProposedBlock);
   }
 
   @Override
-  public void handlePreparePayload(final SignedData<PreparePayload> signedPayload) {
+  public void handlePreparePayload(final PrepareMessage msg) {
     LOG.debug("Received a Prepare Payload.");
     actionOrBufferMessage(
-        signedPayload, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
+        msg, currentRound::handlePrepareMessage, RoundState::addPrepareMessage);
   }
 
   @Override
-  public void handleCommitPayload(final CommitMessage payload) {
+  public void handleCommitPayload(final CommitMessage msg) {
     LOG.debug("Received a Commit Payload.");
-    actionOrBufferMessage(payload, currentRound::handleCommitMessage, RoundState::addCommitMessage);
+    actionOrBufferMessage(msg, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
   private <T extends Payload> void actionOrBufferMessage(
-      final Message message,
-      final Consumer<SignedData<T>> inRoundHandler,
-      final BiConsumer<RoundState, SignedData<T>> buffer) {
+      final Message msg,
+      final Consumer<? extends Message> inRoundHandler,
+      final BiConsumer<RoundState, Message> buffer) {
 
-    final MessageAge messageAge = determineAgeOfPayload(message);
+    final MessageAge messageAge = determineAgeOfPayload(msg);
     if (messageAge == CURRENT_ROUND) {
-      inRoundHandler.accept(message);
+      inRoundHandler.accept(msg);
     } else if (messageAge == FUTURE_ROUND) {
-      final ConsensusRoundIdentifier msgRoundId = payload.getRoundIdentifier();
+      final ConsensusRoundIdentifier msgRoundId =
+          new ConsensusRoundIdentifier(getChainHeight(), msg.getRound());
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      buffer.accept(roundstate, message);
+      buffer.accept(roundstate, msg);
     }
   }
 
   @Override
-  public void handleRoundChangePayload(final SignedData<RoundChangePayload> signedPayload) {
-    final ConsensusRoundIdentifier targetRound = signedPayload.getPayload().getRoundIdentifier();
+  public void handleRoundChangePayload(final RoundChangeMessage msg) {
+    final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(getChainHeight(), msg.getRound());
     LOG.info("Received a RoundChange Payload for {}", targetRound.toString());
 
-    final MessageAge messageAge = determineAgeOfPayload(signedPayload.getPayload());
+    final MessageAge messageAge = determineAgeOfPayload(msg);
     if (messageAge == PRIOR_ROUND) {
       LOG.debug("Received RoundChange Payload for a prior round. targetRound={}", targetRound);
       return;
     }
 
     final Optional<RoundChangeCertificate> result =
-        roundChangeManager.appendRoundChangeMessage(signedPayload);
+        roundChangeManager.appendRoundChangeMessage(msg);
     if (result.isPresent()) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
@@ -232,9 +237,8 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   }
 
   @Override
-  public void handleNewRoundPayload(final SignedData<NewRoundPayload> signedPayload) {
-    final NewRoundPayload payload = signedPayload.getPayload();
-    final MessageAge messageAge = determineAgeOfPayload(payload);
+  public void handleNewRoundPayload(final NewRoundMessage msg) {
+    final MessageAge messageAge = determineAgeOfPayload(msg);
 
     if (messageAge == PRIOR_ROUND) {
       LOG.info("Received NewRound Payload for a prior round={}", payload.getRoundIdentifier());
@@ -242,11 +246,11 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     }
     LOG.info("Received NewRound Payload for {}", payload.getRoundIdentifier());
 
-    if (newRoundMessageValidator.validateNewRoundMessage(signedPayload)) {
+    if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(payload.getRoundIdentifier().getRoundNumber());
       }
-      currentRound.handleProposalFromNewRound(signedPayload);
+      currentRound.handleProposalFromNewRound(msg);
     }
   }
 
