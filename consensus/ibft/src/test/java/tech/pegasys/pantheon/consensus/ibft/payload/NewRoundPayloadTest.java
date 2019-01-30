@@ -44,8 +44,8 @@ public class NewRoundPayloadTest {
         TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
     final ProposalPayload proposalPayload = new ProposalPayload(ROUND_IDENTIFIER, block);
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
-    final SignedData<ProposalPayload> proposalPayloadSignedData =
-        SignedData.from(proposalPayload, signature);
+    final ProposalMessage proposalPayloadSignedData =
+        new ProposalMessage(SignedData.from(proposalPayload, signature));
 
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Collections.emptyList());
@@ -53,7 +53,7 @@ public class NewRoundPayloadTest {
         new NewRoundPayload(
             ROUND_IDENTIFIER,
             roundChangeCertificate,
-            new ProposalMessage(proposalPayloadSignedData));
+            proposalPayloadSignedData);
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     expectedNewRoundPayload.writeTo(rlpOut);
 
