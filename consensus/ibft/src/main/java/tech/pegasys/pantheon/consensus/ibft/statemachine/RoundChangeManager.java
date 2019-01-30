@@ -12,8 +12,10 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
@@ -44,7 +46,7 @@ public class RoundChangeManager {
 
     // Store only 1 round change per round per validator
     @VisibleForTesting
-    final Map<Address, SignedData<RoundChangePayload>> receivedMessages = Maps.newLinkedHashMap();
+    final Map<Address, RoundChangeMessage> receivedMessages = Maps.newLinkedHashMap();
 
     private boolean actioned = false;
 
@@ -52,9 +54,9 @@ public class RoundChangeManager {
       this.quorum = quorum;
     }
 
-    public void addMessage(final SignedData<RoundChangePayload> msg) {
+    public void addMessage(final RoundChangeMessage msg) {
       if (!actioned) {
-        receivedMessages.putIfAbsent(msg.getSender(), msg);
+        receivedMessages.putIfAbsent(msg.getAuthor(), msg);
       }
     }
 
@@ -65,7 +67,9 @@ public class RoundChangeManager {
     public RoundChangeCertificate createRoundChangeCertificate() {
       if (roundChangeReady()) {
         actioned = true;
-        return new RoundChangeCertificate(receivedMessages.values());
+        return new RoundChangeCertificate(
+            receivedMessages.values().stream().map(msg -> msg.getRaw()).collect(
+                Collectors.toList()));
       } else {
         throw new IllegalStateException("Unable to create RoundChangeCertificate at this time.");
       }
@@ -91,10 +95,10 @@ public class RoundChangeManager {
    *
    * @param msg The signed round change message to add
    * @return Empty if the round change threshold hasn't been hit, otherwise a round change
-   *     certificate
+   * certificate
    */
   public Optional<RoundChangeCertificate> appendRoundChangeMessage(
-      final SignedData<RoundChangePayload> msg) {
+      final RoundChangeMessage msg) {
 
     if (!isMessageValid(msg)) {
       LOG.info("RoundChange message was invalid.");
@@ -110,12 +114,13 @@ public class RoundChangeManager {
     return Optional.empty();
   }
 
-  private boolean isMessageValid(final SignedData<RoundChangePayload> msg) {
+  private boolean isMessageValid(final RoundChangeMessage msg) {
     return roundChangeMessageValidator.validateMessage(msg);
   }
 
-  private RoundChangeStatus storeRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
-    final ConsensusRoundIdentifier msgTargetRound = msg.getPayload().getRoundIdentifier();
+  private RoundChangeStatus storeRoundChangeMessage(final RoundChangeMessage msg) {
+    final ConsensusRoundIdentifier msgTargetRound =
+        new ConsensusRoundIdentifier(msg.getSequence(), msg.getRound());
 
     final RoundChangeStatus roundChangeStatus =
         roundChangeCache.computeIfAbsent(msgTargetRound, ignored -> new RoundChangeStatus(quorum));

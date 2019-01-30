@@ -24,12 +24,12 @@ public class CommitMessage implements Message { //implement (expose RoundChange 
   }
 
   @Override
-  public Address author() {
+  public Address getAuthor() {
     return underlyingPayload.getSender();
   }
 
   @Override
-  public Signature signature() {
+  public Signature getSignature() {
     return underlyingPayload.getSignature();
   }
 

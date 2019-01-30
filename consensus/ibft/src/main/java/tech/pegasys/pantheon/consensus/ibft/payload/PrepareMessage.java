@@ -25,12 +25,12 @@ public class PrepareMessage implements Message {
   }
 
   @Override
-  public Address author() {
+  public Address getAuthor() {
     return underlyingPayload.getSender();
   }
 
   @Override
-  public Signature signature() {
+  public Signature getSignature() {
     return underlyingPayload.getSignature();
   }
 

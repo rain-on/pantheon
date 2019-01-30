@@ -10,7 +10,7 @@ public interface Message {
 
   long getSequence();
 
-  Address author();
+  Address getAuthor();
 
-  Signature signature();
+  Signature getSignature();
 }

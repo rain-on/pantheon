@@ -24,16 +24,18 @@ public class RoundChangeMessage implements Message {
   }
 
   @Override
-  public Address author() {
+  public Address getAuthor() {
     return underlyingPayload.getSender();
   }
 
   @Override
-  public Signature signature() {
+  public Signature getSignature() {
     return underlyingPayload.getSignature();
   }
 
   public Optional<PreparedCertificate> getPreparedCertificate() {
     return underlyingPayload.getPayload().getPreparedCertificate();
   }
+
+  public SignedData<RoundChangePayload> getRaw() { return underlyingPayload; }
 }
