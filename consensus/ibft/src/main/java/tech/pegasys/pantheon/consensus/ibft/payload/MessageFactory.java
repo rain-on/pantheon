@@ -31,42 +31,42 @@ public class MessageFactory {
     this.validatorKeyPair = validatorKeyPair;
   }
 
-  public SignedData<ProposalPayload> createSignedProposalPayload(
+  public ProposalMessage createSignedProposalPayload(
       final ConsensusRoundIdentifier roundIdentifier, final Block block) {
 
     final ProposalPayload payload = new ProposalPayload(roundIdentifier, block);
 
-    return createSignedMessage(payload);
+    return new ProposalMessage(createSignedMessage(payload));
   }
 
-  public SignedData<PreparePayload> createSignedPreparePayload(
+  public PrepareMessage createSignedPreparePayload(
       final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
 
     final PreparePayload payload = new PreparePayload(roundIdentifier, digest);
 
-    return createSignedMessage(payload);
+    return new PrepareMessage (createSignedMessage(payload));
   }
 
-  public SignedData<CommitPayload> createSignedCommitPayload(
+  public CommitMessage createSignedCommitPayload(
       final ConsensusRoundIdentifier roundIdentifier,
       final Hash digest,
       final Signature commitSeal) {
 
     final CommitPayload payload = new CommitPayload(roundIdentifier, digest, commitSeal);
 
-    return createSignedMessage(payload);
+    return new CommitMessage(createSignedMessage(payload));
   }
 
-  public SignedData<RoundChangePayload> createSignedRoundChangePayload(
+  public RoundChangeMessage createSignedRoundChangePayload(
       final ConsensusRoundIdentifier roundIdentifier,
       final Optional<PreparedCertificate> preparedCertificate) {
 
     final RoundChangePayload payload = new RoundChangePayload(roundIdentifier, preparedCertificate);
 
-    return createSignedMessage(payload);
+    return new RoundChangeMessage(createSignedMessage(payload));
   }
 
-  public SignedData<NewRoundPayload> createSignedNewRoundPayload(
+  public NewRoundMessage createSignedNewRoundPayload(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
       final ProposalMessage proposalPayload) {
@@ -74,7 +74,7 @@ public class MessageFactory {
     final NewRoundPayload payload =
         new NewRoundPayload(roundIdentifier, roundChangeCertificate, proposalPayload);
 
-    return createSignedMessage(payload);
+    return new NewRoundMessage(createSignedMessage(payload));
   }
 
   private <M extends Payload> SignedData<M> createSignedMessage(final M payload) {
