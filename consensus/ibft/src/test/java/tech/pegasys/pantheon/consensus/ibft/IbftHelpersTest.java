@@ -19,6 +19,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -90,7 +91,7 @@ public class IbftHelpersTest {
     final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 4);
 
     final ConsensusRoundIdentifier preparedRound = TestHelpers.createFrom(roundIdentifier, 0, -1);
-    final SignedData<ProposalPayload> differentProposal =
+    final ProposalMessage differentProposal =
         proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
 
     final Optional<PreparedCertificate> latterPreparedCert =
@@ -107,7 +108,7 @@ public class IbftHelpersTest {
     // is correctly followed.
     final ConsensusRoundIdentifier earlierPreparedRound =
         TestHelpers.createFrom(roundIdentifier, 0, -2);
-    final SignedData<ProposalPayload> earlierProposal =
+    final ProposalMessage earlierProposal =
         proposerMessageFactory.createSignedProposalPayload(earlierPreparedRound, proposedBlock);
     final Optional<PreparedCertificate> earlierPreparedCert =
         Optional.of(

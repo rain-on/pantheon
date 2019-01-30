@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -80,7 +81,7 @@ public class IbftRoundTest {
   @Mock private IbftBlockCreator blockCreator;
   @Mock private MessageValidator messageValidator;
 
-  @Captor private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
+  @Captor private ArgumentCaptor<ProposalMessage> payloadArgCaptor;
 
   private Block proposedBlock;
   private IbftExtraData proposedExtraData;
@@ -318,7 +319,7 @@ public class IbftRoundTest {
 
     final IbftExtraData proposedExtraData =
         IbftExtraData.decode(
-            payloadArgCaptor.getValue().getPayload().getBlock().getHeader().getExtraData());
+            payloadArgCaptor.getValue().getBlock().getHeader().getExtraData());
     assertThat(proposedExtraData.getRound()).isEqualTo(roundIdentifier.getRoundNumber());
 
     // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
