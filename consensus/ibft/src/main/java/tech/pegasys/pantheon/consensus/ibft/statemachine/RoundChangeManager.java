@@ -65,9 +65,7 @@ public class RoundChangeManager {
     public RoundChangeCertificate createRoundChangeCertificate() {
       if (roundChangeReady()) {
         actioned = true;
-        return new RoundChangeCertificate(
-            receivedMessages.values().stream().map(msg -> msg.getRaw()).collect(
-                Collectors.toList()));
+        return new RoundChangeCertificate(receivedMessages.values());
       } else {
         throw new IllegalStateException("Unable to create RoundChangeCertificate at this time.");
       }

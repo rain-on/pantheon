@@ -12,21 +12,15 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.ethereum.core.Address;
-
 import java.util.Collection;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
+import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
+import tech.pegasys.pantheon.ethereum.core.Address;
 
 public class RoundChangeMessageValidator {
 
@@ -75,7 +69,7 @@ public class RoundChangeMessageValidator {
 
   private boolean validatePrepareCertificate(
       final PreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
-    final ProposalMessage proposalMessage = new ProposalMessage(certificate.getProposalPayload());
+    final ProposalMessage proposalMessage = certificate.getProposalPayload();
 
     final ConsensusRoundIdentifier proposalRoundIdentifier =
         proposalMessage.getConsensusRound();
@@ -91,7 +85,7 @@ public class RoundChangeMessageValidator {
 
   private boolean validateConsistencyOfPrepareCertificateMessages(
       final PreparedCertificate certificate, final MessageValidator messageValidator) {
-    final ProposalMessage proposalMessage = new ProposalMessage(certificate.getProposalPayload());
+    final ProposalMessage proposalMessage = certificate.getProposalPayload();
 
     if (!messageValidator.addSignedProposalPayload(proposalMessage)) {
       LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
@@ -105,8 +99,8 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      if (!messageValidator.validatePrepareMessage(new PrepareMessage(prepareMsg))) {
+    for (final PrepareMessage prepareMsg : certificate.getPreparePayloads()) {
+      if (!messageValidator.validatePrepareMessage(prepareMsg)) {
         LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
         return false;
       }

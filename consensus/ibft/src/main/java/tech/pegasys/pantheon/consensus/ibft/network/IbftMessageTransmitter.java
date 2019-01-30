@@ -95,7 +95,7 @@ public class IbftMessageTransmitter {
 
     final NewRoundMessage msg = new NewRoundMessage(
         messageFactory.createSignedNewRoundPayload(
-            roundIdentifier, roundChangeCertificate, proposalMessage.getRaw()));
+            roundIdentifier, roundChangeCertificate, proposalMessage));
 
     final NewRoundMessageData message = NewRoundMessageData.create(msg.getRaw());
 

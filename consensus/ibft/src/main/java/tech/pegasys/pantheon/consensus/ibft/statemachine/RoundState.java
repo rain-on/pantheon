@@ -135,8 +135,7 @@ public class RoundState {
 
   public Optional<PreparedCertificate> constructPreparedCertificate() {
     if (isPrepared()) {
-      return Optional.of(new PreparedCertificate(proposalMessage.get(),
-          preparePayloads.stream().map(payload -> payload.getRaw()).collect(Collectors.toList())));
+      return Optional.of(new PreparedCertificate(proposalMessage.get(), preparePayloads));
     }
     return Optional.empty();
   }
