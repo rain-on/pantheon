@@ -1,5 +1,7 @@
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
+import java.util.Objects;
+import java.util.StringJoiner;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -45,5 +47,29 @@ public class ProposalMessage implements IbftMessage {
 
   public SignedData<ProposalPayload> getRaw() { return underlyingPayload; }
 
-  public long getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
+  public int getMessageType() { return underlyingPayload.getPayload().getMessageType(); }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", ProposalMessage.class.getSimpleName() + "[", "]")
+        .add("underlyingPayload=" + underlyingPayload)
+        .toString();
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final ProposalMessage that = (ProposalMessage) o;
+    return Objects.equals(underlyingPayload, that.underlyingPayload);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(underlyingPayload);
+  }
 }

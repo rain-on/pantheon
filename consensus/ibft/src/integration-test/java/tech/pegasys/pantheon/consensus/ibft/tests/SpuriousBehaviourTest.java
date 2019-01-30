@@ -17,10 +17,9 @@ import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSig
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.support.NodeParams;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
@@ -63,8 +62,8 @@ public class SpuriousBehaviourTest {
   private final RoundSpecificPeers peers = context.roundSpecificPeers(roundId);
 
   private Block proposedBlock = context.createBlockForProposalFromChainHead(0, 30);
-  private SignedData<PreparePayload> expectedPrepare;
-  private SignedData<CommitPayload> expectedCommit;
+  private PrepareMessage expectedPrepare;
+  private CommitMessage expectedCommit;
 
   @Before
   public void setup() {

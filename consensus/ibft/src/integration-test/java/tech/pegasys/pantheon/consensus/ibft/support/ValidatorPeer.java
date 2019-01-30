@@ -20,15 +20,14 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.NewRoundMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -77,18 +76,18 @@ public class ValidatorPeer {
     return nodeKeys;
   }
 
-  public SignedData<ProposalPayload> injectProposal(
+  public ProposalMessage injectProposal(
       final ConsensusRoundIdentifier rId, final Block block) {
-    final SignedData<ProposalPayload> payload =
+    final ProposalMessage payload =
         messageFactory.createSignedProposalPayload(rId, block);
 
     injectMessage(ProposalMessageData.create(payload));
     return payload;
   }
 
-  public SignedData<PreparePayload> injectPrepare(
+  public PrepareMessage injectPrepare(
       final ConsensusRoundIdentifier rId, final Hash digest) {
-    final SignedData<PreparePayload> payload =
+    final PrepareMessage payload =
         messageFactory.createSignedPreparePayload(rId, digest);
     injectMessage(PrepareMessageData.create(payload));
     return payload;
@@ -98,35 +97,35 @@ public class ValidatorPeer {
     return SECP256K1.sign(digest, nodeKeys);
   }
 
-  public SignedData<CommitPayload> injectCommit(
+  public CommitMessage injectCommit(
       final ConsensusRoundIdentifier rId, final Hash digest) {
     final Signature commitSeal = SECP256K1.sign(digest, nodeKeys);
 
     return injectCommit(rId, digest, commitSeal);
   }
 
-  public SignedData<CommitPayload> injectCommit(
+  public CommitMessage injectCommit(
       final ConsensusRoundIdentifier rId, final Hash digest, final Signature commitSeal) {
-    final SignedData<CommitPayload> payload =
+    final CommitMessage payload =
         messageFactory.createSignedCommitPayload(rId, digest, commitSeal);
     injectMessage(CommitMessageData.create(payload));
     return payload;
   }
 
-  public SignedData<NewRoundPayload> injectNewRound(
+  public NewRoundMessage injectNewRound(
       final ConsensusRoundIdentifier rId,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final ProposalMessage proposalPayload) {
 
-    final SignedData<NewRoundPayload> payload =
+    final NewRoundMessage payload =
         messageFactory.createSignedNewRoundPayload(rId, roundChangeCertificate, proposalPayload);
     injectMessage(NewRoundMessageData.create(payload));
     return payload;
   }
 
-  public SignedData<RoundChangePayload> injectRoundChange(
+  public RoundChangeMessage injectRoundChange(
       final ConsensusRoundIdentifier rId, final Optional<PreparedCertificate> preparedCertificate) {
-    final SignedData<RoundChangePayload> payload =
+    final RoundChangeMessage payload =
         messageFactory.createSignedRoundChangePayload(rId, preparedCertificate);
     injectMessage(RoundChangeMessageData.create(payload));
     return payload;

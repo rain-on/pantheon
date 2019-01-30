@@ -19,10 +19,9 @@ import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createSig
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.NewChainHead;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.PrepareMessage;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -89,11 +88,11 @@ public class FutureHeightTest {
         .getController()
         .handleNewBlockEvent(new NewChainHead(signedCurrentHeightBlock.getHeader()));
 
-    final SignedData<PreparePayload> expectedPrepareMessage =
+    final PrepareMessage expectedPrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(
             futureHeightRoundId, futureHeightBlock.getHash());
 
-    final SignedData<CommitPayload> expectedCommitMessage =
+    final CommitMessage expectedCommitMessage =
         createSignedCommitPayload(
             futureHeightRoundId, futureHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
 
@@ -110,7 +109,7 @@ public class FutureHeightTest {
     peers.getProposer().injectProposal(roundId, currentHeightBlock);
     peers.getNonProposing(0).injectPrepare(roundId, currentHeightBlock.getHash());
 
-    final SignedData<PreparePayload> expectedPrepareMessage =
+    final PrepareMessage expectedPrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(roundId, currentHeightBlock.getHash());
 
     peers.verifyMessagesReceived(expectedPrepareMessage);
@@ -148,7 +147,7 @@ public class FutureHeightTest {
     // Should only require 1 more prepare to close it out
     peers.getNonProposing(1).injectPrepare(roundId, currentHeightBlock.getHash());
 
-    final SignedData<CommitPayload> expectedCommitMessage =
+    final CommitMessage expectedCommitMessage =
         createSignedCommitPayload(
             roundId, currentHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
     peers.verifyMessagesReceived(expectedCommitMessage);
@@ -185,7 +184,7 @@ public class FutureHeightTest {
     peers.verifyNoMessagesReceived();
     peers.getProposer().injectProposal(nextHeightRoundId, nextHeightBlock);
 
-    final SignedData<PreparePayload> expectedPrepareMessage =
+    final PrepareMessage expectedPrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(
             nextHeightRoundId, nextHeightBlock.getHash());
 
@@ -202,11 +201,11 @@ public class FutureHeightTest {
         .getController()
         .handleNewBlockEvent(new NewChainHead(signedNextHeightBlock.getHeader()));
 
-    final SignedData<PreparePayload> expectedFuturePrepareMessage =
+    final PrepareMessage expectedFuturePrepareMessage =
         localNodeMessageFactory.createSignedPreparePayload(
             futureHeightRoundId, futureHeightBlock.getHash());
 
-    final SignedData<CommitPayload> expectedCommitMessage =
+    final CommitMessage expectedCommitMessage =
         createSignedCommitPayload(
             futureHeightRoundId, futureHeightBlock, context.getLocalNodeParams().getNodeKeyPair());
 

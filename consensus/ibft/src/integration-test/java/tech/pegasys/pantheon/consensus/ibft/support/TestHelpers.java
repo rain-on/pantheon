@@ -15,14 +15,13 @@ package tech.pegasys.pantheon.consensus.ibft.support;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -32,7 +31,7 @@ import java.util.List;
 
 public class TestHelpers {
 
-  public static SignedData<CommitPayload> createSignedCommitPayload(
+  public static CommitMessage createSignedCommitPayload(
       final ConsensusRoundIdentifier roundId, final Block block, final KeyPair signingKeyPair) {
 
     final IbftExtraData extraData = IbftExtraData.decode(block.getHeader().getExtraData());
@@ -56,13 +55,13 @@ public class TestHelpers {
         peers.createSignedPreparePayloadOfNonProposing(preparedRound, block.getHash()));
   }
 
-  public static SignedData<NewRoundPayload> injectEmptyNewRound(
+  public static NewRoundMessage injectEmptyNewRound(
       final ConsensusRoundIdentifier targetRoundId,
       final ValidatorPeer proposer,
-      final List<SignedData<RoundChangePayload>> roundChangePayloads,
+      final List<RoundChangeMessage> roundChangePayloads,
       final Block blockToPropose) {
 
-    final SignedData<ProposalPayload> proposal =
+    final ProposalMessage proposal =
         proposer.getMessageFactory().createSignedProposalPayload(targetRoundId, blockToPropose);
 
     return proposer.injectNewRound(

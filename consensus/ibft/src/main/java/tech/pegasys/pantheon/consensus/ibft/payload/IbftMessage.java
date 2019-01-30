@@ -17,5 +17,5 @@ public interface IbftMessage {
 
   Signature getSignature();
 
-  long getMessageType();
+  int getMessageType();
 }
