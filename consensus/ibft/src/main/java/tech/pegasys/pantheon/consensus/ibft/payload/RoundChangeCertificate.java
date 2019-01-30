@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
@@ -24,15 +25,15 @@ import java.util.StringJoiner;
 import com.google.common.collect.Lists;
 
 public class RoundChangeCertificate {
-  private final Collection<SignedData<RoundChangePayload>> roundChangePayloads;
+  private final Collection<RoundChangeMessage> roundChangePayloads;
 
   public RoundChangeCertificate(
-      final Collection<SignedData<RoundChangePayload>> roundChangePayloads) {
+      final Collection<RoundChangeMessage> roundChangePayloads) {
     this.roundChangePayloads = roundChangePayloads;
   }
 
   public static RoundChangeCertificate readFrom(final RLPInput rlpInput) {
-    final Collection<SignedData<RoundChangePayload>> roundChangePayloads;
+    final Collection<RoundChangeMessage> roundChangePayloads;
 
     rlpInput.enterList();
     roundChangePayloads = rlpInput.readList(SignedData::readSignedRoundChangePayloadFrom);
@@ -43,20 +44,21 @@ public class RoundChangeCertificate {
 
   public void writeTo(final RLPOutput rlpOutput) {
     rlpOutput.startList();
-    rlpOutput.writeList(roundChangePayloads, SignedData::writeTo);
+    rlpOutput.writeList(roundChangePayloads.stream().map(payload -> payload.getRaw()).collect(
+        Collectors.toList()), SignedData::writeTo);
     rlpOutput.endList();
   }
 
-  public Collection<SignedData<RoundChangePayload>> getRoundChangePayloads() {
+  public Collection<RoundChangeMessage> getRoundChangePayloads() {
     return roundChangePayloads;
   }
 
   public static class Builder {
-    private final List<SignedData<RoundChangePayload>> roundChangePayloads = Lists.newArrayList();
+    private final List<RoundChangeMessage> roundChangePayloads = Lists.newArrayList();
 
     public Builder() {}
 
-    public void appendRoundChangeMessage(final SignedData<RoundChangePayload> msg) {
+    public void appendRoundChangeMessage(final RoundChangeMessage msg) {
       roundChangePayloads.add(msg);
     }
 

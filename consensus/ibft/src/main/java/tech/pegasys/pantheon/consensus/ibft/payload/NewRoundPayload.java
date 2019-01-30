@@ -45,7 +45,7 @@ public class NewRoundPayload implements Payload {
     return roundChangeCertificate;
   }
 
-  public SignedData<ProposalPayload> getProposalPayload() {
+  public ProposalMessage getProposalPayload() {
     return proposalPayload;
   }
 
@@ -110,7 +110,7 @@ public class NewRoundPayload implements Payload {
     private RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Collections.emptyList());
 
-    private SignedData<ProposalPayload> proposalPayload = null;
+    private ProposalMessage proposalPayload = null;
 
     public Builder(
         final ConsensusRoundIdentifier roundChangeIdentifier,
