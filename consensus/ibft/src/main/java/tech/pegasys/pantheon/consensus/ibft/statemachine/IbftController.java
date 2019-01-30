@@ -130,7 +130,7 @@ public class IbftController {
     }
   }
 
-  private <P extends Payload> void consumeMessage(
+  private <P extends Message> void consumeMessage(
       final Message message,
       final SignedData<P> signedPayload,
       final Consumer<SignedData<P>> handleMessage) {
