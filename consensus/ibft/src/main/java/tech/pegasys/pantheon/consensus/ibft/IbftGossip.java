@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
+import tech.pegasys.pantheon.consensus.ibft.payload.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.p2p.api.Message;
@@ -50,29 +51,29 @@ public class IbftGossip implements Gossiper {
   @Override
   public void send(final Message message) {
     final MessageData messageData = message.getData();
-    final SignedData<?> signedData;
+    final IbftMessage ibftMessage;
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
-        signedData = ProposalMessageData.fromMessageData(messageData).decode();
+        ibftMessage = ProposalMessageData.fromMessageData(messageData).decode();
         break;
       case IbftV2.PREPARE:
-        signedData = PrepareMessageData.fromMessageData(messageData).decode();
+        ibftMessage = PrepareMessageData.fromMessageData(messageData).decode();
         break;
       case IbftV2.COMMIT:
-        signedData = CommitMessageData.fromMessageData(messageData).decode();
+        ibftMessage = CommitMessageData.fromMessageData(messageData).decode();
         break;
       case IbftV2.ROUND_CHANGE:
-        signedData = RoundChangeMessageData.fromMessageData(messageData).decode();
+        ibftMessage = RoundChangeMessageData.fromMessageData(messageData).decode();
         break;
       case IbftV2.NEW_ROUND:
-        signedData = NewRoundMessageData.fromMessageData(messageData).decode();
+        ibftMessage = NewRoundMessageData.fromMessageData(messageData).decode();
         break;
       default:
         throw new IllegalArgumentException(
             "Received message does not conform to any recognised IBFT message structure.");
     }
     final List<Address> excludeAddressesList =
-        Lists.newArrayList(message.getConnection().getPeer().getAddress(), signedData.getSender());
+        Lists.newArrayList(message.getConnection().getPeer().getAddress(), ibftMessage.getAuthor());
 
     multicaster.send(messageData, excludeAddressesList);
   }

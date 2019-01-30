@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft;
 
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -61,21 +62,20 @@ public class IbftHelpers {
   }
 
   public static Optional<PreparedCertificate> findLatestPreparedCertificate(
-      final Collection<SignedData<RoundChangePayload>> msgs) {
+      final Collection<RoundChangeMessage> msgs) {
 
     Optional<PreparedCertificate> result = Optional.empty();
 
-    for (SignedData<RoundChangePayload> roundChangeMsg : msgs) {
-      final RoundChangePayload payload = roundChangeMsg.getPayload();
-      if (payload.getPreparedCertificate().isPresent()) {
+    for (RoundChangeMessage roundChangeMsg : msgs) {
+      if (roundChangeMsg.getPreparedCertificate().isPresent()) {
         if (!result.isPresent()) {
-          result = payload.getPreparedCertificate();
+          result = roundChangeMsg.getPreparedCertificate();
         } else {
           final PreparedCertificate currentLatest = result.get();
-          final PreparedCertificate nextCert = payload.getPreparedCertificate().get();
+          final PreparedCertificate nextCert = roundChangeMsg.getPreparedCertificate().get();
 
-          if (currentLatest.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
-              < nextCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
+          if (currentLatest.getProposalPayload().getRound()
+              < nextCert.getProposalPayload().getRound()) {
             result = Optional.of(nextCert);
           }
         }

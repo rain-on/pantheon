@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
@@ -99,8 +100,7 @@ public class NewRoundMessageValidator {
   private boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
       final ConsensusRoundIdentifier expectedRound, final RoundChangeCertificate roundChangeCert) {
 
-    final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
-        roundChangeCert.getRoundChangePayloads();
+    final Collection<RoundChangeMessage> roundChangeMsgs = roundChangeCert.getRoundChangePayloads();
 
     if (roundChangeMsgs.size() < quorum) {
       LOG.info(
@@ -112,14 +112,14 @@ public class NewRoundMessageValidator {
     if (!roundChangeCert
         .getRoundChangePayloads()
         .stream()
-        .allMatch(p -> p.getPayload().getRoundIdentifier().equals(expectedRound))) {
+        .allMatch(p -> p.getConsensusRound().equals(expectedRound))) {
       LOG.info(
           "Invalid NewRound message, not all embedded RoundChange messages have a "
               + "matching target round.");
       return false;
     }
 
-    for (final SignedData<RoundChangePayload> roundChangeMsg :
+    for (final RoundChangeMessage roundChangeMsg :
         roundChangeCert.getRoundChangePayloads()) {
       final RoundChangeMessageValidator roundChangeValidator =
           new RoundChangeMessageValidator(
@@ -140,7 +140,7 @@ public class NewRoundMessageValidator {
       final NewRoundMessage msg) {
 
     final RoundChangeCertificate roundChangeCert = msg.getRoundChangeCertificate();
-    final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
+    final Collection<RoundChangeMessage> roundChangeMsgs =
         roundChangeCert.getRoundChangePayloads();
 
     final Optional<PreparedCertificate> latestPreparedCertificate =
@@ -158,7 +158,6 @@ public class NewRoundMessageValidator {
             latestPreparedCertificate
                 .get()
                 .getProposalPayload()
-                .getPayload()
                 .getBlock()
                 .getHeader());
 
