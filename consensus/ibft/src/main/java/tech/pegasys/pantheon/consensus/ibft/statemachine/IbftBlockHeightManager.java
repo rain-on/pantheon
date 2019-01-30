@@ -21,7 +21,9 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.Message;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
@@ -168,25 +170,25 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   }
 
   @Override
-  public void handleCommitPayload(final SignedData<CommitPayload> payload) {
+  public void handleCommitPayload(final CommitMessage payload) {
     LOG.debug("Received a Commit Payload.");
     actionOrBufferMessage(payload, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
   private <T extends Payload> void actionOrBufferMessage(
-      final SignedData<T> msgData,
+      final Message message,
       final Consumer<SignedData<T>> inRoundHandler,
       final BiConsumer<RoundState, SignedData<T>> buffer) {
-    final Payload payload = msgData.getPayload();
-    final MessageAge messageAge = determineAgeOfPayload(payload);
+
+    final MessageAge messageAge = determineAgeOfPayload(message);
     if (messageAge == CURRENT_ROUND) {
-      inRoundHandler.accept(msgData);
+      inRoundHandler.accept(message);
     } else if (messageAge == FUTURE_ROUND) {
       final ConsensusRoundIdentifier msgRoundId = payload.getRoundIdentifier();
       final RoundState roundstate =
           futureRoundStateBuffer.computeIfAbsent(
               msgRoundId.getRoundNumber(), k -> roundStateCreator.apply(msgRoundId));
-      buffer.accept(roundstate, msgData);
+      buffer.accept(roundstate, message);
     }
   }
 
@@ -258,8 +260,8 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     return parentHeader;
   }
 
-  private MessageAge determineAgeOfPayload(final Payload payload) {
-    final int messageRoundNumber = payload.getRoundIdentifier().getRoundNumber();
+  private MessageAge determineAgeOfPayload(final Message message) {
+    final int messageRoundNumber = message.getRound();
     final int currentRoundNumber = currentRound.getRoundIdentifier().getRoundNumber();
     if (messageRoundNumber > currentRoundNumber) {
       return FUTURE_ROUND;

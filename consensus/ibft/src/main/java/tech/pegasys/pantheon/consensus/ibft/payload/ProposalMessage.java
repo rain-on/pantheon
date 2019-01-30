@@ -1,16 +1,15 @@
 package tech.pegasys.pantheon.consensus.ibft.payload;
 
-import javax.annotation.Signed;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.core.Block;
 
-public class PrepareMessage implements Message {
+public class ProposalMessage implements Message {
 
-  private final SignedData<PreparePayload> underlyingPayload;
+  private final SignedData<ProposalPayload> underlyingPayload;
 
-  public PrepareMessage(
-      final SignedData<PreparePayload> underlyingPayload) {
+  public ProposalMessage(
+      SignedData<ProposalPayload> underlyingPayload) {
     this.underlyingPayload = underlyingPayload;
   }
 
@@ -34,9 +33,7 @@ public class PrepareMessage implements Message {
     return underlyingPayload.getSignature();
   }
 
-  public Hash getDigest() {
-    return underlyingPayload.getPayload().getDigest();
+  public Block getBlock() {
+    return underlyingPayload.getPayload().getBlock();
   }
-  
-  public SignedData<PreparePayload> getRaw() { return underlyingPayload; }
 }

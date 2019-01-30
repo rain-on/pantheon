@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
@@ -46,7 +47,7 @@ public class RoundState {
   // Must track the actual Prepare message, not just the sender, as these may need to be reused
   // to send out in a PrepareCertificate.
   private final Set<SignedData<PreparePayload>> preparePayloads = Sets.newLinkedHashSet();
-  private final Set<SignedData<CommitPayload>> commitPayloads = Sets.newLinkedHashSet();
+  private final Set<CommitMessage> commitPayloads = Sets.newLinkedHashSet();
 
   private boolean prepared = false;
   private boolean committed = false;
@@ -87,7 +88,7 @@ public class RoundState {
     updateState();
   }
 
-  public void addCommitMessage(final SignedData<CommitPayload> msg) {
+  public void addCommitMessage(final CommitMessage msg) {
     if (!proposalMessage.isPresent() || validator.validateCommmitMessage(msg)) {
       commitPayloads.add(msg);
       LOG.debug("Round state added commit message commit={}", msg);
@@ -125,7 +126,7 @@ public class RoundState {
   public Collection<Signature> getCommitSeals() {
     return commitPayloads
         .stream()
-        .map(cp -> cp.getPayload().getCommitSeal())
+        .map(cp -> cp.getCommitSeal())
         .collect(Collectors.toList());
   }
 

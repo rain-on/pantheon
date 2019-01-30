@@ -9,11 +9,10 @@ public class CommitMessage implements Message { //implement (expose RoundChange 
   private final SignedData<CommitPayload> underlyingPayload;
 
   public CommitMessage(
-      SignedData<CommitPayload> underlyingPayload) {
+      final SignedData<CommitPayload> underlyingPayload) {
     this.underlyingPayload = underlyingPayload;
   }
 
-  ///////////// EXPOSED ON BASE INTERFACE
   @Override
   public int getRound() {
     return underlyingPayload.getPayload().getRoundIdentifier().getRoundNumber();
@@ -28,7 +27,11 @@ public class CommitMessage implements Message { //implement (expose RoundChange 
   public Address author() {
     return underlyingPayload.getSender();
   }
-  ////////////////
+
+  @Override
+  public Signature signature() {
+    return underlyingPayload.getSignature();
+  }
 
 
   public Hash getDigest() {

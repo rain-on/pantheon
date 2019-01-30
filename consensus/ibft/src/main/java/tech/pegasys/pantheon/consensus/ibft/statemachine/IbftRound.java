@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
+import tech.pegasys.pantheon.consensus.ibft.payload.CommitMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
@@ -184,7 +185,7 @@ public class IbftRound {
     peerIsPrepared(msg);
   }
 
-  public void handleCommitMessage(final SignedData<CommitPayload> msg) {
+  public void handleCommitMessage(final CommitMessage msg) {
     LOG.debug("Received a commit message. round={}", roundState.getRoundIdentifier());
     peerIsCommitted(msg);
   }
@@ -229,7 +230,7 @@ public class IbftRound {
     }
   }
 
-  private void peerIsCommitted(final SignedData<CommitPayload> msg) {
+  private void peerIsCommitted(final CommitMessage msg) {
     final boolean wasCommitted = roundState.isCommitted();
     roundState.addCommitMessage(msg);
     if (wasCommitted != roundState.isCommitted()) {
