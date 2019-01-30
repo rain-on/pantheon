@@ -56,7 +56,7 @@ public class RoundChangePayloadTest {
 
   @Test
   public void roundTripRlpWithEmptyPreparedCertificate() {
-    final SignedData<ProposalPayload> signedProposal = signedProposal();
+    final ProposalMessage signedProposal = new ProposalMessage(signedProposal());
 
     final PreparedCertificate preparedCertificate =
         new PreparedCertificate(signedProposal, Collections.emptyList());
@@ -76,11 +76,11 @@ public class RoundChangePayloadTest {
 
   @Test
   public void roundTripRlpWithPreparedCertificate() {
-    final SignedData<ProposalPayload> signedProposal = signedProposal();
+    final ProposalMessage signedProposal = new ProposalMessage(signedProposal());
 
     final PreparePayload preparePayload =
         new PreparePayload(ROUND_IDENTIFIER, Hash.fromHexStringLenient("0x8523ba6e7c5f59ae87"));
-    final SignedData<PreparePayload> signedPrepare = SignedData.from(preparePayload, SIGNATURE);
+    final PrepareMessage signedPrepare = new PrepareMessage(SignedData.from(preparePayload, SIGNATURE));
     final PreparedCertificate preparedCert =
         new PreparedCertificate(signedProposal, Lists.newArrayList(signedPrepare));
 

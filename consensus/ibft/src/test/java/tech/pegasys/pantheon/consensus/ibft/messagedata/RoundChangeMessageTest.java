@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -37,7 +38,7 @@ public class RoundChangeMessageTest {
   @Test
   public void createMessageFromRoundChangeMessageData() {
     when(roundChangePayload.encode()).thenReturn(messageBytes);
-    RoundChangeMessageData roundChangeMessage = RoundChangeMessageData.create(roundChangePayload);
+    RoundChangeMessageData roundChangeMessage = RoundChangeMessageData.create(new RoundChangeMessage(roundChangePayload));
 
     assertThat(roundChangeMessage.getData()).isEqualTo(messageBytes);
     assertThat(roundChangeMessage.getCode()).isEqualTo(IbftV2.ROUND_CHANGE);
