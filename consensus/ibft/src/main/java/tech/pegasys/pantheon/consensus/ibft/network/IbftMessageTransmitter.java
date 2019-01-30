@@ -20,9 +20,11 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
@@ -89,13 +91,13 @@ public class IbftMessageTransmitter {
   public void multicastNewRound(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final ProposalMessage proposalMessage) {
 
-    final SignedData<NewRoundPayload> signedPayload =
+    final NewRoundMessage msg =
         messageFactory.createSignedNewRoundPayload(
-            roundIdentifier, roundChangeCertificate, proposalPayload);
+            roundIdentifier, roundChangeCertificate, proposalMessage);
 
-    final NewRoundMessageData message = NewRoundMessageData.create(signedPayload);
+    final NewRoundMessageData message = NewRoundMessageData.create(msg);
 
     multicaster.send(message);
   }

@@ -114,7 +114,7 @@ public class RoundState {
   }
 
   public Optional<Block> getProposedBlock() {
-    return proposalMessage.map(p -> p.getPayload().getBlock());
+    return proposalMessage.map(p -> p.getBlock());
   }
 
   public boolean isPrepared() {
