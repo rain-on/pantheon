@@ -45,4 +45,6 @@ public class NewRoundMessage implements Message {
   public ProposalMessage getProposalMessage() {
     return new ProposalMessage(underlyingPayload.getPayload().getProposalPayload());
   }
+
+  public SignedData<NewRoundPayload> getRaw() { return underlyingPayload; }
 }

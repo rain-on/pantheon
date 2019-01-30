@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -31,7 +32,7 @@ public class RoundChangeMessageData extends AbstractIbftMessageData {
         messageData, MESSAGE_CODE, RoundChangeMessageData.class, RoundChangeMessageData::new);
   }
 
-  public SignedData<RoundChangePayload> decode() {
+  public RoundChangeMessage decode() {
     return SignedData.readSignedRoundChangePayloadFrom(RLP.input(data));
   }
 

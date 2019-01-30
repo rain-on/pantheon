@@ -93,11 +93,11 @@ public class IbftMessageTransmitter {
       final RoundChangeCertificate roundChangeCertificate,
       final ProposalMessage proposalMessage) {
 
-    final NewRoundMessage msg =
+    final NewRoundMessage msg = new NewRoundMessage(
         messageFactory.createSignedNewRoundPayload(
-            roundIdentifier, roundChangeCertificate, proposalMessage);
+            roundIdentifier, roundChangeCertificate, proposalMessage.getRaw()));
 
-    final NewRoundMessageData message = NewRoundMessageData.create(msg);
+    final NewRoundMessageData message = NewRoundMessageData.create(msg.getRaw());
 
     multicaster.send(message);
   }

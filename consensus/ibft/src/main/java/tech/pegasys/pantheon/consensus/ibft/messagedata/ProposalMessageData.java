@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -31,7 +32,7 @@ public class ProposalMessageData extends AbstractIbftMessageData {
         messageData, MESSAGE_CODE, ProposalMessageData.class, ProposalMessageData::new);
   }
 
-  public SignedData<ProposalPayload> decode() {
+  public ProposalMessage decode() {
     return SignedData.readSignedProposalPayloadFrom(RLP.input(data));
   }
 
