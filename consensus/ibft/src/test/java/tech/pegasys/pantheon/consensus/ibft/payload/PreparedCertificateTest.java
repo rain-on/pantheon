@@ -39,8 +39,8 @@ public class PreparedCertificateTest {
 
   @Test
   public void roundTripRlpWithNoPreparePayloads() {
-    final SignedData<ProposalPayload> signedProposalPayload = signedProposal();
-    final Collection<SignedData<PreparePayload>> preparePayloads = Collections.emptyList();
+    final ProposalMessage signedProposalPayload = new ProposalMessage(signedProposal());
+    final Collection<PrepareMessage> preparePayloads = Collections.emptyList();
 
     final PreparedCertificate preparedCert =
         new PreparedCertificate(signedProposalPayload, preparePayloads);
