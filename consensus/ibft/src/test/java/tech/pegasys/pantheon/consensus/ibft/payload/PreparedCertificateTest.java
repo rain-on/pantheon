@@ -57,11 +57,11 @@ public class PreparedCertificateTest {
 
   @Test
   public void roundTripRlpWithPreparePayload() {
-    final SignedData<ProposalPayload> signedProposalPayload = signedProposal();
+    final ProposalMessage signedProposalPayload = new ProposalMessage(signedProposal());
     final PreparePayload preparePayload =
         new PreparePayload(ROUND_IDENTIFIER, Hash.fromHexStringLenient("0x8523ba6e7c5f59ae87"));
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
-    final SignedData<PreparePayload> signedPrepare = SignedData.from(preparePayload, signature);
+    final PrepareMessage signedPrepare = new PrepareMessage(SignedData.from(preparePayload, signature));
 
     final PreparedCertificate preparedCert =
         new PreparedCertificate(signedProposalPayload, Lists.newArrayList(signedPrepare));
