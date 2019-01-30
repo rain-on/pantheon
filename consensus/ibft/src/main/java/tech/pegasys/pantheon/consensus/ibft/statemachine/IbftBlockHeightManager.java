@@ -149,9 +149,9 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
-    final SignedData<RoundChangePayload> localRoundChange =
-        messageFactory.createSignedRoundChangePayload(
-            currentRound.getRoundIdentifier(), latestPreparedCertificate);
+    final RoundChangeMessage localRoundChange =
+        new RoundChangeMessage(messageFactory.createSignedRoundChangePayload(
+            currentRound.getRoundIdentifier(), latestPreparedCertificate));
     transmitter.multicastRoundChange(currentRound.getRoundIdentifier(), latestPreparedCertificate);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
@@ -179,10 +179,10 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     actionOrBufferMessage(msg, currentRound::handleCommitMessage, RoundState::addCommitMessage);
   }
 
-  private <T extends Payload> void actionOrBufferMessage(
-      final Message msg,
-      final Consumer<? extends Message> inRoundHandler,
-      final BiConsumer<RoundState, Message> buffer) {
+  private <T extends Message> void actionOrBufferMessage(
+      final T msg,
+      final Consumer<T> inRoundHandler,
+      final BiConsumer<RoundState, T> buffer) {
 
     final MessageAge messageAge = determineAgeOfPayload(msg);
     if (messageAge == CURRENT_ROUND) {
@@ -241,14 +241,14 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     final MessageAge messageAge = determineAgeOfPayload(msg);
 
     if (messageAge == PRIOR_ROUND) {
-      LOG.info("Received NewRound Payload for a prior round={}", payload.getRoundIdentifier());
+      LOG.info("Received NewRound Payload for a prior round={}", msg.getRound());
       return;
     }
-    LOG.info("Received NewRound Payload for {}", payload.getRoundIdentifier());
+    LOG.info("Received NewRound Payload for {}", msg.getRound());
 
     if (newRoundMessageValidator.validateNewRoundMessage(msg)) {
       if (messageAge == FUTURE_ROUND) {
-        startNewRound(payload.getRoundIdentifier().getRoundNumber());
+        startNewRound(msg.getRound());
       }
       currentRound.handleProposalFromNewRound(msg);
     }
