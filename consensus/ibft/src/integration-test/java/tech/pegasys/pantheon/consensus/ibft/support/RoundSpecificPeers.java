@@ -169,15 +169,13 @@ public class RoundSpecificPeers {
     verifyMessagesReceived(candidates, msgs);
   }
 
-  public final void verifyMessagesReceivedNonPropsing(
-      final IbftMessage<?>... msgs) {
+  public final void verifyMessagesReceivedNonPropsing(final IbftMessage<?>... msgs) {
     verifyMessagesReceived(nonProposingPeers, msgs);
   }
 
   public final void verifyMessagesReceived(final IbftMessage<?>... msgs) {
     verifyMessagesReceived(peers, msgs);
   }
-
 
   private void verifyMessagesReceived(
       final Collection<ValidatorPeer> candidates, final IbftMessage<?>... msgs) {
@@ -198,29 +196,24 @@ public class RoundSpecificPeers {
     candidates.forEach(ValidatorPeer::clearReceivedMessages);
   }
 
-  private void verifyMessage(
-      final MessageData actual, final IbftMessage<?> expectedMessage) {
+  private void verifyMessage(final MessageData actual, final IbftMessage<?> expectedMessage) {
     IbftMessage<?> actualSignedPayload = null;
 
     switch (expectedMessage.getMessageType()) {
       case IbftV2.PROPOSAL:
-        actualSignedPayload =
-            ProposalMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = ProposalMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.PREPARE:
-        actualSignedPayload =
-            PrepareMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = PrepareMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.COMMIT:
         actualSignedPayload = CommitMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.NEW_ROUND:
-        actualSignedPayload =
-            NewRoundMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = NewRoundMessageData.fromMessageData(actual).decode();
         break;
       case IbftV2.ROUND_CHANGE:
-        actualSignedPayload =
-            RoundChangeMessageData.fromMessageData(actual).decode();
+        actualSignedPayload = RoundChangeMessageData.fromMessageData(actual).decode();
         break;
       default:
         fail("Illegal IBFTV2 message type.");
