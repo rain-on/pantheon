@@ -205,7 +205,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     }
 
     final Optional<RoundChangeCertificate> result =
-        roundChangeManager.appendRoundChangeMessage(message.getSignedPayload());
+        roundChangeManager.appendRoundChangeMessage(message);
     if (result.isPresent()) {
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
