@@ -68,7 +68,7 @@ public class RoundChangeManager {
             receivedMessages
                 .values()
                 .stream()
-                .map(message -> message.getSignedPayload())
+                .map(RoundChange::getSignedPayload)
                 .collect(Collectors.toList()));
       } else {
         throw new IllegalStateException("Unable to create RoundChangeCertificate at this time.");
