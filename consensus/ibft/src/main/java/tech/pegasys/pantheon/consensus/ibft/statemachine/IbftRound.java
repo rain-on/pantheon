@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.RoundChangeManager.RoundChangeArtefacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -97,12 +98,11 @@ public class IbftRound {
   }
 
   public void startRoundWith(
-      final RoundChangeCertificate roundChangeCertificate, final long headerTimestamp) {
-    final Optional<PreparedCertificate> latestCertificate =
-        findLatestPreparedCertificate(roundChangeCertificate.getRoundChangePayloads());
+      final RoundChangeArtefacts roundChangeArtefacts, final long headerTimestamp) {
+    final Optional<Block> bestBlockFromRoundChange = roundChangeArtefacts.getBlock();
 
     Proposal proposal;
-    if (!latestCertificate.isPresent()) {
+    if (!bestBlockFromRoundChange.isPresent()) {
       LOG.trace("Multicasting NewRound with new block. round={}", roundState.getRoundIdentifier());
       final Block block = blockCreator.createBlock(headerTimestamp);
       proposal = messageFactory.createSignedProposalPayload(getRoundIdentifier(), block);
@@ -110,16 +110,14 @@ public class IbftRound {
       LOG.trace(
           "Multicasting NewRound from PreparedCertificate. round={}",
           roundState.getRoundIdentifier());
-      proposal = createProposalFromPreparedCertificate(latestCertificate.get());
+      proposal = createProposalAroundBlock(bestBlockFromRoundChange.get());
     }
     transmitter.multicastNewRound(
-        getRoundIdentifier(), roundChangeCertificate, proposal.getSignedPayload());
+        getRoundIdentifier(), roundChangeArtefacts.getCertificate(), proposal);
     updateStateWithProposedBlock(proposal);
   }
 
-  private Proposal createProposalFromPreparedCertificate(
-      final PreparedCertificate preparedCertificate) {
-    final Block block = preparedCertificate.getProposalPayload().getPayload().getBlock();
+  private Proposal createProposalAroundBlock(final Block block) {
 
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
     final IbftExtraData extraDataToPublish =
@@ -163,11 +161,11 @@ public class IbftRound {
       LOG.error("Illegally received a NewRound message when in Round 0.");
       return;
     }
-    actionReceivedProposal(new Proposal(msg.getSignedPayload().getPayload().getProposalPayload()));
+    actionReceivedProposal(new Proposal(msg.getProposalPayload(), msg.getBlock()));
   }
 
   private void actionReceivedProposal(final Proposal msg) {
-    final Block block = msg.getSignedPayload().getPayload().getBlock();
+    final Block block = msg.getBlock();
 
     if (updateStateWithProposedBlock(msg)) {
       LOG.info("Sending prepare message.");
@@ -189,8 +187,8 @@ public class IbftRound {
     peerIsCommitted(msg);
   }
 
-  public Optional<PreparedCertificate> createPrepareCertificate() {
-    return roundState.constructPreparedCertificate();
+  public Optional<TerminatedRoundArtefacts> getTerminatedRoundArtefacts() {
+    return roundState.getReceivedArtefacts();
   }
 
   private boolean updateStateWithProposedBlock(final Proposal msg) {
@@ -211,7 +209,7 @@ public class IbftRound {
       final Commit localCommitMessage =
           messageFactory.createSignedCommitPayload(
               roundState.getRoundIdentifier(),
-              msg.getSignedPayload().getPayload().getBlock().getHash(),
+              msg.getBlock().getHash(),
               createCommitSeal(roundState.getProposedBlock().get()));
       peerIsCommitted(localCommitMessage);
     }

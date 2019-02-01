@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -66,10 +67,10 @@ public class RoundState {
   public boolean setProposedBlock(final Proposal msg) {
 
     if (!proposalMessage.isPresent()) {
-      if (validator.addSignedProposalPayload(msg.getSignedPayload())) {
+      if (validator.addSignedProposalPayload(msg)) {
         proposalMessage = Optional.of(msg);
-        preparePayloads.removeIf(p -> !validator.validatePrepareMessage(p.getSignedPayload()));
-        commitPayloads.removeIf(p -> !validator.validateCommmitMessage(p.getSignedPayload()));
+        preparePayloads.removeIf(p -> !validator.validatePrepareMessage(p));
+        commitPayloads.removeIf(p -> !validator.validateCommitMessage(p));
         updateState();
         return true;
       }
@@ -79,7 +80,7 @@ public class RoundState {
   }
 
   public void addPrepareMessage(final Prepare msg) {
-    if (!proposalMessage.isPresent() || validator.validatePrepareMessage(msg.getSignedPayload())) {
+    if (!proposalMessage.isPresent() || validator.validatePrepareMessage(msg)) {
       preparePayloads.add(msg);
       LOG.debug("Round state added prepare message prepare={}", msg);
     }
@@ -87,7 +88,7 @@ public class RoundState {
   }
 
   public void addCommitMessage(final Commit msg) {
-    if (!proposalMessage.isPresent() || validator.validateCommmitMessage(msg.getSignedPayload())) {
+    if (!proposalMessage.isPresent() || validator.validateCommitMessage(msg)) {
       commitPayloads.add(msg);
       LOG.debug("Round state added commit message commit={}", msg);
     }
@@ -110,7 +111,7 @@ public class RoundState {
   }
 
   public Optional<Block> getProposedBlock() {
-    return proposalMessage.map(p -> p.getSignedPayload().getPayload().getBlock());
+    return proposalMessage.map(Proposal::getBlock);
   }
 
   public boolean isPrepared() {

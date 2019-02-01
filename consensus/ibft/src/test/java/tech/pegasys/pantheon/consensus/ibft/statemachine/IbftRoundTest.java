@@ -34,7 +34,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -78,7 +78,7 @@ public class IbftRoundTest {
   @Mock private IbftMessageTransmitter transmitter;
   @Mock private MinedBlockObserver minedBlockObserver;
   @Mock private IbftBlockCreator blockCreator;
-  @Mock private MessageValidator messageValidator;
+  @Mock private SignedDataValidator signedDataValidator;
 
   @Captor private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
 
@@ -96,9 +96,9 @@ public class IbftRoundTest {
             worldStateArchive,
             new IbftContext(new VoteTally(Collections.emptyList()), new VoteProposer()));
 
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(signedDataValidator.validateCommmitMessage(any())).thenReturn(true);
 
     proposedExtraData =
         new IbftExtraData(
@@ -124,7 +124,7 @@ public class IbftRoundTest {
 
   @Test
   public void onReceptionOfValidProposalSendsAPrepareToNetworkPeers() {
-    final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 3, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -144,7 +144,7 @@ public class IbftRoundTest {
 
   @Test
   public void sendsAProposalWhenRequested() {
-    final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 3, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -164,7 +164,7 @@ public class IbftRoundTest {
 
   @Test
   public void singleValidatorImportBlocksImmediatelyOnProposalCreation() {
-    final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 1, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -184,7 +184,7 @@ public class IbftRoundTest {
 
   @Test
   public void twoValidatorNetworkSendsPrepareOnProposalReceptionThenSendsCommitOnCommitReceive() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -227,7 +227,7 @@ public class IbftRoundTest {
 
   @Test
   public void localNodeProposesToNetworkOfTwoValidatorsImportsOnReceptionOfCommitFromPeer() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -263,7 +263,7 @@ public class IbftRoundTest {
 
   @Test
   public void aNewRoundMessageWithAnewBlockIsSentUponReceptionOfARoundChangeWithNoCertificate() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -286,7 +286,7 @@ public class IbftRoundTest {
   @Test
   public void aNewRoundMessageWithTheSameBlockIsSentUponReceptionOfARoundChangeWithCertificate() {
     final ConsensusRoundIdentifier priorRoundChange = new ConsensusRoundIdentifier(1, 0);
-    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -332,7 +332,7 @@ public class IbftRoundTest {
 
   @Test
   public void creatingNewBlockFromEmptyPreparedCertificateUpdatesInternalState() {
-    final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 2, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -365,7 +365,7 @@ public class IbftRoundTest {
 
   @Test
   public void creatingNewBlockNotifiesBlockMiningObservers() {
-    final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, 1, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -384,7 +384,7 @@ public class IbftRoundTest {
   public void blockIsOnlyImportedOnceWhenCommitsAreReceivedBeforeProposal() {
     final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
     final int QUORUM_SIZE = 2;
-    final RoundState roundState = new RoundState(roundIdentifier, QUORUM_SIZE, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, QUORUM_SIZE, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,
@@ -409,7 +409,7 @@ public class IbftRoundTest {
   @Test
   public void blockIsImportedOnlyOnceIfQuorumCommitsAreReceivedPriorToProposal() {
     final int QUORUM_SIZE = 1;
-    final RoundState roundState = new RoundState(roundIdentifier, QUORUM_SIZE, messageValidator);
+    final RoundState roundState = new RoundState(roundIdentifier, QUORUM_SIZE, signedDataValidator);
     final IbftRound round =
         new IbftRound(
             roundState,

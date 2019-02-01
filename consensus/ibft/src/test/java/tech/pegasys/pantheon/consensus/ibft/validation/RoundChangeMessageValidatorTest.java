@@ -56,7 +56,7 @@ public class RoundChangeMessageValidatorTest {
 
   private final Block block = mock(Block.class);
 
-  private final MessageValidator basicValidator = mock(MessageValidator.class);
+  private final SignedDataValidator basicValidator = mock(SignedDataValidator.class);
   private final List<Address> validators = Lists.newArrayList();
 
   private final MessageValidatorForHeightFactory validatorFactory =

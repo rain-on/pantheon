@@ -14,10 +14,15 @@ package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 
 public class Prepare extends IbftMessage<PreparePayload> {
 
   public Prepare(final SignedData<PreparePayload> payload) {
     super(payload);
+  }
+
+  public Hash getDigest() {
+    return getSignedPayload().getPayload().getDigest();
   }
 }

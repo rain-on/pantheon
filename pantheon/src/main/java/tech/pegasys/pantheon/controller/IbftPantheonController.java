@@ -242,7 +242,8 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
             new IbftBlockHeightManagerFactory(
                 finalState,
                 new IbftRoundFactory(
-                    finalState, protocolContext, protocolSchedule, minedBlockObservers),
+                    finalState, protocolContext, protocolSchedule, minedBlockObservers,
+                    messageValidatorFactory),
                 messageValidatorFactory),
             gossiper);
     ibftController.start();

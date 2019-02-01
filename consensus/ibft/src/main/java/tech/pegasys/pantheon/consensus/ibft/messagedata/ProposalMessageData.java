@@ -32,11 +32,10 @@ public class ProposalMessageData extends AbstractIbftMessageData {
   }
 
   public Proposal decode() {
-    return new Proposal(SignedData.readSignedProposalPayloadFrom(RLP.input(data)));
+    return Proposal.decode(data);
   }
 
   public static ProposalMessageData create(final Proposal proposal) {
-
     return new ProposalMessageData(proposal.encode());
   }
 

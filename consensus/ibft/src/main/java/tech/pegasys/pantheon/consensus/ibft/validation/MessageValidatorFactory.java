@@ -41,15 +41,22 @@ public class MessageValidatorFactory {
     this.protocolContext = protocolContext;
   }
 
+  public SignedDataValidator createSignedDataValidator(
+      final ConsensusRoundIdentifier roundIdentifier)
+  {
+    return new SignedDataValidator(
+        protocolContext.getConsensusState().getVoteTally().getValidators(),
+        proposerSelector.selectProposerForRound(roundIdentifier),
+        roundIdentifier);
+  }
+
   public MessageValidator createMessageValidator(
       final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
 
     return new MessageValidator(
-        protocolContext.getConsensusState().getVoteTally().getValidators(),
-        proposerSelector.selectProposerForRound(roundIdentifier),
-        roundIdentifier,
+        createSignedDataValidator(roundIdentifier),
         blockValidator,
         protocolContext,
         parentHeader);

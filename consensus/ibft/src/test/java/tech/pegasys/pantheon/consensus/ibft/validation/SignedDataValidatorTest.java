@@ -51,7 +51,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MessageValidatorTest {
+public class SignedDataValidatorTest {
 
   private final KeyPair proposerKey = KeyPair.generate();
   private final KeyPair validatorKey = KeyPair.generate();
@@ -65,7 +65,7 @@ public class MessageValidatorTest {
   @Mock private BlockValidator<IbftContext> blockValidator;
   private final BlockHeader parentHeader = mock(BlockHeader.class);
   private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(2, 0);
-  private MessageValidator validator;
+  private SignedDataValidator validator;
 
   private final Block block = mock(Block.class);
 
@@ -79,7 +79,7 @@ public class MessageValidatorTest {
             mock(MutableBlockchain.class), mock(WorldStateArchive.class), mock(IbftContext.class));
 
     validator =
-        new MessageValidator(
+        new SignedDataValidator(
             validators,
             Util.publicKeyToAddress(proposerKey.getPublicKey()),
             roundIdentifier,

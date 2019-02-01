@@ -18,6 +18,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCou
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
@@ -80,9 +81,9 @@ public class NewRoundMessageValidator {
     }
 
     final SignedData<ProposalPayload> proposalPayload = payload.getProposalPayload();
-    final MessageValidator proposalValidator =
+    final SignedDataValidator proposalValidator =
         messageValidatorFactory.createAt(rootRoundIdentifier);
-    if (!proposalValidator.addSignedProposalPayload(proposalPayload)) {
+    if (!proposalValidator.addSignedProposalPayload(new Proposal(proposalPayload))) {
       LOG.info("Invalid NewRound message, embedded proposal failed validation");
       return false;
     }

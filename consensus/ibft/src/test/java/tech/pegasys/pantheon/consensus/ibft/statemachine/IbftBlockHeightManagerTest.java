@@ -42,7 +42,7 @@ import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -125,10 +125,10 @@ public class IbftBlockHeightManagerTest {
 
     buildCreatedBlock();
 
-    final MessageValidator messageValidator = mock(MessageValidator.class);
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+    final SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);
+    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(signedDataValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
     when(finalState.getRoundTimer()).thenReturn(roundTimer);
@@ -138,7 +138,8 @@ public class IbftBlockHeightManagerTest {
     when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
     when(messageValidatorFactory.createNewRoundValidator(any()))
         .thenReturn(newRoundMessageValidator);
-    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
+    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(
+        signedDataValidator);
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -150,7 +151,7 @@ public class IbftBlockHeightManagerTest {
               final int round = (int) invocation.getArgument(1);
               final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, round);
               final RoundState createdRoundState =
-                  new RoundState(roundId, finalState.getQuorum(), messageValidator);
+                  new RoundState(roundId, finalState.getQuorum(), signedDataValidator);
               return new IbftRound(
                   createdRoundState,
                   blockCreator,
