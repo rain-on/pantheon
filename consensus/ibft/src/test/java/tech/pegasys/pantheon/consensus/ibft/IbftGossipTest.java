@@ -65,13 +65,13 @@ public class IbftGossipTest {
   @Test
   public void assertRebroadcastsProposalToAllExceptSignerAndSender() {
     assertRebroadcastToAllExceptSignerAndSender(
-        TestHelpers::createSignedProposalPayload, ProposalMessageData::create);
+        TestHelpers::createProposal, ProposalMessageData::create);
   }
 
   @Test
   public void assertRebroadcastsRoundChangeToAllExceptSignerAndSender() {
     assertRebroadcastToAllExceptSignerAndSender(
-        TestHelpers::createSignedRoundChangePayload, RoundChangeMessageData::create);
+        TestHelpers::createRoundChange, RoundChangeMessageData::create);
   }
 
   @Test

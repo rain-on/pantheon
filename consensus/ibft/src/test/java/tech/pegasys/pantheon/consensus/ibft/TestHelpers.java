@@ -61,11 +61,11 @@ public class TestHelpers {
     return new BlockDataGenerator().block(blockOptions);
   }
 
-  public static Proposal createSignedProposalPayload(final KeyPair signerKeys) {
-    return createSignedProposalPayloadWithRound(signerKeys, 0xFEDCBA98);
+  public static Proposal createProposal(final KeyPair signerKeys) {
+    return createProposalWithRound(signerKeys, 0xFEDCBA98);
   }
 
-  public static Proposal createSignedProposalPayloadWithRound(
+  public static Proposal createProposalWithRound(
       final KeyPair signerKeys, final int round) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
@@ -75,7 +75,7 @@ public class TestHelpers {
     return messageFactory.createSignedProposalPayload(roundIdentifier, block);
   }
 
-  public static Prepare createSignedPreparePayload(final KeyPair signerKeys) {
+  public static Prepare createPrepare(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
@@ -83,7 +83,7 @@ public class TestHelpers {
         roundIdentifier, Hash.fromHexStringLenient("0"));
   }
 
-  public static Commit createSignedCommitPayload(final KeyPair signerKeys) {
+  public static Commit createCommit(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
@@ -93,7 +93,7 @@ public class TestHelpers {
         Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0));
   }
 
-  public static RoundChange createSignedRoundChangePayload(final KeyPair signerKeys) {
+  public static RoundChange createRoundChange(final KeyPair signerKeys) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
@@ -104,10 +104,11 @@ public class TestHelpers {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    final Proposal proposalPayload = createSignedProposalPayload(signerKeys);
+    final Proposal proposalPayload = createProposal(signerKeys);
     return messageFactory.createSignedNewRoundPayload(
         roundIdentifier,
         new RoundChangeCertificate(newArrayList()),
-        proposalPayload.getSignedPayload());
+        proposalPayload.getSignedPayload(),
+        proposalPayload.getBlock());
   }
 }

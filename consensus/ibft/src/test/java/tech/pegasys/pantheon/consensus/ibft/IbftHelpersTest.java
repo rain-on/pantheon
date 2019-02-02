@@ -20,6 +20,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -74,83 +75,5 @@ public class IbftHelpersTest {
   @Test
   public void calculateRequiredValidatorQuorum20Validator() {
     assertThat(calculateRequiredValidatorQuorum(20)).isEqualTo(14);
-  }
-
-  @Test
-  public void latestPreparedCertificateIsExtractedFromRoundChangeCertificate() {
-    // NOTE: This function does not validate that all RoundCHanges/Prepares etc. come from valid
-    // sources, it is only responsible for determine which of the list or RoundChange messages
-    // contains the newest
-    // NOTE: This capability is tested as part of the NewRoundMessageValidationTests.
-    final KeyPair proposerKey = KeyPair.generate();
-    final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
-    final Block proposedBlock = mock(Block.class);
-    when(proposedBlock.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
-    final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 4);
-
-    final ConsensusRoundIdentifier preparedRound = TestHelpers.createFrom(roundIdentifier, 0, -1);
-    final Proposal differentProposal =
-        proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
-
-    final Optional<PreparedCertificate> latterPreparedCert =
-        Optional.of(
-            new PreparedCertificate(
-                differentProposal.getSignedPayload(),
-                Lists.newArrayList(
-                    proposerMessageFactory
-                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash())
-                        .getSignedPayload(),
-                    proposerMessageFactory
-                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash())
-                        .getSignedPayload())));
-
-    // An earlier PrepareCert is added to ensure the path to find the latest PrepareCert
-    // is correctly followed.
-    final ConsensusRoundIdentifier earlierPreparedRound =
-        TestHelpers.createFrom(roundIdentifier, 0, -2);
-    final Proposal earlierProposal =
-        proposerMessageFactory.createSignedProposalPayload(earlierPreparedRound, proposedBlock);
-    final Optional<PreparedCertificate> earlierPreparedCert =
-        Optional.of(
-            new PreparedCertificate(
-                earlierProposal.getSignedPayload(),
-                Lists.newArrayList(
-                    proposerMessageFactory
-                        .createSignedPreparePayload(earlierPreparedRound, proposedBlock.getHash())
-                        .getSignedPayload(),
-                    proposerMessageFactory
-                        .createSignedPreparePayload(earlierPreparedRound, proposedBlock.getHash())
-                        .getSignedPayload())));
-
-    final Optional<PreparedCertificate> newestCert =
-        IbftHelpers.findLatestPreparedCertificate(
-            Lists.newArrayList(
-                proposerMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, earlierPreparedCert)
-                    .getSignedPayload(),
-                proposerMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, latterPreparedCert)
-                    .getSignedPayload()));
-
-    assertThat(newestCert).isEqualTo(latterPreparedCert);
-  }
-
-  @Test
-  public void allRoundChangeHaveNoPreparedReturnsEmptyOptional() {
-    final KeyPair proposerKey = KeyPair.generate();
-    final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
-    final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 4);
-
-    final Optional<PreparedCertificate> newestCert =
-        IbftHelpers.findLatestPreparedCertificate(
-            Lists.newArrayList(
-                proposerMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty())
-                    .getSignedPayload(),
-                proposerMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty())
-                    .getSignedPayload()));
-
-    assertThat(newestCert).isEmpty();
   }
 }
