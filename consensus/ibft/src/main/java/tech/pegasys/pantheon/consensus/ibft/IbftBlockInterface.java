@@ -16,10 +16,12 @@ import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.Collection;
 import java.util.Optional;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 
 public class IbftBlockInterface implements BlockInterface {
 
@@ -53,5 +55,28 @@ public class IbftBlockInterface implements BlockInterface {
   public int roundOfBlock(final BlockHeader header) {
     final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
     return ibftExtraData.getRound();
+  }
+
+  public static Block replaceRoundInBlock(final Block block, final int round) {
+    final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
+    final IbftExtraData substituteExtraData =
+        new IbftExtraData(
+            prevExtraData.getVanityData(),
+            prevExtraData.getSeals(),
+            prevExtraData.getVote(),
+            round,
+            prevExtraData.getValidators());
+
+    final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
+    headerBuilder
+        .extraData(substituteExtraData.encode())
+        .blockHashFunction(
+            blockHeader ->
+                IbftBlockHashing.calculateDataHashForCommittedSeal(
+                    blockHeader, substituteExtraData));
+
+    final BlockHeader newHeader = headerBuilder.buildBlockHeader();
+
+    return new Block(newHeader, block.getBody());
   }
 }

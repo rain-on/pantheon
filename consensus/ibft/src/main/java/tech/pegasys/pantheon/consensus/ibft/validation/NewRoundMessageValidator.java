@@ -17,16 +17,18 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCou
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator.MessageValidatorForHeightFactory;
+import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.Collection;
@@ -41,26 +43,29 @@ public class NewRoundMessageValidator {
 
   private final Collection<Address> validators;
   private final ProposerSelector proposerSelector;
-  private final MessageValidatorForHeightFactory messageValidatorFactory;
+  private final SignedDataValidatorForHeightFactory signedDataForHeightValidator;
+  private ProposalBlockConsistencyChecker proposalBlockConsistencyChecker;
   private final long quorum;
   private final long chainHeight;
 
   public NewRoundMessageValidator(
       final Collection<Address> validators,
       final ProposerSelector proposerSelector,
-      final MessageValidatorForHeightFactory messageValidatorFactory,
+      final SignedDataValidatorForHeightFactory signedDataForHeightValidator,
+      final ProposalBlockConsistencyChecker proposalBlockConsistencyChecker,
       final long quorum,
       final long chainHeight) {
     this.validators = validators;
     this.proposerSelector = proposerSelector;
-    this.messageValidatorFactory = messageValidatorFactory;
+    this.signedDataForHeightValidator = signedDataForHeightValidator;
+    this.proposalBlockConsistencyChecker = proposalBlockConsistencyChecker;
     this.quorum = quorum;
     this.chainHeight = chainHeight;
   }
 
-  public boolean validateNewRoundMessage(final SignedData<NewRoundPayload> msg) {
-
-    final NewRoundPayload payload = msg.getPayload();
+  public boolean validateNewRoundMessage(final NewRound msg) {
+    final SignedData<NewRoundPayload> signedPayload = msg.getSignedPayload();
+    final NewRoundPayload payload = signedPayload.getPayload();
     final ConsensusRoundIdentifier rootRoundIdentifier = payload.getRoundIdentifier();
     final Address expectedProposer = proposerSelector.selectProposerForRound(rootRoundIdentifier);
     final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
@@ -70,21 +75,26 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    if (msg.getPayload().getRoundIdentifier().getSequenceNumber() != chainHeight) {
+    if (msg.getRoundIdentifier().getSequenceNumber() != chainHeight) {
       LOG.info("Invalid NewRound message, not valid for local chain height.");
       return false;
     }
 
-    if (msg.getPayload().getRoundIdentifier().getRoundNumber() == 0) {
+    if (msg.getRoundIdentifier().getRoundNumber() == 0) {
       LOG.info("Invalid NewRound message, illegally targets a new round of 0.");
       return false;
     }
 
     final SignedData<ProposalPayload> proposalPayload = payload.getProposalPayload();
     final SignedDataValidator proposalValidator =
-        messageValidatorFactory.createAt(rootRoundIdentifier);
-    if (!proposalValidator.addSignedProposalPayload(new Proposal(proposalPayload))) {
+        signedDataForHeightValidator.createAt(rootRoundIdentifier);
+    if (!proposalValidator.addSignedProposalPayload(proposalPayload)) {
       LOG.info("Invalid NewRound message, embedded proposal failed validation");
+      return false;
+    }
+
+    if(!proposalBlockConsistencyChecker.validateProposalMatchesBlock(proposalPayload, msg.getBlock())) {
+      LOG.info("Invalid New Round, proposal payload did not align with supplied block.");
       return false;
     }
 
@@ -93,16 +103,16 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    return validateProposalMessageMatchesLatestPrepareCertificate(payload);
+    return validateProposalMessageMatchesLatestPrepareCertificate(payload, msg.getBlock());
   }
 
   private boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
       final ConsensusRoundIdentifier expectedRound, final RoundChangeCertificate roundChangeCert) {
 
-    final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
+    final Collection<SignedData<RoundChangePayload>> roundChangePayloads =
         roundChangeCert.getRoundChangePayloads();
 
-    if (roundChangeMsgs.size() < quorum) {
+    if (roundChangePayloads.size() < quorum) {
       LOG.info(
           "Invalid NewRound message, RoundChange certificate has insufficient "
               + "RoundChange messages.");
@@ -119,16 +129,16 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    for (final SignedData<RoundChangePayload> roundChangeMsg :
+    for (final SignedData<RoundChangePayload> roundChangePayload :
         roundChangeCert.getRoundChangePayloads()) {
-      final RoundChangeMessageValidator roundChangeValidator =
-          new RoundChangeMessageValidator(
-              messageValidatorFactory,
+      final RoundChangeSignedDataValidator roundChangeValidator =
+          new RoundChangeSignedDataValidator(
+              signedDataForHeightValidator,
               validators,
               prepareMessageCountForQuorum(quorum),
               chainHeight);
 
-      if (!roundChangeValidator.validateMessage(roundChangeMsg)) {
+      if (!roundChangeValidator.validatePayload(roundChangePayload)) {
         LOG.info("Invalid NewRound message, embedded RoundChange message failed validation.");
         return false;
       }
@@ -137,7 +147,7 @@ public class NewRoundMessageValidator {
   }
 
   private boolean validateProposalMessageMatchesLatestPrepareCertificate(
-      final NewRoundPayload payload) {
+      final NewRoundPayload payload, final Block proposedBlock) {
 
     final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
@@ -152,21 +162,17 @@ public class NewRoundMessageValidator {
       return true;
     }
 
-    // Get the hash of the block in latest prepareCert, not including the Round field.
-    final Hash roundAgnosticBlockHashPreparedCert =
-        IbftBlockHashing.calculateHashOfIbftBlockOnChain(
-            latestPreparedCertificate
-                .get()
-                .getProposalPayload()
-                .getPayload()
-                .getBlock()
-                .getHeader());
+    // Need to check that if we substitute the LatestedPrepareCert round number into the supplied
+    // block that we get the SAME hash as PreparedCert.
+    final Block currentBlockWithOldRound = IbftBlockInterface.replaceRoundInBlock(
+        proposedBlock,
+        latestPreparedCertificate.get().getProposalPayload().getPayload().getRoundIdentifier()
+            .getRoundNumber());
 
-    final Hash roundAgnosticBlockHashProposal =
-        IbftBlockHashing.calculateHashOfIbftBlockOnChain(
-            payload.getProposalPayload().getPayload().getBlock().getHeader());
+    final Hash oldRoundHash =
+        IbftBlockHashing.calculateDataHashForCommittedSeal(currentBlockWithOldRound.getHeader());
 
-    if (!roundAgnosticBlockHashPreparedCert.equals(roundAgnosticBlockHashProposal)) {
+    if(oldRoundHash != latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest()) {
       LOG.info(
           "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;

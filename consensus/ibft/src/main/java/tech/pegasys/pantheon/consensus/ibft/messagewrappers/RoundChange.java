@@ -39,7 +39,7 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
   }
 
   public Optional<PreparedCertificate> getPreparedCertificate() {
-    getPayload().getPreparedCertificate();
+    return getPayload().getPreparedCertificate();
   }
 
   @Override

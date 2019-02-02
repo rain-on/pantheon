@@ -16,6 +16,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPrepare
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
@@ -118,31 +119,11 @@ public class IbftRound {
   }
 
   private Proposal createProposalAroundBlock(final Block block) {
-
-    final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
-    final IbftExtraData extraDataToPublish =
-        new IbftExtraData(
-            prevExtraData.getVanityData(),
-            prevExtraData.getSeals(),
-            prevExtraData.getVote(),
-            getRoundIdentifier().getRoundNumber(),
-            prevExtraData.getValidators());
-
-    final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
-    headerBuilder
-        .extraData(extraDataToPublish.encode())
-        .blockHashFunction(
-            blockHeader ->
-                IbftBlockHashing.calculateDataHashForCommittedSeal(
-                    blockHeader, extraDataToPublish));
-    final BlockHeader newHeader = headerBuilder.buildBlockHeader();
-    final Block newBlock = new Block(newHeader, block.getBody());
-    LOG.debug(
-        "Created proposal from prepared certificate blockHeader={} extraData={}",
-        block.getHeader(),
-        extraDataToPublish);
-    return messageFactory.createSignedProposalPayload(getRoundIdentifier(), newBlock);
+    final Block blockToPublish =
+        IbftBlockInterface.replaceRoundInBlock(block, getRoundIdentifier().getRoundNumber());
+    return messageFactory.createSignedProposalPayload(getRoundIdentifier(), blockToPublish);
   }
+
 
   public void handleProposalMessage(final Proposal msg) {
     LOG.info("Handling a Proposal message.");

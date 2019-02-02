@@ -12,56 +12,30 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.ethereum.core.Address;
-
-import java.util.Collection;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 
 public class RoundChangeMessageValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private final MessageValidatorForHeightFactory messageValidatorFactory;
-  private final Collection<Address> validators;
-  private final long minimumPrepareMessages;
-  private final long chainHeight;
+  private final RoundChangeSignedDataValidator signedDataValidator;
+  private final ProposalBlockConsistencyChecker proposalBlockConsistencyChecker;
+
 
   public RoundChangeMessageValidator(
-      final MessageValidatorForHeightFactory messageValidatorFactory,
-      final Collection<Address> validators,
-      final long minimumPrepareMessages,
-      final long chainHeight) {
-    this.messageValidatorFactory = messageValidatorFactory;
-    this.validators = validators;
-    this.minimumPrepareMessages = minimumPrepareMessages;
-    this.chainHeight = chainHeight;
+      final RoundChangeSignedDataValidator signedDataValidator,
+      final ProposalBlockConsistencyChecker proposalBlockConsistencyChecker) {
+    this.proposalBlockConsistencyChecker = proposalBlockConsistencyChecker;
+    this.signedDataValidator = signedDataValidator;
   }
 
   public boolean validateMessage(final RoundChange msg) {
 
-    if (!validators.contains(msg.getAuthor())) {
-      LOG.info(
-          "Invalid RoundChange message, was not transmitted by a validator for the associated"
-              + " round.");
-      return false;
-    }
-
-    final ConsensusRoundIdentifier targetRound = msg.getRoundIdentifier();
-
-    if (targetRound.getSequenceNumber() != chainHeight) {
-      LOG.info("Invalid RoundChange message, not valid for local chain height.");
+    if (signedDataValidator.validatePayload(msg.getSignedPayload())) {
+      LOG.info("Invalid RoundChange message, signed data did not validate correctly.");
       return false;
     }
 
@@ -72,72 +46,14 @@ public class RoundChangeMessageValidator {
     }
 
     if (msg.getPreparedCertificate().isPresent()) {
-      final PreparedCertificate certificate = msg.getPreparedCertificate().get();
-      return validatePrepareCertificate(certificate, msg.getProposedBlock().get(), targetRound);
-    }
-
-    return true;
-  }
-
-  private boolean validatePrepareCertificate(
-      final PreparedCertificate certificate, final Block attachedBlock,
-      final ConsensusRoundIdentifier roundChangeTarget) {
-    final SignedData<ProposalPayload> proposalMessage = certificate.getProposalPayload();
-
-    final ConsensusRoundIdentifier proposalRoundIdentifier =
-        proposalMessage.getPayload().getRoundIdentifier();
-
-    if (!validatePreparedCertificateRound(proposalRoundIdentifier, roundChangeTarget)) {
-      return false;
-    }
-
-    final MessageValidator messageValidator =
-        messageValidatorFactory.createAt(proposalRoundIdentifier);
-    return validateConsistencyOfPrepareCertificateMessages(certificate, attachedBlock,
-        messageValidator);
-  }
-
-  private boolean validateConsistencyOfPrepareCertificateMessages(
-      final PreparedCertificate certificate, final Block attachedBlock,
-      final MessageValidator messageValidator) {
-    final Proposal localProposal = new Proposal(certificate.getProposalPayload(), attachedBlock);
-
-    if (!messageValidator.addProposalMessage(localProposal)) {
-      LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
-      return false;
-    }
-
-    if (certificate.getPreparePayloads().size() < minimumPrepareMessages) {
-      LOG.info(
-          "Invalid RoundChange message, insufficient Prepare messages exist to justify "
-              + "prepare certificate.");
-      return false;
-    }
-
-    for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      if (!messageValidator.validatePrepareMessage(new Prepare(prepareMsg))) {
-        LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
+      if (!proposalBlockConsistencyChecker
+          .validateProposalMatchesBlock(msg.getPreparedCertificate().get().getProposalPayload(),
+              msg.getProposedBlock().get())) {
+        LOG.info("Invalid RoundChange message, proposal did not align with supplied block.");
         return false;
       }
     }
 
-    return true;
-  }
-
-  private boolean validatePreparedCertificateRound(
-      final ConsensusRoundIdentifier prepareCertRound,
-      final ConsensusRoundIdentifier roundChangeTarget) {
-
-    if (prepareCertRound.getSequenceNumber() != roundChangeTarget.getSequenceNumber()) {
-      LOG.info("Invalid RoundChange message, PreparedCertificate is not for local chain height.");
-      return false;
-    }
-
-    if (prepareCertRound.getRoundNumber() >= roundChangeTarget.getRoundNumber()) {
-      LOG.info(
-          "Invalid RoundChange message, PreparedCertificate not older than RoundChange target.");
-      return false;
-    }
     return true;
   }
 

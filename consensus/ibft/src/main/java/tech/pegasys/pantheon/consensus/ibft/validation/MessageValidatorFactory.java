@@ -42,8 +42,7 @@ public class MessageValidatorFactory {
   }
 
   public SignedDataValidator createSignedDataValidator(
-      final ConsensusRoundIdentifier roundIdentifier)
-  {
+      final ConsensusRoundIdentifier roundIdentifier) {
     return new SignedDataValidator(
         protocolContext.getConsensusState().getVoteTally().getValidators(),
         proposerSelector.selectProposerForRound(roundIdentifier),
@@ -51,27 +50,33 @@ public class MessageValidatorFactory {
   }
 
   public MessageValidator createMessageValidator(
-      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
+      final ConsensusRoundIdentifier roundIdentifier) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
 
     return new MessageValidator(
         createSignedDataValidator(roundIdentifier),
-        blockValidator,
-        protocolContext,
-        parentHeader);
+        new ProposalBlockConsistencyChecker(blockValidator, protocolContext));
   }
 
   public RoundChangeMessageValidator createRoundChangeMessageValidator(
-      final BlockHeader parentHeader) {
+      final ConsensusRoundIdentifier roundIdentifier) {
+
+    final long chainHeight = roundIdentifier.getSequenceNumber();
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
+
+    final BlockValidator<IbftContext> blockValidator =
+        protocolSchedule.getByBlockNumber(chainHeight).getBlockValidator();
+
     return new RoundChangeMessageValidator(
-        roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
-        validators,
-        prepareMessageCountForQuorum(
-            IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
-        parentHeader.getNumber() + 1);
+        new RoundChangeSignedDataValidator(
+            this::createSignedDataValidator,
+            validators,
+            IbftHelpers.prepareMessageCountForQuorum(
+                IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
+            chainHeight),
+        new ProposalBlockConsistencyChecker(blockValidator, protocolContext));
   }
 
   public NewRoundMessageValidator createNewRoundValidator(final BlockHeader parentHeader) {
@@ -80,8 +85,9 @@ public class MessageValidatorFactory {
     return new NewRoundMessageValidator(
         validators,
         proposerSelector,
-        roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
+        this::createMessageValidator,
         IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
         parentHeader.getNumber() + 1);
   }
+
 }

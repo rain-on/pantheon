@@ -157,7 +157,7 @@ public class RoundChangeManager {
   }
 
   private boolean isMessageValid(final RoundChange msg) {
-    return roundChangeMessageValidator.validateMessage(msg.getSignedPayload());
+    return roundChangeMessageValidator.validateMessage(msg);
   }
 
   private RoundChangeStatus storeRoundChangeMessage(final RoundChange msg) {
