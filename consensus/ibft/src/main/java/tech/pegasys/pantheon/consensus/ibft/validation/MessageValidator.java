@@ -59,11 +59,11 @@ public class MessageValidator {
   }
 
   public boolean validatePrepareMessage(final Prepare msg) {
-    return dataValidator.validatePrepareMessage(msg.getSignedPayload());
+    return dataValidator.validatePreparePayload(msg.getSignedPayload());
   }
 
   public boolean validateCommitMessage(final Commit msg) {
-    return dataValidator.validateCommitMessage(msg.getSignedPayload());
+    return dataValidator.validateCommitPayload(msg.getSignedPayload());
   }
 
   private boolean validateBlockMatchesProposalRound(final ProposalPayload payload,

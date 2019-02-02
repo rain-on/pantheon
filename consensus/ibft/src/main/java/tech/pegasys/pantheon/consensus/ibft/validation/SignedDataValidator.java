@@ -87,7 +87,7 @@ public class SignedDataValidator {
     return validateDigestMatchesProposal(msg.getPayload().getDigest(), payloadType);
   }
 
-  public boolean validateCommmitPayload(final SignedData<CommitPayload> msg) {
+  public boolean validateCommitPayload(final SignedData<CommitPayload> msg) {
     final String payloadType = "Commit";
 
     if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, payloadType)) {

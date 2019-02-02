@@ -49,4 +49,9 @@ public class IbftBlockInterface implements BlockInterface {
     final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
     return ibftExtraData.getValidators();
   }
+
+  public int roundOfBlock(final BlockHeader header) {
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
+    return ibftExtraData.getRound();
+  }
 }
