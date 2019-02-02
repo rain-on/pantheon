@@ -36,7 +36,7 @@ public class MessageValidator {
     this.protocolContext = protocolContext;
   }
 
-  public boolean addSignedProposalPayload(final Proposal msg) {
+  public boolean addProposalMessage(final Proposal msg) {
     final SignedData<ProposalPayload> signedPayload = msg.getSignedPayload();
 
     ProposalBlockConsistencyChecker consistencyChecker = new ProposalBlockConsistencyChecker(

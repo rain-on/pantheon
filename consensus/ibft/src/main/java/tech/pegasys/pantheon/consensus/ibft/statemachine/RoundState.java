@@ -18,9 +18,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
-import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -67,7 +65,7 @@ public class RoundState {
   public boolean setProposedBlock(final Proposal msg) {
 
     if (!proposalMessage.isPresent()) {
-      if (validator.addSignedProposalPayload(msg)) {
+      if (validator.addProposalMessage(msg)) {
         proposalMessage = Optional.of(msg);
         preparePayloads.removeIf(p -> !validator.validatePrepareMessage(p));
         commitPayloads.removeIf(p -> !validator.validateCommitMessage(p));

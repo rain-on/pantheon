@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
@@ -25,6 +27,7 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.ethereum.core.Block;
 
 public class RoundChangeMessageValidator {
 
@@ -62,7 +65,7 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    if(msg.getPreparedCertificate().isPresent() != msg.getProposedBlock().isPresent()) {
+    if (msg.getPreparedCertificate().isPresent() != msg.getProposedBlock().isPresent()) {
       LOG.info("Invalid RoundChange message, availability of certificate does not correlate with"
           + "availability of block.");
       return false;
@@ -70,14 +73,15 @@ public class RoundChangeMessageValidator {
 
     if (msg.getPreparedCertificate().isPresent()) {
       final PreparedCertificate certificate = msg.getPreparedCertificate().get();
-      return validatePrepareCertificate(certificate, targetRound);
+      return validatePrepareCertificate(certificate, msg.getProposedBlock().get(), targetRound);
     }
 
     return true;
   }
 
   private boolean validatePrepareCertificate(
-      final PreparedCertificate certificate, final ConsensusRoundIdentifier roundChangeTarget) {
+      final PreparedCertificate certificate, final Block attachedBlock,
+      final ConsensusRoundIdentifier roundChangeTarget) {
     final SignedData<ProposalPayload> proposalMessage = certificate.getProposalPayload();
 
     final ConsensusRoundIdentifier proposalRoundIdentifier =
@@ -87,15 +91,18 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    final SignedDataValidator signedDataValidator =
-        new SignedDataValidator(validators, null, proposalRoundIdentifier);
-    return validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator);
+    final MessageValidator messageValidator =
+        messageValidatorFactory.createAt(proposalRoundIdentifier);
+    return validateConsistencyOfPrepareCertificateMessages(certificate, attachedBlock,
+        messageValidator);
   }
 
   private boolean validateConsistencyOfPrepareCertificateMessages(
-      final PreparedCertificate certificate, final SignedDataValidator dataValidator) {
+      final PreparedCertificate certificate, final Block attachedBlock,
+      final MessageValidator messageValidator) {
+    final Proposal localProposal = new Proposal(certificate.getProposalPayload(), attachedBlock);
 
-    if (!dataValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
+    if (!messageValidator.addProposalMessage(localProposal)) {
       LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
       return false;
     }
@@ -108,7 +115,7 @@ public class RoundChangeMessageValidator {
     }
 
     for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      if (!dataValidator.validatePreparePayload(prepareMsg)) {
+      if (!messageValidator.validatePrepareMessage(new Prepare(prepareMsg))) {
         LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
         return false;
       }
@@ -136,6 +143,7 @@ public class RoundChangeMessageValidator {
 
   @FunctionalInterface
   public interface MessageValidatorForHeightFactory {
+
     MessageValidator createAt(final ConsensusRoundIdentifier roundIdentifier);
   }
 }
