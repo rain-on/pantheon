@@ -56,7 +56,7 @@ public class IbftRoundFactory {
         new RoundState(
             roundIdentifier,
             finalState.getQuorum(),
-            messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
+            messageValidatorFactory.createMessageValidator(roundIdentifier));
 
     return createNewRoundWithState(parentHeader, roundState);
   }

@@ -59,10 +59,8 @@ public class MessageValidatorFactory {
         new ProposalBlockConsistencyChecker(blockValidator, protocolContext));
   }
 
-  public RoundChangeMessageValidator createRoundChangeMessageValidator(
-      final ConsensusRoundIdentifier roundIdentifier) {
+  public RoundChangeMessageValidator createRoundChangeMessageValidator(final long chainHeight) {
 
-    final long chainHeight = roundIdentifier.getSequenceNumber();
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
 
@@ -79,15 +77,20 @@ public class MessageValidatorFactory {
         new ProposalBlockConsistencyChecker(blockValidator, protocolContext));
   }
 
-  public NewRoundMessageValidator createNewRoundValidator(final BlockHeader parentHeader) {
+  public NewRoundMessageValidator createNewRoundValidator(final long chainHeight) {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
+
+    final BlockValidator<IbftContext> blockValidator =
+        protocolSchedule.getByBlockNumber(chainHeight).getBlockValidator();
+
     return new NewRoundMessageValidator(
         validators,
         proposerSelector,
-        this::createMessageValidator,
+        this::createSignedDataValidator,
+        new ProposalBlockConsistencyChecker(blockValidator, protocolContext),
         IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
-        parentHeader.getNumber() + 1);
+        chainHeight);
   }
 
 }

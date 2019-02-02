@@ -115,7 +115,7 @@ public class RoundChangeSignedDataValidator {
   }
 
   @FunctionalInterface
-  public static interface SignedDataValidatorForHeightFactory {
+  public interface SignedDataValidatorForHeightFactory {
 
     SignedDataValidator createAt(ConsensusRoundIdentifier roundIdentifier);
   }
