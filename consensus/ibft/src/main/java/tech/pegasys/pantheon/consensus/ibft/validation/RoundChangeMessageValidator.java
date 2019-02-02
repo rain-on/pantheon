@@ -81,15 +81,15 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    final MessageValidator signedDataValidator =
-        messageValidatorFactory.createAt(proposalRoundIdentifier);
-    return validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator);
+    final SignedDataValidator messageValidator =
+        new SignedDataValidator(validators, null, proposalRoundIdentifier);
+    return validateConsistencyOfPrepareCertificateMessages(certificate, messageValidator);
   }
 
   private boolean validateConsistencyOfPrepareCertificateMessages(
-      final PreparedCertificate certificate, final MessageValidator signedDataValidator) {
+      final PreparedCertificate certificate, final SignedDataValidator dataValidator) {
 
-    if (!signedDataValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
+    if (!dataValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
       LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
       return false;
     }
@@ -102,7 +102,7 @@ public class RoundChangeMessageValidator {
     }
 
     for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      if (!signedDataValidator.validatePrepareMessage(prepareMsg)) {
+      if (!dataValidator.validatePreparePayload(prepareMsg)) {
         LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
         return false;
       }

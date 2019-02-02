@@ -125,7 +125,7 @@ public class IbftBlockHeightManagerTest {
 
     buildCreatedBlock();
 
-    final SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);
+    final MessageValidator messageValidator = mock(SignedDataValidator.class);
     when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
     when(signedDataValidator.validateCommmitMessage(any())).thenReturn(true);
     when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
@@ -138,8 +138,7 @@ public class IbftBlockHeightManagerTest {
     when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
     when(messageValidatorFactory.createNewRoundValidator(any()))
         .thenReturn(newRoundMessageValidator);
-    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(
-        signedDataValidator);
+    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -151,7 +150,7 @@ public class IbftBlockHeightManagerTest {
               final int round = (int) invocation.getArgument(1);
               final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, round);
               final RoundState createdRoundState =
-                  new RoundState(roundId, finalState.getQuorum(), signedDataValidator);
+                  new RoundState(roundId, finalState.getQuorum(), messageValidator);
               return new IbftRound(
                   createdRoundState,
                   blockCreator,

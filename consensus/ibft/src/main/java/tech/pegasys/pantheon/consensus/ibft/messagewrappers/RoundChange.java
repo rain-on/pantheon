@@ -12,12 +12,57 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
+import java.util.Optional;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
+import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
+import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class RoundChange extends IbftMessage<RoundChangePayload> {
 
-  public RoundChange(final SignedData<RoundChangePayload> payload) {
+  final private Optional<Block> proposedBlock;
+
+  public RoundChange(final SignedData<RoundChangePayload> payload,
+      final Optional<Block> proposedBlock) {
     super(payload);
+    this.proposedBlock = proposedBlock;
+  }
+
+  public Optional<Block> getProposedBlock() {
+    return proposedBlock;
+  }
+
+  @Override
+  public BytesValue encode() {
+    final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
+    rlpOut.startList();
+    rlpOut.writeBytesValue(getSignedPayload().encode());
+    if(proposedBlock.isPresent()) {
+      rlpOut.writeBytesValue(proposedBlock.get().toRlp());
+    }
+    else {
+      rlpOut.writeNull();
+    }
+    rlpOut.endList();
+    return rlpOut.encoded();
+  }
+
+  public static RoundChange decode(final BytesValue data) {
+    RLPInput rlpIn = RLP.input(data);
+    rlpIn.enterList();
+    final SignedData<RoundChangePayload> payload =
+        SignedData.readSignedRoundChangePayloadFrom(rlpIn);
+    Optional<Block> proposedBlock = Optional.empty();
+    if (!rlpIn.nextIsNull()) {
+      proposedBlock =
+          Optional.of(Block.readFrom(rlpIn, IbftBlockHashing::calculateDataHashForCommittedSeal));
+    }
+    rlpIn.leaveList();
+    return new RoundChange(payload, proposedBlock);
   }
 }

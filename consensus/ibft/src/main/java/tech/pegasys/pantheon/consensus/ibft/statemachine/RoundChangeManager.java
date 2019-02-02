@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
@@ -26,6 +27,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.ethereum.core.Block;
 
 /**
  * Responsible for handling all RoundChange messages received for a given block height
@@ -38,12 +40,36 @@ import org.apache.logging.log4j.Logger;
  */
 public class RoundChangeManager {
 
+  public static class RoundChangeArtefacts {
+
+    private final RoundChangeCertificate certificate;
+    private final Optional<Block> block;
+
+    public RoundChangeArtefacts(
+        final RoundChangeCertificate certificate, final Optional<Block> block) {
+      this.certificate = certificate;
+      this.block = block;
+    }
+
+    public RoundChangeCertificate getCertificate() {
+      return certificate;
+    }
+
+    public Optional<Block> getBlock() {
+      return block;
+    }
+  }
+
+
   public static class RoundChangeStatus {
 
     private final long quorum;
+    private Optional<Block> selectedBlock = Optional.empty();
+    private final IbftBlockInterface blockInterface = new IbftBlockInterface();
 
     // Store only 1 round change per round per validator
-    @VisibleForTesting final Map<Address, RoundChange> receivedMessages = Maps.newLinkedHashMap();
+    @VisibleForTesting
+    final Map<Address, RoundChange> receivedMessages = Maps.newLinkedHashMap();
 
     private boolean actioned = false;
 
@@ -54,6 +80,22 @@ public class RoundChangeManager {
     public void addMessage(final RoundChange msg) {
       if (!actioned) {
         receivedMessages.putIfAbsent(msg.getAuthor(), msg);
+        updateSelectedBlock(msg.getProposedBlock());
+      }
+
+    }
+
+    private void updateSelectedBlock(final Optional<Block> reportedBlock) {
+      if (!selectedBlock.isPresent()) {
+        selectedBlock = reportedBlock;
+        return;
+      }
+
+      if (reportedBlock.isPresent()) {
+        if (blockInterface.roundOfBlock(reportedBlock.get().getHeader()) >
+            blockInterface.roundOfBlock(selectedBlock.get().getHeader())) {
+          selectedBlock = reportedBlock;
+        }
       }
     }
 
@@ -61,15 +103,16 @@ public class RoundChangeManager {
       return receivedMessages.size() >= quorum && !actioned;
     }
 
-    public RoundChangeCertificate createRoundChangeCertificate() {
+    public RoundChangeArtefacts createRoundChangeArtefacts() {
       if (roundChangeReady()) {
         actioned = true;
-        return new RoundChangeCertificate(
+        final RoundChangeCertificate certificate = new RoundChangeCertificate(
             receivedMessages
                 .values()
                 .stream()
                 .map(RoundChange::getSignedPayload)
                 .collect(Collectors.toList()));
+        return new RoundChangeArtefacts(certificate, selectedBlock);
       } else {
         throw new IllegalStateException("Unable to create RoundChangeCertificate at this time.");
       }
@@ -95,9 +138,9 @@ public class RoundChangeManager {
    *
    * @param msg The signed round change message to add
    * @return Empty if the round change threshold hasn't been hit, otherwise a round change
-   *     certificate
+   * certificate
    */
-  public Optional<RoundChangeCertificate> appendRoundChangeMessage(final RoundChange msg) {
+  public Optional<RoundChangeArtefacts> appendRoundChangeMessage(final RoundChange msg) {
 
     if (!isMessageValid(msg)) {
       LOG.info("RoundChange message was invalid.");
@@ -107,7 +150,7 @@ public class RoundChangeManager {
     final RoundChangeStatus roundChangeStatus = storeRoundChangeMessage(msg);
 
     if (roundChangeStatus.roundChangeReady()) {
-      return Optional.of(roundChangeStatus.createRoundChangeCertificate());
+      return Optional.of(roundChangeStatus.createRoundChangeArtefacts());
     }
 
     return Optional.empty();

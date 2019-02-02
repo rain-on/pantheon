@@ -32,7 +32,7 @@ public class NewRoundMessageData extends AbstractIbftMessageData {
   }
 
   public NewRound decode() {
-    return new NewRound(SignedData.readSignedNewRoundPayloadFrom(RLP.input(data)));
+    return NewRound.decode(data);
   }
 
   public static NewRoundMessageData create(final NewRound newRound) {

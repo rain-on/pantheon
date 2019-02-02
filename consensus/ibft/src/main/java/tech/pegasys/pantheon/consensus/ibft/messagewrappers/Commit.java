@@ -24,10 +24,10 @@ public class Commit extends IbftMessage<CommitPayload> {
   }
 
   public Signature getCommitSeal() {
-    return getSignedPayload().getPayload().getCommitSeal();
+    return getPayload().getCommitSeal();
   }
 
   public Hash getDigest() {
-    return getSignedPayload().getPayload().getDigest();
+    return getPayload().getDigest();
   }
 }

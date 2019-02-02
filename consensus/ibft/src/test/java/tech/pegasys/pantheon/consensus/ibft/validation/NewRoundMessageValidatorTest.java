@@ -58,7 +58,7 @@ public class NewRoundMessageValidatorTest {
   private final ProposerSelector proposerSelector = mock(ProposerSelector.class);
   private final MessageValidatorForHeightFactory validatorFactory =
       mock(MessageValidatorForHeightFactory.class);
-  private final SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);
+  private final SignedDataValidator messageValidator = mock(SignedDataValidator.class);
 
   private Block proposedBlock;
   private NewRound validMsg;
@@ -78,9 +78,9 @@ public class NewRoundMessageValidatorTest {
 
     when(proposerSelector.selectProposerForRound(any())).thenReturn(proposerAddress);
 
-    when(validatorFactory.createAt(any())).thenReturn(signedDataValidator);
-    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(validatorFactory.createAt(any())).thenReturn(messageValidator);
+    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(messageValidator.validatePreparePayload(any())).thenReturn(true);
 
     validator =
         new NewRoundMessageValidator(
@@ -226,7 +226,7 @@ public class NewRoundMessageValidatorTest {
     msgBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
 
     // The prepare Message in the RoundChange Cert will be deemed illegal.
-    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(false);
+    when(messageValidator.validatePreparePayload(any())).thenReturn(false);
 
     final NewRound msg = signPayload(msgBuilder.build(), proposerKey);
 
@@ -293,7 +293,7 @@ public class NewRoundMessageValidatorTest {
 
   @Test
   public void embeddedProposalFailsValidation() {
-    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(false, true);
+    when(messageValidator.addSignedProposalPayload(any())).thenReturn(false, true);
 
     final Proposal proposal =
         proposerMessageFactory.createSignedProposalPayload(roundIdentifier, proposedBlock);

@@ -23,6 +23,6 @@ public class Prepare extends IbftMessage<PreparePayload> {
   }
 
   public Hash getDigest() {
-    return getSignedPayload().getPayload().getDigest();
+    return getPayload().getDigest();
   }
 }

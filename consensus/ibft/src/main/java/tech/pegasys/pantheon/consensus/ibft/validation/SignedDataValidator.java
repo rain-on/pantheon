@@ -12,29 +12,19 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
+import java.util.Collection;
+import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.ethereum.BlockValidator;
-import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
-
-import java.util.Collection;
-import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class SignedDataValidator {
 
@@ -44,7 +34,7 @@ public class SignedDataValidator {
   private final Address expectedProposer;
   private final ConsensusRoundIdentifier roundIdentifier;
 
-  private Optional<SignedData<ProposalPayload>> proposal = Optional.empty();
+  private Optional<SignedData<ProposalPayload>> proposal;
 
   public SignedDataValidator(
       final Collection<Address> validators,
@@ -56,10 +46,6 @@ public class SignedDataValidator {
   }
 
   public boolean addSignedProposalPayload(final SignedData<ProposalPayload> msg) {
-
-    if (proposal.isPresent()) {
-      return handleSubsequentProposal(proposal.get(), msg);
-    }
 
     if (!validateSignedProposalPayload(msg)) {
       return false;
@@ -86,28 +72,10 @@ public class SignedDataValidator {
     return true;
   }
 
-  private boolean handleSubsequentProposal(
-      final SignedData<ProposalPayload> existingMsg, final SignedData<ProposalPayload> newMsg) {
-    if (!existingMsg.getAuthor().equals(newMsg.getAuthor())) {
-      LOG.debug("Received subsequent invalid Proposal message; sender differs from original.");
-      return false;
-    }
+  public boolean validatePreparePayload(final SignedData<PreparePayload> msg) {
+    final String payloadType = "Prepare";
 
-    final ProposalPayload existingData = existingMsg.getPayload();
-    final ProposalPayload newData = newMsg.getPayload();
-
-    if (!proposalMessagesAreIdentical(existingData, newData)) {
-      LOG.debug("Received subsequent invalid Proposal message; content differs from original.");
-      return false;
-    }
-
-    return true;
-  }
-
-  public boolean validatePrepareMessage(final SignedData<PreparePayload> msg) {
-    final String msgType = "Prepare";
-
-    if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, msgType)) {
+    if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, payloadType)) {
       return false;
     }
 
@@ -116,13 +84,13 @@ public class SignedDataValidator {
       return false;
     }
 
-    return validateDigestMatchesProposal(msg.getPayload().getDigest(), msgType);
+    return validateDigestMatchesProposal(msg.getPayload().getDigest(), payloadType);
   }
 
-  public boolean validateCommitMessage(final SignedData<CommitPayload> msg) {
-    final String msgType = "Commit";
+  public boolean validateCommmitPayload(final SignedData<CommitPayload> msg) {
+    final String payloadType = "Commit";
 
-    if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, msgType)) {
+    if (!isMessageForCurrentRoundFromValidatorAndProposalAvailable(msg, payloadType)) {
       return false;
     }
 
@@ -135,7 +103,7 @@ public class SignedDataValidator {
       return false;
     }
 
-    return validateDigestMatchesProposal(msg.getPayload().getDigest(), msgType);
+    return validateDigestMatchesProposal(msg.getPayload().getDigest(), payloadType);
   }
 
   private boolean isMessageForCurrentRoundFromValidatorAndProposalAvailable(
@@ -166,15 +134,9 @@ public class SignedDataValidator {
   private boolean validateDigestMatchesProposal(final Hash digest, final String msgType) {
     if (!digest.equals(proposal.get().getPayload().getDigest())) {
       LOG.info(
-          "Illegal {} message, digest does not match the digest in the Proposal Message.", msgType);
+          "Illegal {} message, digest does not match the block in the Prepare Message.", msgType);
       return false;
     }
     return true;
-  }
-
-  private boolean proposalMessagesAreIdentical(
-      final ProposalPayload right, final ProposalPayload left) {
-    return right.getDigest().equals(left.getDigest())
-        && right.getRoundIdentifier().equals(left.getRoundIdentifier());
   }
 }

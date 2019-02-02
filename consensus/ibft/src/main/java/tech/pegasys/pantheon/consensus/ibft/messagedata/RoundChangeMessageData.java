@@ -32,7 +32,7 @@ public class RoundChangeMessageData extends AbstractIbftMessageData {
   }
 
   public RoundChange decode() {
-    return new RoundChange(SignedData.readSignedRoundChangePayloadFrom(RLP.input(data)));
+    return RoundChange.decode(data);
   }
 
   public static RoundChangeMessageData create(final RoundChange signedPayload) {

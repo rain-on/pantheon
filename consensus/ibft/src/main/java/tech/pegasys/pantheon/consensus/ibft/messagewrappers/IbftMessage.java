@@ -49,4 +49,8 @@ public class IbftMessage<P extends Payload> implements Authored, RoundSpecific {
   public int getMessageType() {
     return payload.getPayload().getMessageType();
   }
+
+  protected P getPayload() {
+    return payload.getPayload();
+  }
 }

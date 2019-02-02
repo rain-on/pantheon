@@ -125,19 +125,13 @@ public class RoundState {
   public Collection<Signature> getCommitSeals() {
     return commitPayloads
         .stream()
-        .map(cp -> cp.getSignedPayload().getPayload().getCommitSeal())
+        .map(Commit::getCommitSeal)
         .collect(Collectors.toList());
   }
 
-  public Optional<PreparedCertificate> constructPreparedCertificate() {
+  public Optional<TerminatedRoundArtefacts> getReceivedArtefacts() {
     if (isPrepared()) {
-      return Optional.of(
-          new PreparedCertificate(
-              proposalMessage.get().getSignedPayload(),
-              preparePayloads
-                  .stream()
-                  .map(Prepare::getSignedPayload)
-                  .collect(Collectors.toList())));
+      return Optional.of(new TerminatedRoundArtefacts(proposalMessage.get(), preparePayloads));
     }
     return Optional.empty();
   }
