@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -28,13 +29,14 @@ import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
-import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.RoundChangeManager.RoundChangeArtefacts;
+import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -72,15 +74,23 @@ public class IbftRoundTest {
   private final Subscribers<MinedBlockObserver> subscribers = new Subscribers<>();
   private ProtocolContext<IbftContext> protocolContext;
 
-  @Mock private MutableBlockchain blockChain;
-  @Mock private WorldStateArchive worldStateArchive;
-  @Mock private BlockImporter<IbftContext> blockImporter;
-  @Mock private IbftMessageTransmitter transmitter;
-  @Mock private MinedBlockObserver minedBlockObserver;
-  @Mock private IbftBlockCreator blockCreator;
-  @Mock private MessageValidator messageValidator;
+  @Mock
+  private MutableBlockchain blockChain;
+  @Mock
+  private WorldStateArchive worldStateArchive;
+  @Mock
+  private BlockImporter<IbftContext> blockImporter;
+  @Mock
+  private IbftMessageTransmitter transmitter;
+  @Mock
+  private MinedBlockObserver minedBlockObserver;
+  @Mock
+  private IbftBlockCreator blockCreator;
+  @Mock
+  private MessageValidator messageValidator;
 
-  @Captor private ArgumentCaptor<SignedData<ProposalPayload>> payloadArgCaptor;
+  @Captor
+  private ArgumentCaptor<Proposal> proposalCaptor;
 
   private Block proposedBlock;
   private IbftExtraData proposedExtraData;
@@ -96,15 +106,15 @@ public class IbftRoundTest {
             worldStateArchive,
             new IbftContext(new VoteTally(Collections.emptyList()), new VoteProposer()));
 
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePreparePayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitPayload(any())).thenReturn(true);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     proposedExtraData =
         new IbftExtraData(
             BytesValue.wrap(new byte[32]),
             Collections.emptyList(),
-            Optional.empty(),
+            empty(),
             0,
             Collections.emptyList());
     final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
@@ -277,8 +287,9 @@ public class IbftRoundTest {
 
     final RoundChangeCertificate roundChangeCertificate =
         new RoundChangeCertificate(Collections.emptyList());
-
-    round.startRoundWith(roundChangeCertificate, 15);
+    final RoundChangeArtefacts artefacts =
+        new RoundChangeArtefacts(roundChangeCertificate, empty());
+    round.startRoundWith(artefacts, 15);
     verify(transmitter, times(1))
         .multicastNewRound(eq(roundIdentifier), eq(roundChangeCertificate), any());
   }
@@ -304,23 +315,22 @@ public class IbftRoundTest {
                 messageFactory
                     .createSignedRoundChangePayload(
                         roundIdentifier,
-                        Optional.of(
-                            new PreparedCertificate(
-                                messageFactory
-                                    .createSignedProposalPayload(priorRoundChange, proposedBlock)
-                                    .getSignedPayload(),
-                                Collections.emptyList())))
+                        Optional.of(new TerminatedRoundArtefacts(
+                            messageFactory
+                                .createSignedProposalPayload(priorRoundChange, proposedBlock),
+                            Collections.emptyList())))
                     .getSignedPayload()));
     // NOTE: IbftRound assumes the prepare's are valid
 
-    round.startRoundWith(roundChangeCertificate, 15);
+    round.startRoundWith(
+        new RoundChangeArtefacts(roundChangeCertificate, Optional.of(proposedBlock)), 15);
     verify(transmitter, times(1))
         .multicastNewRound(
-            eq(roundIdentifier), eq(roundChangeCertificate), payloadArgCaptor.capture());
+            eq(roundIdentifier), eq(roundChangeCertificate), proposalCaptor.capture());
 
     final IbftExtraData proposedExtraData =
         IbftExtraData.decode(
-            payloadArgCaptor.getValue().getPayload().getBlock().getHeader().getExtraData());
+            proposalCaptor.getValue().getBlock().getHeader().getExtraData());
     assertThat(proposedExtraData.getRound()).isEqualTo(roundIdentifier.getRoundNumber());
 
     // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
@@ -348,13 +358,13 @@ public class IbftRoundTest {
         new RoundChangeCertificate(
             Collections.singletonList(
                 messageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, Optional.empty())
+                    .createSignedRoundChangePayload(roundIdentifier, empty())
                     .getSignedPayload()));
 
-    round.startRoundWith(roundChangeCertificate, 15);
+    round.startRoundWith(new RoundChangeArtefacts(roundChangeCertificate, empty()), 15);
     verify(transmitter, times(1))
         .multicastNewRound(
-            eq(roundIdentifier), eq(roundChangeCertificate), payloadArgCaptor.capture());
+            eq(roundIdentifier), eq(roundChangeCertificate), proposalCaptor.capture());
 
     // Inject a single Prepare message, and confirm the roundState has gone to Prepared (which
     // indicates the block has entered the roundState (note: all msgs are deemed valid due to mocks)

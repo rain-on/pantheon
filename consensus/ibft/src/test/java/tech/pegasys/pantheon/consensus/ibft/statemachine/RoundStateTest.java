@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -76,7 +77,7 @@ public class RoundStateTest {
 
   @Test
   public void ifProposalMessageFailsValidationMethodReturnsFalse() {
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(false);
+    when(messageValidator.addProposalMessage(any())).thenReturn(false);
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
 
     final Proposal proposal =
@@ -90,7 +91,7 @@ public class RoundStateTest {
 
   @Test
   public void singleValidatorIsPreparedWithJustProposal() {
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
 
     final Proposal proposal =
@@ -100,14 +101,14 @@ public class RoundStateTest {
     assertThat(roundState.isPrepared()).isTrue();
     assertThat(roundState.isCommitted()).isFalse();
     assertThat(roundState.getReceivedArtefacts()).isNotEmpty();
-    assertThat(roundState.getReceivedArtefacts().get().getProposalPayload())
+    assertThat(roundState.getReceivedArtefacts().get().getPreparedCertificate().getProposalPayload())
         .isEqualTo(proposal.getSignedPayload());
   }
 
   @Test
   public void singleValidatorRequiresCommitMessageToBeCommitted() {
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitPayload(any())).thenReturn(true);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
 
@@ -134,8 +135,8 @@ public class RoundStateTest {
 
   @Test
   public void prepareMessagesCanBeReceivedPriorToProposal() {
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePreparePayload(any())).thenReturn(true);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
 
@@ -183,13 +184,13 @@ public class RoundStateTest {
     // 'prepared'.
     final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
 
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePreparePayload(firstPrepare)).thenReturn(true);
-    when(messageValidator.validatePreparePayload(secondPrepare)).thenReturn(false);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(firstPrepare)).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(secondPrepare)).thenReturn(false);
 
     roundState.addPrepareMessage(firstPrepare);
     roundState.addPrepareMessage(secondPrepare);
-    verify(messageValidator, never()).validatePreparePayload(any());
+    verify(messageValidator, never()).validatePrepareMessage(any());
 
     final Proposal proposal =
         validatorMessageFactories.get(0).createSignedProposalPayload(roundIdentifier, block);
@@ -217,9 +218,9 @@ public class RoundStateTest {
     final Proposal proposal =
         validatorMessageFactories.get(0).createSignedProposalPayload(roundIdentifier, block);
 
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePreparePayload(firstPrepare)).thenReturn(false);
-    when(messageValidator.validatePreparePayload(secondPrepare)).thenReturn(true);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(firstPrepare)).thenReturn(false);
+    when(messageValidator.validatePrepareMessage(secondPrepare)).thenReturn(true);
 
     roundState.setProposedBlock(proposal);
     assertThat(roundState.isPrepared()).isFalse();
@@ -233,8 +234,8 @@ public class RoundStateTest {
 
   @Test
   public void commitSealsAreExtractedFromReceivedMessages() {
-    when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitPayload(any())).thenReturn(true);
+    when(messageValidator.addProposalMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
 
