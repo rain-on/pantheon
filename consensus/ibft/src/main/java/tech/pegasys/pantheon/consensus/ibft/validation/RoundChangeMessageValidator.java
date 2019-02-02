@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
@@ -45,7 +46,7 @@ public class RoundChangeMessageValidator {
     this.chainHeight = chainHeight;
   }
 
-  public boolean validateMessage(final SignedData<RoundChangePayload> msg) {
+  public boolean validateMessage(final RoundChange msg) {
 
     if (!validators.contains(msg.getAuthor())) {
       LOG.info(
@@ -54,16 +55,21 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    final ConsensusRoundIdentifier targetRound = msg.getPayload().getRoundIdentifier();
+    final ConsensusRoundIdentifier targetRound = msg.getRoundIdentifier();
 
     if (targetRound.getSequenceNumber() != chainHeight) {
       LOG.info("Invalid RoundChange message, not valid for local chain height.");
       return false;
     }
 
-    if (msg.getPayload().getPreparedCertificate().isPresent()) {
-      final PreparedCertificate certificate = msg.getPayload().getPreparedCertificate().get();
+    if(msg.getPreparedCertificate().isPresent() != msg.getProposedBlock().isPresent()) {
+      LOG.info("Invalid RoundChange message, availability of certificate does not correlate with"
+          + "availability of block.");
+      return false;
+    }
 
+    if (msg.getPreparedCertificate().isPresent()) {
+      final PreparedCertificate certificate = msg.getPreparedCertificate().get();
       return validatePrepareCertificate(certificate, targetRound);
     }
 
@@ -81,9 +87,9 @@ public class RoundChangeMessageValidator {
       return false;
     }
 
-    final SignedDataValidator messageValidator =
+    final SignedDataValidator signedDataValidator =
         new SignedDataValidator(validators, null, proposalRoundIdentifier);
-    return validateConsistencyOfPrepareCertificateMessages(certificate, messageValidator);
+    return validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator);
   }
 
   private boolean validateConsistencyOfPrepareCertificateMessages(

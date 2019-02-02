@@ -25,7 +25,6 @@ public class MessageValidator {
   private final SignedDataValidator dataValidator;
   private final BlockValidator<IbftContext> blockValidator;
   private final ProtocolContext<IbftContext> protocolContext;
-  private final BlockHeader parentHeader;
 
   public MessageValidator(
       SignedDataValidator dataValidator,
@@ -35,24 +34,16 @@ public class MessageValidator {
     this.dataValidator = dataValidator;
     this.blockValidator = blockValidator;
     this.protocolContext = protocolContext;
-    this.parentHeader = parentHeader;
   }
 
   public boolean addSignedProposalPayload(final Proposal msg) {
     final SignedData<ProposalPayload> signedPayload = msg.getSignedPayload();
-    if (!validateBlockMatchesProposalRound(signedPayload.getPayload(), msg.getBlock())) {
-      return false;
-    }
 
-    final Block proposedBlock = msg.getBlock();
+    ProposalBlockConsistencyChecker consistencyChecker = new ProposalBlockConsistencyChecker(
+        blockValidator, protocolContext);
 
-    final Optional<BlockProcessingOutputs> validationResult =
-        blockValidator.validateAndProcessBlock(
-            protocolContext, proposedBlock, HeaderValidationMode.LIGHT, HeaderValidationMode.FULL);
-
-    if (!validationResult.isPresent()) {
-      LOG.info("Invalid Proposal message, block did not pass validation.");
-      return false;
+    if(!consistencyChecker.validateProposalMatchesBlock(msg.getSignedPayload(), msg.getBlock())) {
+      LOG.info("Invalid Proposal, Block does not validate, or does not align with proposal data.");
     }
 
     return dataValidator.addSignedProposalPayload(signedPayload);
@@ -66,15 +57,5 @@ public class MessageValidator {
     return dataValidator.validateCommitPayload(msg.getSignedPayload());
   }
 
-  private boolean validateBlockMatchesProposalRound(final ProposalPayload payload,
-      final Block block) {
-    final ConsensusRoundIdentifier msgRound = payload.getRoundIdentifier();
-    final IbftExtraData extraData =
-        IbftExtraData.decode(block.getHeader().getExtraData());
-    if (extraData.getRound() != msgRound.getRoundNumber()) {
-      LOG.info("Invalid Proposal message, round number in block does not match that in message.");
-      return false;
-    }
-    return true;
-  }
+
 }
