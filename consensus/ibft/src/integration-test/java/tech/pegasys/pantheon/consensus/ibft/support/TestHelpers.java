@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -49,16 +50,12 @@ public class TestHelpers {
         .getSignedPayload();
   }
 
-  public static PreparedCertificate createValidPreparedCertificate(
+  public static TerminatedRoundArtefacts createValidTerminatedRoundArtefacts(
       final TestContext context, final ConsensusRoundIdentifier preparedRound, final Block block) {
     final RoundSpecificPeers peers = context.roundSpecificPeers(preparedRound);
 
-    return new PreparedCertificate(
-        peers
-            .getProposer()
-            .getMessageFactory()
-            .createSignedProposalPayload(preparedRound, block)
-            .getSignedPayload(),
+    return new TerminatedRoundArtefacts(
+        peers.getProposer().getMessageFactory().createSignedProposalPayload(preparedRound, block),
         peers.createSignedPreparePayloadOfNonProposing(preparedRound, block.getHash()));
   }
 
@@ -74,6 +71,6 @@ public class TestHelpers {
     return proposer.injectNewRound(
         targetRoundId,
         new RoundChangeCertificate(roundChangePayloads),
-        proposal.getSignedPayload());
+        proposal);
   }
 }

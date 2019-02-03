@@ -20,6 +20,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -92,17 +93,15 @@ public class IbftHelpersTest {
     final Proposal differentProposal =
         proposerMessageFactory.createSignedProposalPayload(preparedRound, proposedBlock);
 
-    final Optional<PreparedCertificate> latterPreparedCert =
+    final Optional<TerminatedRoundArtefacts> latterPreparedCert =
         Optional.of(
-            new PreparedCertificate(
-                differentProposal.getSignedPayload(),
+            new TerminatedRoundArtefacts(
+                differentProposal,
                 Lists.newArrayList(
                     proposerMessageFactory
-                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash())
-                        .getSignedPayload(),
+                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()),
                     proposerMessageFactory
-                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash())
-                        .getSignedPayload())));
+                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()))));
 
     // An earlier PrepareCert is added to ensure the path to find the latest PrepareCert
     // is correctly followed.
@@ -110,17 +109,16 @@ public class IbftHelpersTest {
         TestHelpers.createFrom(roundIdentifier, 0, -2);
     final Proposal earlierProposal =
         proposerMessageFactory.createSignedProposalPayload(earlierPreparedRound, proposedBlock);
-    final Optional<PreparedCertificate> earlierPreparedCert =
+    final Optional<TerminatedRoundArtefacts> earlierPreparedCert =
         Optional.of(
-            new PreparedCertificate(
-                earlierProposal.getSignedPayload(),
+            new TerminatedRoundArtefacts(
+                earlierProposal,
                 Lists.newArrayList(
                     proposerMessageFactory
-                        .createSignedPreparePayload(earlierPreparedRound, proposedBlock.getHash())
-                        .getSignedPayload(),
+                        .createSignedPreparePayload(earlierPreparedRound, proposedBlock.getHash()),
                     proposerMessageFactory
-                        .createSignedPreparePayload(earlierPreparedRound, proposedBlock.getHash())
-                        .getSignedPayload())));
+                        .createSignedPreparePayload(earlierPreparedRound,
+                            proposedBlock.getHash()))));
 
     final Optional<PreparedCertificate> newestCert =
         IbftHelpers.findLatestPreparedCertificate(

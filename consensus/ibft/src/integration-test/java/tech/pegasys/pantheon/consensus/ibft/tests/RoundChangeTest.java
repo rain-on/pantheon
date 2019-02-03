@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.tests;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
-import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidPreparedCertificate;
+import static tech.pegasys.pantheon.consensus.ibft.support.TestHelpers.createValidTerminatedRoundArtefacts;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -130,12 +131,12 @@ public class RoundChangeTest {
         localNodeMessageFactory.createSignedRoundChangePayload(
             targetRound,
             Optional.of(
-                new PreparedCertificate(
-                    proposal.getSignedPayload(),
+                new TerminatedRoundArtefacts(
+                    proposal,
                     Lists.newArrayList(
-                        localPrepareMessage.getSignedPayload(),
-                        p1.getSignedPayload(),
-                        p2.getSignedPayload()))));
+                        localPrepareMessage,
+                        p1,
+                        p2))));
 
     context.getController().handleRoundExpiry(new RoundExpiry(roundId));
     peers.verifyMessagesReceived(expectedTxRoundChange);
@@ -164,7 +165,8 @@ public class RoundChangeTest {
                     rc4.getSignedPayload())),
             localNodeMessageFactory
                 .createSignedProposalPayload(targetRound, locallyProposedBlock)
-                .getSignedPayload());
+                .getSignedPayload(),
+            locallyProposedBlock);
 
     peers.verifyMessagesReceived(expectedNewRound);
   }
@@ -173,14 +175,14 @@ public class RoundChangeTest {
   public void newRoundMessageContainsBlockOnWhichPeerPrepared() {
     final long ARBITRARY_BLOCKTIME = 1500;
 
-    final PreparedCertificate earlierPrepCert =
-        createValidPreparedCertificate(
+    final TerminatedRoundArtefacts earlierPrepCert =
+        createValidTerminatedRoundArtefacts(
             context,
             new ConsensusRoundIdentifier(1, 1),
             context.createBlockForProposalFromChainHead(1, ARBITRARY_BLOCKTIME / 2));
 
-    final PreparedCertificate bestPrepCert =
-        createValidPreparedCertificate(
+    final TerminatedRoundArtefacts bestPrepCert =
+        createValidTerminatedRoundArtefacts(
             context,
             new ConsensusRoundIdentifier(1, 2),
             context.createBlockForProposalFromChainHead(2, ARBITRARY_BLOCKTIME));
@@ -218,7 +220,8 @@ public class RoundChangeTest {
                     rc4.getSignedPayload())),
             localNodeMessageFactory
                 .createSignedProposalPayload(targetRound, expectedBlockToPropose)
-                .getSignedPayload());
+                .getSignedPayload(),
+            expectedBlockToPropose);
 
     peers.verifyMessagesReceived(expectedNewRound);
   }
@@ -242,7 +245,8 @@ public class RoundChangeTest {
             new RoundChangeCertificate(roundChangeMessages),
             localNodeMessageFactory
                 .createSignedProposalPayload(futureRound, locallyProposedBlock)
-                .getSignedPayload());
+                .getSignedPayload(),
+            locallyProposedBlock);
 
     peers.verifyMessagesReceived(expectedNewRound);
   }
@@ -267,8 +271,8 @@ public class RoundChangeTest {
 
     final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(1, 4);
 
-    final PreparedCertificate prepCert =
-        createValidPreparedCertificate(
+    final TerminatedRoundArtefacts termintedRoundArtefacts =
+        createValidTerminatedRoundArtefacts(
             context,
             new ConsensusRoundIdentifier(1, 2),
             context.createBlockForProposalFromChainHead(2, ARBITRARY_BLOCKTIME));
@@ -278,7 +282,7 @@ public class RoundChangeTest {
     roundChangeMessages.add(
         peers
             .getProposer()
-            .injectRoundChange(targetRound, Optional.of(prepCert))
+            .injectRoundChange(targetRound, Optional.of(termintedRoundArtefacts))
             .getSignedPayload());
 
     // Attempt to override the previously received RoundChange (but now without a payload).
@@ -296,7 +300,8 @@ public class RoundChangeTest {
             new RoundChangeCertificate(Lists.newArrayList(roundChangeMessages)),
             localNodeMessageFactory
                 .createSignedProposalPayload(targetRound, expectedBlockToPropose)
-                .getSignedPayload());
+                .getSignedPayload(),
+            expectedBlockToPropose);
 
     peers.verifyMessagesReceived(expectedNewRound);
   }
@@ -333,18 +338,17 @@ public class RoundChangeTest {
     final RoundChange rc3 = peers.getNonProposing(2).injectRoundChange(targetRound, empty());
 
     // create illegal RoundChangeMessage
-    final PreparedCertificate illegalPreparedCertificate =
-        new PreparedCertificate(
+    final TerminatedRoundArtefacts illegalTerminatedRoundArtefacts =
+        new TerminatedRoundArtefacts(
             peers
                 .getNonProposing(0)
                 .getMessageFactory()
-                .createSignedProposalPayload(roundId, blockToPropose)
-                .getSignedPayload(),
+                .createSignedProposalPayload(roundId, blockToPropose),
             emptyList());
 
     peers
         .getNonProposing(2)
-        .injectRoundChange(targetRound, Optional.of(illegalPreparedCertificate));
+        .injectRoundChange(targetRound, Optional.of(illegalTerminatedRoundArtefacts));
 
     // Ensure no NewRound message is sent.
     peers.verifyNoMessagesReceived();

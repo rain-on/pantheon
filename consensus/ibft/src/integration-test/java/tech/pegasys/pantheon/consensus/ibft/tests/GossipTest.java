@@ -95,7 +95,7 @@ public class GossipTest {
     final RoundChangeCertificate roundChangeCert =
         new RoundChangeCertificate(singleton(roundChange.getSignedPayload()));
     final NewRound newRound =
-        sender.injectNewRound(roundId, roundChangeCert, proposal.getSignedPayload());
+        sender.injectNewRound(roundId, roundChangeCert, proposal);
     peers.verifyMessagesReceivedNonPropsing(newRound);
     peers.verifyNoMessagesReceivedProposer();
 
@@ -122,8 +122,7 @@ public class GossipTest {
     final MessageFactory unknownMsgFactory = new MessageFactory(unknownKeyPair);
     final Proposal unknownProposal = unknownMsgFactory.createSignedProposalPayload(roundId, block);
 
-    sender.injectMessage(
-        ProposalMessageData.create(new Proposal(unknownProposal.getSignedPayload())));
+    sender.injectMessage(ProposalMessageData.create(unknownProposal));
     peers.verifyNoMessagesReceived();
   }
 

@@ -24,12 +24,14 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.PrepareMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.ProposalMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.IbftMessage;
+import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
@@ -113,13 +115,14 @@ public class RoundSpecificPeers {
   }
 
   public List<SignedData<RoundChangePayload>> createSignedRoundChangePayload(
-      final ConsensusRoundIdentifier roundId, final PreparedCertificate preparedCertificate) {
+      final ConsensusRoundIdentifier roundId,
+      final TerminatedRoundArtefacts terminatedRoundArtefacts) {
     return peers
         .stream()
         .map(
             p ->
                 p.getMessageFactory()
-                    .createSignedRoundChangePayload(roundId, Optional.of(preparedCertificate))
+                    .createSignedRoundChangePayload(roundId, Optional.of(terminatedRoundArtefacts))
                     .getSignedPayload())
         .collect(Collectors.toList());
   }
@@ -132,15 +135,14 @@ public class RoundSpecificPeers {
     nonProposingPeers.forEach(peer -> peer.injectCommit(roundId, hash));
   }
 
-  public Collection<SignedData<PreparePayload>> createSignedPreparePayloadOfNonProposing(
+  public Collection<Prepare> createSignedPreparePayloadOfNonProposing(
       final ConsensusRoundIdentifier preparedRound, final Hash hash) {
     return nonProposingPeers
         .stream()
         .map(
             role ->
                 role.getMessageFactory()
-                    .createSignedPreparePayload(preparedRound, hash)
-                    .getSignedPayload())
+                    .createSignedPreparePayload(preparedRound, hash))
         .collect(Collectors.toList());
   }
 
