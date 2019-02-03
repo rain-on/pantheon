@@ -59,4 +59,28 @@ public class IbftHelpers {
 
     return new Block(sealedHeader, block.getBody());
   }
+
+  public static Optional<PreparedCertificate> findLatestPreparedCertificate(
+      final Collection<SignedData<RoundChangePayload>> msgs) {
+
+    Optional<PreparedCertificate> result = Optional.empty();
+
+    for (SignedData<RoundChangePayload> roundChangeMsg : msgs) {
+      final RoundChangePayload payload = roundChangeMsg.getPayload();
+      if (payload.getPreparedCertificate().isPresent()) {
+        if (!result.isPresent()) {
+          result = payload.getPreparedCertificate();
+        } else {
+          final PreparedCertificate currentLatest = result.get();
+          final PreparedCertificate nextCert = payload.getPreparedCertificate().get();
+
+          if (currentLatest.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
+              < nextCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
+            result = Optional.of(nextCert);
+          }
+        }
+      }
+    }
+    return result;
+  }
 }
