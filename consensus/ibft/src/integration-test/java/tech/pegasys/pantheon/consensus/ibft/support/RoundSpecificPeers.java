@@ -166,7 +166,7 @@ public class RoundSpecificPeers {
     verifyMessagesReceived(candidates, msgs);
   }
 
-  public final void verifyMessagesReceivedNonPropsing(final IbftMessage<?>... msgs) {
+  public final void verifyMessagesReceivedNonProposing(final IbftMessage<?>... msgs) {
     verifyMessagesReceived(nonProposingPeers, msgs);
   }
 

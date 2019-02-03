@@ -66,6 +66,9 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
       proposedBlock =
           Optional.of(Block.readFrom(rlpIn, IbftBlockHashing::calculateDataHashForCommittedSeal));
     }
+    else {
+      rlpIn.skipNext();
+    }
     rlpIn.leaveList();
     return new RoundChange(payload, proposedBlock);
   }
