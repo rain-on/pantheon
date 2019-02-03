@@ -20,16 +20,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
@@ -40,6 +33,14 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Util;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RoundChangeSignedDataValidatorTest {
 
@@ -63,8 +64,7 @@ public class RoundChangeSignedDataValidatorTest {
   private final SignedDataValidatorForHeightFactory validatorFactory =
       mock(SignedDataValidatorForHeightFactory.class);
   private final RoundChangeSignedDataValidator validator =
-      new RoundChangeSignedDataValidator(
-          validatorFactory, validators, 1, chainHeight);
+      new RoundChangeSignedDataValidator(validatorFactory, validators, 1, chainHeight);
 
   @Before
   public void setup() {
@@ -84,7 +84,8 @@ public class RoundChangeSignedDataValidatorTest {
   @Test
   public void roundChangeSentByNonValidatorFails() {
     final SignedData<RoundChangePayload> payload =
-        nonValidatorMessageFactory.createSignedRoundChangePayload(targetRound, Optional.empty())
+        nonValidatorMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.empty())
             .getSignedPayload();
     assertThat(validator.validatePayload(payload)).isFalse();
   }
@@ -92,7 +93,8 @@ public class RoundChangeSignedDataValidatorTest {
   @Test
   public void roundChangeContainingNoCertificateIsSuccessful() {
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(targetRound, Optional.empty())
+        proposerMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.empty())
             .getSignedPayload();
 
     assertThat(validator.validatePayload(payload)).isTrue();
@@ -106,8 +108,9 @@ public class RoundChangeSignedDataValidatorTest {
             Collections.emptyList());
 
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(
-            targetRound, Optional.of(terminatedRoundArtefacts)).getSignedPayload();
+        proposerMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.of(terminatedRoundArtefacts))
+            .getSignedPayload();
 
     when(basicValidator.addSignedProposalPayload(any())).thenReturn(false);
 
@@ -131,8 +134,9 @@ public class RoundChangeSignedDataValidatorTest {
             Collections.emptyList());
 
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(
-            targetRound, Optional.of(terminatedRoundArtefacts)).getSignedPayload();
+        proposerMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.of(terminatedRoundArtefacts))
+            .getSignedPayload();
 
     when(basicValidator.addSignedProposalPayload(any())).thenReturn(true);
     assertThat(validator.validatePayload(payload)).isFalse();
@@ -151,8 +155,9 @@ public class RoundChangeSignedDataValidatorTest {
     when(basicValidator.validatePreparePayload(any())).thenReturn(false);
 
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(
-            targetRound, Optional.of(terminatedRoundArtefacts)).getSignedPayload();
+        proposerMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.of(terminatedRoundArtefacts))
+            .getSignedPayload();
 
     assertThat(validator.validatePayload(payload)).isFalse();
 
@@ -166,8 +171,9 @@ public class RoundChangeSignedDataValidatorTest {
         new ConsensusRoundIdentifier(currentRound.getSequenceNumber() + 1, 1);
 
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(
-            latterRoundIdentifier, Optional.empty()).getSignedPayload();
+        proposerMessageFactory
+            .createSignedRoundChangePayload(latterRoundIdentifier, Optional.empty())
+            .getSignedPayload();
 
     assertThat(validator.validatePayload(payload)).isFalse();
     verify(basicValidator, never()).validatePreparePayload(any());
@@ -187,8 +193,9 @@ public class RoundChangeSignedDataValidatorTest {
             Lists.newArrayList(prepareMsg));
 
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(
-            targetRound, Optional.of(terminatedRoundArtefacts)).getSignedPayload();
+        proposerMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.of(terminatedRoundArtefacts))
+            .getSignedPayload();
 
     assertThat(validator.validatePayload(payload)).isFalse();
     verify(validatorFactory, never()).createAt(any());
@@ -206,8 +213,9 @@ public class RoundChangeSignedDataValidatorTest {
             Lists.newArrayList(prepareMsg));
 
     final SignedData<RoundChangePayload> payload =
-        proposerMessageFactory.createSignedRoundChangePayload(
-            targetRound, Optional.of(terminatedRoundArtefacts)).getSignedPayload();
+        proposerMessageFactory
+            .createSignedRoundChangePayload(targetRound, Optional.of(terminatedRoundArtefacts))
+            .getSignedPayload();
 
     final PreparedCertificate prepareCertificate =
         terminatedRoundArtefacts.getPreparedCertificate();

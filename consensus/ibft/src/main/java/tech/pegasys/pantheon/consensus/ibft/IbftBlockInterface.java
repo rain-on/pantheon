@@ -58,8 +58,8 @@ public class IbftBlockInterface implements BlockInterface {
     return ibftExtraData.getRound();
   }
 
-  public static Block replaceRoundInBlock(final Block block, final int round,
-      final BlockHashFunction blockHashFunction) {
+  public static Block replaceRoundInBlock(
+      final Block block, final int round, final BlockHashFunction blockHashFunction) {
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
     final IbftExtraData substituteExtraData =
         new IbftExtraData(

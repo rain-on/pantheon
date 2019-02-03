@@ -82,30 +82,20 @@ public class IbftBlockHeightManagerTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
 
-  @Mock
-  private IbftFinalState finalState;
-  @Mock
-  private IbftMessageTransmitter messageTransmitter;
-  @Mock
-  private RoundChangeManager roundChangeManager;
-  @Mock
-  private IbftRoundFactory roundFactory;
-  @Mock
-  private Clock clock;
+  @Mock private IbftFinalState finalState;
+  @Mock private IbftMessageTransmitter messageTransmitter;
+  @Mock private RoundChangeManager roundChangeManager;
+  @Mock private IbftRoundFactory roundFactory;
+  @Mock private Clock clock;
 
-  @Mock
-  private IbftBlockCreator blockCreator;
-  @Mock
-  private BlockImporter<IbftContext> blockImporter;
-  @Mock
-  private BlockTimer blockTimer;
-  @Mock
-  private RoundTimer roundTimer;
+  @Mock private IbftBlockCreator blockCreator;
+  @Mock private BlockImporter<IbftContext> blockImporter;
+  @Mock private BlockTimer blockTimer;
+  @Mock private RoundTimer roundTimer;
   private NewRoundMessageValidator newRoundMessageValidator = mock(NewRoundMessageValidator.class);
   private MessageValidatorFactory messageValidatorFactory = mock(MessageValidatorFactory.class);
 
-  @Captor
-  private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
+  @Captor private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private final List<Address> validators = Lists.newArrayList();

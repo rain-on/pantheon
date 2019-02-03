@@ -25,7 +25,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.ProposalBlockConsistencyChecker;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeSignedDataValidator;
@@ -83,7 +82,7 @@ public class RoundChangeManagerTest {
 
     final RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory
         signedDataValidatorForHeightFactory =
-        mock(RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory.class);
+            mock(RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory.class);
 
     when(signedDataValidatorForHeightFactory.createAt(ri1))
         .thenAnswer(

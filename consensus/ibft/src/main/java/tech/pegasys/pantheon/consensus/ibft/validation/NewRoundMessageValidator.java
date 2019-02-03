@@ -29,7 +29,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -176,11 +175,9 @@ public class NewRoundMessageValidator {
                 .getRoundNumber(),
             IbftBlockHashing::calculateDataHashForCommittedSeal);
 
-    final Hash oldRoundHash =
-        IbftBlockHashing.calculateDataHashForCommittedSeal(currentBlockWithOldRound.getHeader());
-
-    if (!oldRoundHash.equals(
-        latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest())) {
+    if (!currentBlockWithOldRound
+        .getHash()
+        .equals(latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest())) {
       LOG.info(
           "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;
