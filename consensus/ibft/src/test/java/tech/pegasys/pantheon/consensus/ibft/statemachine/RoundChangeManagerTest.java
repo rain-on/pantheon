@@ -83,29 +83,23 @@ public class RoundChangeManagerTest {
 
     final RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory
         signedDataValidatorForHeightFactory =
-            mock(RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory.class);
+        mock(RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory.class);
 
     when(signedDataValidatorForHeightFactory.createAt(ri1))
         .thenAnswer(
             invocation ->
-                new MessageValidator(
-                    new SignedDataValidator(
-                        validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri1),
-                    new ProposalBlockConsistencyChecker(blockValidator, protocolContext)));
+                new SignedDataValidator(
+                    validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri1));
     when(signedDataValidatorForHeightFactory.createAt(ri2))
         .thenAnswer(
             invocation ->
-                new MessageValidator(
-                    new SignedDataValidator(
-                        validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri2),
-                    new ProposalBlockConsistencyChecker(blockValidator, protocolContext)));
+                new SignedDataValidator(
+                    validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri2));
     when(signedDataValidatorForHeightFactory.createAt(ri3))
         .thenAnswer(
             invocation ->
-                new MessageValidator(
-                    new SignedDataValidator(
-                        validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri3),
-                    new ProposalBlockConsistencyChecker(blockValidator, protocolContext)));
+                new SignedDataValidator(
+                    validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri3));
 
     final RoundChangeMessageValidator roundChangeMessageValidator =
         new RoundChangeMessageValidator(

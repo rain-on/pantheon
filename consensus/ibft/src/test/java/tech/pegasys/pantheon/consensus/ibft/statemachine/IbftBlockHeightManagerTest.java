@@ -82,19 +82,30 @@ public class IbftBlockHeightManagerTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
 
-  @Mock private IbftFinalState finalState;
-  @Mock private IbftMessageTransmitter messageTransmitter;
-  @Mock private RoundChangeManager roundChangeManager;
-  @Mock private IbftRoundFactory roundFactory;
-  @Mock private Clock clock;
-  @Mock private MessageValidatorFactory messageValidatorFactory;
-  @Mock private IbftBlockCreator blockCreator;
-  @Mock private BlockImporter<IbftContext> blockImporter;
-  @Mock private BlockTimer blockTimer;
-  @Mock private RoundTimer roundTimer;
-  @Mock private NewRoundMessageValidator newRoundMessageValidator;
+  @Mock
+  private IbftFinalState finalState;
+  @Mock
+  private IbftMessageTransmitter messageTransmitter;
+  @Mock
+  private RoundChangeManager roundChangeManager;
+  @Mock
+  private IbftRoundFactory roundFactory;
+  @Mock
+  private Clock clock;
 
-  @Captor private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
+  @Mock
+  private IbftBlockCreator blockCreator;
+  @Mock
+  private BlockImporter<IbftContext> blockImporter;
+  @Mock
+  private BlockTimer blockTimer;
+  @Mock
+  private RoundTimer roundTimer;
+  private NewRoundMessageValidator newRoundMessageValidator = mock(NewRoundMessageValidator.class);
+  private MessageValidatorFactory messageValidatorFactory = mock(MessageValidatorFactory.class);
+
+  @Captor
+  private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private final List<Address> validators = Lists.newArrayList();
@@ -126,9 +137,9 @@ public class IbftBlockHeightManagerTest {
     when(finalState.getMessageFactory()).thenReturn(messageFactory);
     when(blockCreator.createBlock(anyLong())).thenReturn(createdBlock);
     when(newRoundMessageValidator.validateNewRoundMessage(any())).thenReturn(true);
-    when(messageValidatorFactory.createNewRoundValidator(any()))
-        .thenReturn(newRoundMessageValidator);
     when(messageValidatorFactory.createMessageValidator(any())).thenReturn(messageValidator);
+    when(messageValidatorFactory.createNewRoundValidator(anyLong()))
+        .thenReturn(newRoundMessageValidator);
 
     protocolContext =
         new ProtocolContext<>(null, null, new IbftContext(new VoteTally(validators), null));
@@ -179,7 +190,7 @@ public class IbftBlockHeightManagerTest {
   }
 
   @Test
-  public void startsABlockTimerOnStartIfLocalNodeIsTheProoserForRound() {
+  public void startsABlockTimerOnStartIfLocalNodeIsTheProposerForRound() {
     when(finalState.isLocalNodeProposerForRound(any())).thenReturn(true);
 
     final IbftBlockHeightManager manager =
