@@ -25,10 +25,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
-import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.ProposalBlockConsistencyChecker;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
@@ -41,7 +37,6 @@ import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 
@@ -88,35 +83,38 @@ public class RoundChangeManagerTest {
 
     final RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory
         signedDataValidatorForHeightFactory =
-        mock(RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory.class);
+            mock(RoundChangeSignedDataValidator.SignedDataValidatorForHeightFactory.class);
 
     when(signedDataValidatorForHeightFactory.createAt(ri1))
         .thenAnswer(
             invocation ->
                 new MessageValidator(
-                    new SignedDataValidator(validators,
-                        Util.publicKeyToAddress(proposerKey.getPublicKey()), ri1),
+                    new SignedDataValidator(
+                        validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri1),
                     new ProposalBlockConsistencyChecker(blockValidator, protocolContext)));
     when(signedDataValidatorForHeightFactory.createAt(ri2))
         .thenAnswer(
             invocation ->
                 new MessageValidator(
-                    new SignedDataValidator(validators,
-                        Util.publicKeyToAddress(proposerKey.getPublicKey()), ri2),
+                    new SignedDataValidator(
+                        validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri2),
                     new ProposalBlockConsistencyChecker(blockValidator, protocolContext)));
     when(signedDataValidatorForHeightFactory.createAt(ri3))
         .thenAnswer(
             invocation ->
                 new MessageValidator(
-                    new SignedDataValidator(validators,
-                        Util.publicKeyToAddress(proposerKey.getPublicKey()), ri3),
+                    new SignedDataValidator(
+                        validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri3),
                     new ProposalBlockConsistencyChecker(blockValidator, protocolContext)));
 
     final RoundChangeMessageValidator roundChangeMessageValidator =
         new RoundChangeMessageValidator(
-            new RoundChangeSignedDataValidator(signedDataValidatorForHeightFactory, validators,
+            new RoundChangeSignedDataValidator(
+                signedDataValidatorForHeightFactory,
+                validators,
                 IbftHelpers.calculateRequiredValidatorQuorum(
-                    IbftHelpers.calculateRequiredValidatorQuorum(validators.size())), 2),
+                    IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
+                2),
             new ProposalBlockConsistencyChecker(blockValidator, protocolContext));
 
     manager = new RoundChangeManager(2, roundChangeMessageValidator);
@@ -139,8 +137,7 @@ public class RoundChangeManagerTest {
     final ConsensusRoundIdentifier proposalRound = TestHelpers.createFrom(round, 0, -1);
     final Block block = TestHelpers.createProposalBlock(validators, proposalRound.getRoundNumber());
     // Proposal must come from an earlier round.
-    final Proposal proposal =
-        messageFactory.createSignedProposalPayload(proposalRound, block);
+    final Proposal proposal = messageFactory.createSignedProposalPayload(proposalRound, block);
 
     final List<Prepare> preparePayloads =
         prepareProviders

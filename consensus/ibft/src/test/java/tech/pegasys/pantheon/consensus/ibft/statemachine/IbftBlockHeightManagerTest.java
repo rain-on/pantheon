@@ -41,7 +41,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.RoundChangeManager.RoundChangeArtefacts;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
@@ -83,31 +82,19 @@ public class IbftBlockHeightManagerTest {
   private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
 
-  @Mock
-  private IbftFinalState finalState;
-  @Mock
-  private IbftMessageTransmitter messageTransmitter;
-  @Mock
-  private RoundChangeManager roundChangeManager;
-  @Mock
-  private IbftRoundFactory roundFactory;
-  @Mock
-  private Clock clock;
-  @Mock
-  private MessageValidatorFactory messageValidatorFactory;
-  @Mock
-  private IbftBlockCreator blockCreator;
-  @Mock
-  private BlockImporter<IbftContext> blockImporter;
-  @Mock
-  private BlockTimer blockTimer;
-  @Mock
-  private RoundTimer roundTimer;
-  @Mock
-  private NewRoundMessageValidator newRoundMessageValidator;
+  @Mock private IbftFinalState finalState;
+  @Mock private IbftMessageTransmitter messageTransmitter;
+  @Mock private RoundChangeManager roundChangeManager;
+  @Mock private IbftRoundFactory roundFactory;
+  @Mock private Clock clock;
+  @Mock private MessageValidatorFactory messageValidatorFactory;
+  @Mock private IbftBlockCreator blockCreator;
+  @Mock private BlockImporter<IbftContext> blockImporter;
+  @Mock private BlockTimer blockTimer;
+  @Mock private RoundTimer roundTimer;
+  @Mock private NewRoundMessageValidator newRoundMessageValidator;
 
-  @Captor
-  private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
+  @Captor private ArgumentCaptor<Optional<TerminatedRoundArtefacts>> terminatedRoundArtefactsCaptor;
 
   private final List<KeyPair> validatorKeys = Lists.newArrayList();
   private final List<Address> validators = Lists.newArrayList();
@@ -184,8 +171,7 @@ public class IbftBlockHeightManagerTest {
   private void buildCreatedBlock() {
 
     IbftExtraData extraData =
-        new IbftExtraData(
-            BytesValue.wrap(new byte[32]), emptyList(), empty(), 0, validators);
+        new IbftExtraData(BytesValue.wrap(new byte[32]), emptyList(), empty(), 0, validators);
 
     headerTestFixture.extraData(extraData.encode());
     final BlockHeader header = headerTestFixture.buildHeader();
@@ -234,8 +220,9 @@ public class IbftBlockHeightManagerTest {
         messageFactory.createSignedRoundChangePayload(futureRoundIdentifier, empty());
     when(roundChangeManager.appendRoundChangeMessage(any()))
         .thenReturn(
-            Optional.of(new RoundChangeArtefacts(
-                new RoundChangeCertificate(singletonList(roundChange.getSignedPayload())),
+            Optional.of(
+                new RoundChangeArtefacts(
+                    new RoundChangeCertificate(singletonList(roundChange.getSignedPayload())),
                     empty())));
     when(finalState.isLocalNodeProposerForRound(any())).thenReturn(false);
 

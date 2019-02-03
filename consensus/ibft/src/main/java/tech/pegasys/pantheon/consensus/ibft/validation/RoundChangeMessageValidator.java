@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RoundChangeMessageValidator {
 
@@ -23,7 +24,6 @@ public class RoundChangeMessageValidator {
 
   private final RoundChangeSignedDataValidator signedDataValidator;
   private final ProposalBlockConsistencyChecker proposalBlockConsistencyChecker;
-
 
   public RoundChangeMessageValidator(
       final RoundChangeSignedDataValidator signedDataValidator,
@@ -40,15 +40,15 @@ public class RoundChangeMessageValidator {
     }
 
     if (msg.getPreparedCertificate().isPresent() != msg.getProposedBlock().isPresent()) {
-      LOG.info("Invalid RoundChange message, availability of certificate does not correlate with"
-          + "availability of block.");
+      LOG.info(
+          "Invalid RoundChange message, availability of certificate does not correlate with"
+              + "availability of block.");
       return false;
     }
 
     if (msg.getPreparedCertificate().isPresent()) {
-      if (!proposalBlockConsistencyChecker
-          .validateProposalMatchesBlock(msg.getPreparedCertificate().get().getProposalPayload(),
-              msg.getProposedBlock().get())) {
+      if (!proposalBlockConsistencyChecker.validateProposalMatchesBlock(
+          msg.getPreparedCertificate().get().getProposalPayload(), msg.getProposedBlock().get())) {
         LOG.info("Invalid RoundChange message, proposal did not align with supplied block.");
         return false;
       }

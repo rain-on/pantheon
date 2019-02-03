@@ -68,14 +68,14 @@ public class MessageFactory {
       final Optional<TerminatedRoundArtefacts> artefacts) {
 
     if (artefacts.isPresent()) {
-      final RoundChangePayload payload = new RoundChangePayload(roundIdentifier,
-          Optional.of(artefacts.get().getPreparedCertificate()));
+      final RoundChangePayload payload =
+          new RoundChangePayload(
+              roundIdentifier, Optional.of(artefacts.get().getPreparedCertificate()));
       return new RoundChange(createSignedMessage(payload), Optional.of(artefacts.get().getBlock()));
     }
 
     final RoundChangePayload payload = new RoundChangePayload(roundIdentifier, Optional.empty());
     return new RoundChange(createSignedMessage(payload), Optional.empty());
-
   }
 
   public NewRound createSignedNewRoundPayload(

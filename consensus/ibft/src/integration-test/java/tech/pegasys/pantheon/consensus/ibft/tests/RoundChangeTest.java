@@ -24,7 +24,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -132,11 +131,7 @@ public class RoundChangeTest {
             targetRound,
             Optional.of(
                 new TerminatedRoundArtefacts(
-                    proposal,
-                    Lists.newArrayList(
-                        localPrepareMessage,
-                        p1,
-                        p2))));
+                    proposal, Lists.newArrayList(localPrepareMessage, p1, p2))));
 
     context.getController().handleRoundExpiry(new RoundExpiry(roundId));
     peers.verifyMessagesReceived(expectedTxRoundChange);

@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -25,7 +24,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class Proposal extends IbftMessage<ProposalPayload> {
 
-  final private Block proposedBlock;
+  private final Block proposedBlock;
 
   public Proposal(final SignedData<ProposalPayload> payload, final Block proposedBlock) {
     super(payload);

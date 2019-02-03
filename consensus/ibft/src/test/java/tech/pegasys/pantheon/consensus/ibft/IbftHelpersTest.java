@@ -98,10 +98,10 @@ public class IbftHelpersTest {
             new TerminatedRoundArtefacts(
                 differentProposal,
                 Lists.newArrayList(
-                    proposerMessageFactory
-                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()),
-                    proposerMessageFactory
-                        .createSignedPreparePayload(roundIdentifier, proposedBlock.getHash()))));
+                    proposerMessageFactory.createSignedPreparePayload(
+                        roundIdentifier, proposedBlock.getHash()),
+                    proposerMessageFactory.createSignedPreparePayload(
+                        roundIdentifier, proposedBlock.getHash()))));
 
     // An earlier PrepareCert is added to ensure the path to find the latest PrepareCert
     // is correctly followed.
@@ -114,11 +114,10 @@ public class IbftHelpersTest {
             new TerminatedRoundArtefacts(
                 earlierProposal,
                 Lists.newArrayList(
-                    proposerMessageFactory
-                        .createSignedPreparePayload(earlierPreparedRound, proposedBlock.getHash()),
-                    proposerMessageFactory
-                        .createSignedPreparePayload(earlierPreparedRound,
-                            proposedBlock.getHash()))));
+                    proposerMessageFactory.createSignedPreparePayload(
+                        earlierPreparedRound, proposedBlock.getHash()),
+                    proposerMessageFactory.createSignedPreparePayload(
+                        earlierPreparedRound, proposedBlock.getHash()))));
 
     final Optional<PreparedCertificate> newestCert =
         IbftHelpers.findLatestPreparedCertificate(

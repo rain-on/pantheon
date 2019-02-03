@@ -24,7 +24,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
-import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -101,7 +100,8 @@ public class RoundStateTest {
     assertThat(roundState.isPrepared()).isTrue();
     assertThat(roundState.isCommitted()).isFalse();
     assertThat(roundState.getReceivedArtefacts()).isNotEmpty();
-    assertThat(roundState.getReceivedArtefacts().get().getPreparedCertificate().getProposalPayload())
+    assertThat(
+            roundState.getReceivedArtefacts().get().getPreparedCertificate().getProposalPayload())
         .isEqualTo(proposal.getSignedPayload());
   }
 

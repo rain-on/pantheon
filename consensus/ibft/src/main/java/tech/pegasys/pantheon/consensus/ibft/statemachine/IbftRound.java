@@ -12,9 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
@@ -40,6 +37,11 @@ import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.util.Subscribers;
+
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class IbftRound {
 
@@ -116,7 +118,6 @@ public class IbftRound {
         IbftBlockInterface.replaceRoundInBlock(block, getRoundIdentifier().getRoundNumber());
     return messageFactory.createSignedProposalPayload(getRoundIdentifier(), blockToPublish);
   }
-
 
   public void handleProposalMessage(final Proposal msg) {
     LOG.info("Handling a Proposal message.");

@@ -12,9 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
-import java.util.Optional;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
-import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -24,12 +22,14 @@ import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.Optional;
+
 public class RoundChange extends IbftMessage<RoundChangePayload> {
 
-  final private Optional<Block> proposedBlock;
+  private final Optional<Block> proposedBlock;
 
-  public RoundChange(final SignedData<RoundChangePayload> payload,
-      final Optional<Block> proposedBlock) {
+  public RoundChange(
+      final SignedData<RoundChangePayload> payload, final Optional<Block> proposedBlock) {
     super(payload);
     this.proposedBlock = proposedBlock;
   }
@@ -47,10 +47,9 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     rlpOut.startList();
     rlpOut.writeBytesValue(getSignedPayload().encode());
-    if(proposedBlock.isPresent()) {
+    if (proposedBlock.isPresent()) {
       rlpOut.writeBytesValue(proposedBlock.get().toRlp());
-    }
-    else {
+    } else {
       rlpOut.writeNull();
     }
     rlpOut.endList();

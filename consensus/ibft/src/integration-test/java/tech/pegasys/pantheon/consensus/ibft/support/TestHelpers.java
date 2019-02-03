@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -69,8 +68,6 @@ public class TestHelpers {
         proposer.getMessageFactory().createSignedProposalPayload(targetRoundId, blockToPropose);
 
     return proposer.injectNewRound(
-        targetRoundId,
-        new RoundChangeCertificate(roundChangePayloads),
-        proposal);
+        targetRoundId, new RoundChangeCertificate(roundChangePayloads), proposal);
   }
 }

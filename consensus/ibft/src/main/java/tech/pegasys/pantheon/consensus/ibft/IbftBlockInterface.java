@@ -18,10 +18,10 @@ import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 
 import java.util.Collection;
 import java.util.Optional;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 
 public class IbftBlockInterface implements BlockInterface {
 

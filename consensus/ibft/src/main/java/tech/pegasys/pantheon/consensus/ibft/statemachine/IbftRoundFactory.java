@@ -16,9 +16,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
-import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -38,7 +36,7 @@ public class IbftRoundFactory {
       final ProtocolContext<IbftContext> protocolContext,
       final ProtocolSchedule<IbftContext> protocolSchedule,
       final Subscribers<MinedBlockObserver> minedBlockObservers,
-      MessageValidatorFactory messageValidatorFactory) {
+      final MessageValidatorFactory messageValidatorFactory) {
     this.finalState = finalState;
     this.blockCreatorFactory = finalState.getBlockCreatorFactory();
     this.protocolContext = protocolContext;

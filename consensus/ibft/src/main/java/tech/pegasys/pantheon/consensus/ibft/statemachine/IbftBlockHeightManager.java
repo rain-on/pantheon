@@ -29,7 +29,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
-import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.RoundChangeManager.RoundChangeArtefacts;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
@@ -143,12 +142,12 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
 
-    final RoundChange localRoundChange = messageFactory.createSignedRoundChangePayload(
-        currentRound.getRoundIdentifier(),
-        latestAcceptableRoundArtefacts);
+    final RoundChange localRoundChange =
+        messageFactory.createSignedRoundChangePayload(
+            currentRound.getRoundIdentifier(), latestAcceptableRoundArtefacts);
 
-    transmitter.multicastRoundChange(currentRound.getRoundIdentifier(),
-        latestAcceptableRoundArtefacts);
+    transmitter.multicastRoundChange(
+        currentRound.getRoundIdentifier(), latestAcceptableRoundArtefacts);
 
     // Its possible the locally created RoundChange triggers the transmission of a NewRound
     // message - so it must be handled accordingly.

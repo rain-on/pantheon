@@ -12,10 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import java.util.Collection;
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
@@ -25,6 +21,12 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
+
+import java.util.Collection;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SignedDataValidator {
 
@@ -95,8 +97,8 @@ public class SignedDataValidator {
     }
 
     final Address commitSealCreator =
-        Util.signatureToAddress(msg.getPayload().getCommitSeal(),
-            proposal.get().getPayload().getDigest());
+        Util.signatureToAddress(
+            msg.getPayload().getCommitSeal(), proposal.get().getPayload().getDigest());
 
     if (!commitSealCreator.equals(msg.getAuthor())) {
       LOG.info("Invalid Commit message. Seal was not created by the message transmitter.");

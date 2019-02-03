@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
-
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
@@ -21,7 +19,6 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 
 import java.util.Collection;
@@ -49,8 +46,7 @@ public class MessageValidatorFactory {
         roundIdentifier);
   }
 
-  public MessageValidator createMessageValidator(
-      final ConsensusRoundIdentifier roundIdentifier) {
+  public MessageValidator createMessageValidator(final ConsensusRoundIdentifier roundIdentifier) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
 
@@ -92,5 +88,4 @@ public class MessageValidatorFactory {
         IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
         chainHeight);
   }
-
 }

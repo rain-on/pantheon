@@ -49,8 +49,8 @@ public class IbftBlockHeightManagerFactory {
         finalState,
         new RoundChangeManager(
             IbftHelpers.calculateRequiredValidatorQuorum(finalState.getValidators().size()),
-            messageValidatorFactory
-                .createRoundChangeMessageValidator(parentHeader.getNumber() + 1)),
+            messageValidatorFactory.createRoundChangeMessageValidator(
+                parentHeader.getNumber() + 1)),
         roundFactory,
         finalState.getClock(),
         messageValidatorFactory);

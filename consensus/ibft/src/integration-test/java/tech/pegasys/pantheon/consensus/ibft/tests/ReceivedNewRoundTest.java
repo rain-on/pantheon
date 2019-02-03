@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -72,9 +71,7 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         targetRound,
         new RoundChangeCertificate(roundChanges),
-        nextProposer
-            .getMessageFactory()
-            .createSignedProposalPayload(targetRound, blockToPropose));
+        nextProposer.getMessageFactory().createSignedProposalPayload(targetRound, blockToPropose));
 
     final Prepare expectedPrepare =
         localNodeMessageFactory.createSignedPreparePayload(targetRound, blockToPropose.getHash());

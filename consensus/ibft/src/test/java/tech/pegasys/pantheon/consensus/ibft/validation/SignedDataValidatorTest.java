@@ -80,9 +80,7 @@ public class SignedDataValidatorTest {
 
     validator =
         new SignedDataValidator(
-            validators,
-            Util.publicKeyToAddress(proposerKey.getPublicKey()),
-            roundIdentifier);
+            validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), roundIdentifier);
 
     when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
     when(blockValidator.validateAndProcessBlock(any(), any(), any(), any()))

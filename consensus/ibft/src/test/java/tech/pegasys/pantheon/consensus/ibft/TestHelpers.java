@@ -65,8 +65,7 @@ public class TestHelpers {
     return createProposalWithRound(signerKeys, 0xFEDCBA98);
   }
 
-  public static Proposal createProposalWithRound(
-      final KeyPair signerKeys, final int round) {
+  public static Proposal createProposalWithRound(final KeyPair signerKeys, final int round) {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, round);

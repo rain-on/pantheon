@@ -27,8 +27,6 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparePayload;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.TerminatedRoundArtefacts;
@@ -139,10 +137,7 @@ public class RoundSpecificPeers {
       final ConsensusRoundIdentifier preparedRound, final Hash hash) {
     return nonProposingPeers
         .stream()
-        .map(
-            role ->
-                role.getMessageFactory()
-                    .createSignedPreparePayload(preparedRound, hash))
+        .map(role -> role.getMessageFactory().createSignedPreparePayload(preparedRound, hash))
         .collect(Collectors.toList());
   }
 

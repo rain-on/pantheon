@@ -15,10 +15,6 @@ package tech.pegasys.pantheon.consensus.ibft.validation;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.findLatestPreparedCertificate;
 import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
-import java.util.Collection;
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
@@ -34,6 +30,12 @@ import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeSignedDataVali
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+
+import java.util.Collection;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class NewRoundMessageValidator {
 
@@ -91,7 +93,8 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    if(!proposalBlockConsistencyChecker.validateProposalMatchesBlock(proposalPayload, msg.getBlock())) {
+    if (!proposalBlockConsistencyChecker.validateProposalMatchesBlock(
+        proposalPayload, msg.getBlock())) {
       LOG.info("Invalid New Round, proposal payload did not align with supplied block.");
       return false;
     }
@@ -162,15 +165,21 @@ public class NewRoundMessageValidator {
 
     // Need to check that if we substitute the LatestedPrepareCert round number into the supplied
     // block that we get the SAME hash as PreparedCert.
-    final Block currentBlockWithOldRound = IbftBlockInterface.replaceRoundInBlock(
-        proposedBlock,
-        latestPreparedCertificate.get().getProposalPayload().getPayload().getRoundIdentifier()
-            .getRoundNumber());
+    final Block currentBlockWithOldRound =
+        IbftBlockInterface.replaceRoundInBlock(
+            proposedBlock,
+            latestPreparedCertificate
+                .get()
+                .getProposalPayload()
+                .getPayload()
+                .getRoundIdentifier()
+                .getRoundNumber());
 
     final Hash oldRoundHash =
         IbftBlockHashing.calculateDataHashForCommittedSeal(currentBlockWithOldRound.getHeader());
 
-    if(oldRoundHash != latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest()) {
+    if (!oldRoundHash
+        .equals(latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest()) {
       LOG.info(
           "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;
