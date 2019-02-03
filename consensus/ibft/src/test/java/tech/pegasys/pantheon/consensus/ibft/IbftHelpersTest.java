@@ -129,7 +129,7 @@ public class IbftHelpersTest {
                     .createSignedRoundChangePayload(roundIdentifier, latterPreparedCert)
                     .getSignedPayload()));
 
-    assertThat(newestCert).isEqualTo(latterPreparedCert);
+    assertThat(newestCert.get()).isEqualTo(latterPreparedCert.get().getPreparedCertificate());
   }
 
   @Test
