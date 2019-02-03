@@ -15,10 +15,8 @@ package tech.pegasys.pantheon.consensus.ibft.payload;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Objects;
 import java.util.StringJoiner;

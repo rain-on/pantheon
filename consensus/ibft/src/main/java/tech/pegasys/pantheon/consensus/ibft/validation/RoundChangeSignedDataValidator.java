@@ -67,7 +67,7 @@ public class RoundChangeSignedDataValidator {
 
     final PreparedCertificate certificate = payload.getPreparedCertificate().get();
 
-    if(!validatePrepareCertificate(certificate, targetRound)) {
+    if (!validatePrepareCertificate(certificate, targetRound)) {
       LOG.info("Invalid RoundChange payload, prepare certificate is illegal.");
       return false;
     }
@@ -90,7 +90,7 @@ public class RoundChangeSignedDataValidator {
     final SignedDataValidator signedDataValidator =
         signedDataValidatorFactory.createAt(proposalRoundIdentifier);
 
-    if(!validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator)) {
+    if (!validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator)) {
       LOG.info("Invalid RoundChange payload, prepare certificate message are not consistent.");
       return false;
     }
@@ -114,7 +114,7 @@ public class RoundChangeSignedDataValidator {
     }
 
     for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      if(!dataValidator.validatePreparePayload(prepareMsg)) {
+      if (!dataValidator.validatePreparePayload(prepareMsg)) {
         LOG.info("Invalid RoundChange payload, embedded Prepare message failed validation.");
         return false;
       }
