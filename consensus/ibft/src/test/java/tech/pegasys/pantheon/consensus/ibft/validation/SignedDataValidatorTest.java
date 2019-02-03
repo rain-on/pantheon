@@ -64,7 +64,6 @@ public class SignedDataValidatorTest {
 
   private final List<Address> validators = Lists.newArrayList();
 
-  @Mock private BlockValidator<IbftContext> blockValidator;
   private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(2, 0);
   private SignedDataValidator validator;
 
@@ -77,16 +76,9 @@ public class SignedDataValidatorTest {
 
     block = TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
 
-    final ProtocolContext<IbftContext> protocolContext =
-        new ProtocolContext<>(
-            mock(MutableBlockchain.class), mock(WorldStateArchive.class), mock(IbftContext.class));
-
     validator =
         new SignedDataValidator(
             validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), roundIdentifier);
-
-    when(blockValidator.validateAndProcessBlock(any(), any(), any(), any()))
-        .thenReturn(Optional.of(new BlockProcessingOutputs(null, null)));
   }
 
   @Test

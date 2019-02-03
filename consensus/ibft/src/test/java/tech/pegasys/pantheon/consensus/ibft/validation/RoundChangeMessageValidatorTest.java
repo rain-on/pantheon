@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
+import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
@@ -55,10 +56,13 @@ public class RoundChangeMessageValidatorTest {
       new ConsensusRoundIdentifier(chainHeight, 3);
   private final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(chainHeight, 4);
 
-  private final Block block = mock(Block.class);
+  private Block block;
 
   private final SignedDataValidator basicValidator = mock(SignedDataValidator.class);
   private final List<Address> validators = Lists.newArrayList();
+
+  private final ProposalBlockConsistencyChecker proposalChecker =
+      mock(ProposalBlockConsistencyChecker.class);
 
   private final SignedDataValidatorForHeightFactory validatorFactory =
       mock(SignedDataValidatorForHeightFactory.class);
@@ -66,20 +70,23 @@ public class RoundChangeMessageValidatorTest {
       new RoundChangeMessageValidator(
           new RoundChangeSignedDataValidator(
               roundIdentifier -> basicValidator, validators, 1, chainHeight),
-          new ProposalBlockConsistencyChecker(null, null));
+          proposalChecker);
 
   @Before
   public void setup() {
     validators.add(Util.publicKeyToAddress(proposerKey.getPublicKey()));
     validators.add(Util.publicKeyToAddress(validatorKey.getPublicKey()));
 
-    when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
+    block = TestHelpers.createProposalBlock(validators, currentRound.getRoundNumber());
+
     when(validatorFactory.createAt(any())).thenReturn(basicValidator);
 
     // By default, have all basic messages being valid thus any failures are attributed to logic
     // in the RoundChangeMessageValidator
     when(basicValidator.addSignedProposalPayload(any())).thenReturn(true);
     when(basicValidator.validatePreparePayload(any())).thenReturn(true);
+
+    when(proposalChecker.validateProposalMatchesBlock(any(), any())).thenReturn(true);
   }
 
   @Test
