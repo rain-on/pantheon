@@ -65,8 +65,7 @@ public class ProposalBlockConsistencyChecker {
     final ConsensusRoundIdentifier msgRound = payload.getRoundIdentifier();
     final IbftExtraData extraData = IbftExtraData.decode(block.getHeader().getExtraData());
     if (extraData.getRound() != msgRound.getRoundNumber()) {
-      // LOG.info("Invalid Proposal message, round number in block does not match that in
-      // message.");
+      LOG.info("Invalid Proposal message, round number in block does not match that in message.");
       return false;
     }
     return true;

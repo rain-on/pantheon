@@ -59,6 +59,8 @@ public class NewRoundMessageValidatorTest {
   private final SignedDataValidatorForHeightFactory validatorFactory =
       mock(SignedDataValidatorForHeightFactory.class);
   private final SignedDataValidator messageValidator = mock(SignedDataValidator.class);
+  private final ProposalBlockConsistencyChecker proposalChecker =
+      mock(ProposalBlockConsistencyChecker.class);
 
   private Block proposedBlock;
   private NewRound validMsg;
@@ -82,12 +84,14 @@ public class NewRoundMessageValidatorTest {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
     when(messageValidator.validatePreparePayload(any())).thenReturn(true);
 
+    when(proposalChecker.validateProposalMatchesBlock(any(), any())).thenReturn(true);
+
     validator =
         new NewRoundMessageValidator(
             validators,
             proposerSelector,
             validatorFactory,
-            new ProposalBlockConsistencyChecker(null, null),
+            proposalChecker,
             1,
             chainHeight);
   }
@@ -112,7 +116,8 @@ public class NewRoundMessageValidatorTest {
         proposedBlock);
   }
 
-  private NewRound signPayload(final NewRoundPayload payload, final KeyPair signingKey) {
+  private NewRound signPayload(final NewRoundPayload payload, final KeyPair signingKey,
+      final Block block) {
 
     final MessageFactory messageCreator = new MessageFactory(signingKey);
 
@@ -120,7 +125,7 @@ public class NewRoundMessageValidatorTest {
         payload.getRoundIdentifier(),
         payload.getRoundChangeCertificate(),
         payload.getProposalPayload(),
-        null);
+        block);
   }
 
   @Test
@@ -130,7 +135,7 @@ public class NewRoundMessageValidatorTest {
 
   @Test
   public void newRoundFromNonProposerFails() {
-    final NewRound msg = signPayload(validPayload, validatorKey);
+    final NewRound msg = signPayload(validPayload, validatorKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(msg)).isFalse();
   }
@@ -140,7 +145,7 @@ public class NewRoundMessageValidatorTest {
     msgBuilder.setRoundChangeIdentifier(
         new ConsensusRoundIdentifier(roundIdentifier.getSequenceNumber(), 0));
 
-    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey);
+    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(inValidMsg)).isFalse();
   }
@@ -150,7 +155,7 @@ public class NewRoundMessageValidatorTest {
     final ConsensusRoundIdentifier futureRound = TestHelpers.createFrom(roundIdentifier, 1, 0);
     msgBuilder.setRoundChangeIdentifier(futureRound);
 
-    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey);
+    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(inValidMsg)).isFalse();
   }
@@ -159,7 +164,7 @@ public class NewRoundMessageValidatorTest {
   public void newRoundWithEmptyRoundChangeCertificateFails() {
     msgBuilder.setRoundChangeCertificate(new RoundChangeCertificate(Collections.emptyList()));
 
-    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey);
+    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(inValidMsg)).isFalse();
   }
@@ -187,7 +192,7 @@ public class NewRoundMessageValidatorTest {
                         roundIdentifier, Optional.of(terminatedRoundArtefact))
                     .getSignedPayload())));
 
-    final NewRound invalidMsg = signPayload(msgBuilder.build(), proposerKey);
+    final NewRound invalidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(invalidMsg)).isFalse();
   }
@@ -204,7 +209,7 @@ public class NewRoundMessageValidatorTest {
 
     msgBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
 
-    final NewRound msg = signPayload(msgBuilder.build(), proposerKey);
+    final NewRound msg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(msg)).isFalse();
   }
@@ -229,7 +234,7 @@ public class NewRoundMessageValidatorTest {
     // The prepare Message in the RoundChange Cert will be deemed illegal.
     when(messageValidator.validatePreparePayload(any())).thenReturn(false);
 
-    final NewRound msg = signPayload(msgBuilder.build(), proposerKey);
+    final NewRound msg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
 
     assertThat(validator.validateNewRoundMessage(msg)).isFalse();
   }
@@ -258,7 +263,7 @@ public class NewRoundMessageValidatorTest {
             roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 2);
     final Proposal earlierProposal =
         proposerMessageFactory.createSignedProposalPayload(earlierPreparedRound, earlierBlock);
-    final Optional<TerminatedRoundArtefacts> earlierTermiatedRoundArtefacts =
+    final Optional<TerminatedRoundArtefacts> earlierTerminatedRoundArtefacts =
         Optional.of(
             new TerminatedRoundArtefacts(
                 earlierProposal,
@@ -270,7 +275,7 @@ public class NewRoundMessageValidatorTest {
         new RoundChangeCertificate(
             Lists.newArrayList(
                 proposerMessageFactory
-                    .createSignedRoundChangePayload(roundIdentifier, earlierTermiatedRoundArtefacts)
+                    .createSignedRoundChangePayload(roundIdentifier, earlierTerminatedRoundArtefacts)
                     .getSignedPayload(),
                 validatorMessageFactory
                     .createSignedRoundChangePayload(roundIdentifier, terminatedRoundArtefacts)

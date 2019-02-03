@@ -115,7 +115,8 @@ public class IbftRound {
 
   private Proposal createProposalAroundBlock(final Block block) {
     final Block blockToPublish =
-        IbftBlockInterface.replaceRoundInBlock(block, getRoundIdentifier().getRoundNumber());
+        IbftBlockInterface.replaceRoundInBlock(block, getRoundIdentifier().getRoundNumber(),
+            IbftBlockHashing::calculateDataHashForCommittedSeal);
     return messageFactory.createSignedProposalPayload(getRoundIdentifier(), blockToPublish);
   }
 

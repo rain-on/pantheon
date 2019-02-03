@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHashFunction;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 
@@ -57,7 +58,8 @@ public class IbftBlockInterface implements BlockInterface {
     return ibftExtraData.getRound();
   }
 
-  public static Block replaceRoundInBlock(final Block block, final int round) {
+  public static Block replaceRoundInBlock(final Block block, final int round,
+      final BlockHashFunction blockHashFunction) {
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
     final IbftExtraData substituteExtraData =
         new IbftExtraData(

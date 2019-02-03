@@ -151,11 +151,11 @@ public class NewRoundMessageValidator {
       final NewRoundPayload payload, final Block proposedBlock) {
 
     final RoundChangeCertificate roundChangeCert = payload.getRoundChangeCertificate();
-    final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
+    final Collection<SignedData<RoundChangePayload>> roundChangePayloads =
         roundChangeCert.getRoundChangePayloads();
 
     final Optional<PreparedCertificate> latestPreparedCertificate =
-        findLatestPreparedCertificate(roundChangeMsgs);
+        findLatestPreparedCertificate(roundChangePayloads);
 
     if (!latestPreparedCertificate.isPresent()) {
       LOG.info(
@@ -173,7 +173,8 @@ public class NewRoundMessageValidator {
                 .getProposalPayload()
                 .getPayload()
                 .getRoundIdentifier()
-                .getRoundNumber());
+                .getRoundNumber(),
+            IbftBlockHashing::calculateDataHashForCommittedSeal);
 
     final Hash oldRoundHash =
         IbftBlockHashing.calculateDataHashForCommittedSeal(currentBlockWithOldRound.getHeader());
