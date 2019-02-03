@@ -49,7 +49,7 @@ public class RoundChangeSignedDataValidator {
     final RoundChangePayload payload = signedPayload.getPayload();
     if (!validators.contains(signedPayload.getAuthor())) {
       LOG.info(
-          "Invalid RoundChange message, was not transmitted by a validator for the associated"
+          "Invalid RoundChange payload, was not transmitted by a validator for the associated"
               + " round.");
       return false;
     }
@@ -57,7 +57,7 @@ public class RoundChangeSignedDataValidator {
     final ConsensusRoundIdentifier targetRound = payload.getRoundIdentifier();
 
     if (targetRound.getSequenceNumber() != chainHeight) {
-      LOG.info("Invalid RoundChange message, not valid for local chain height.");
+      LOG.info("Invalid RoundChange payload, not valid for local chain height.");
       return false;
     }
 
@@ -66,7 +66,13 @@ public class RoundChangeSignedDataValidator {
     }
 
     final PreparedCertificate certificate = payload.getPreparedCertificate().get();
-    return validatePrepareCertificate(certificate, targetRound);
+
+    if(!validatePrepareCertificate(certificate, targetRound)) {
+      LOG.info("Invalid RoundChange payload, prepare certificate is illegal.");
+      return false;
+    }
+
+    return true;
   }
 
   private boolean validatePrepareCertificate(
@@ -77,34 +83,41 @@ public class RoundChangeSignedDataValidator {
         proposalPayload.getPayload().getRoundIdentifier();
 
     if (!validatePreparedCertificateRound(proposalRoundIdentifier, roundChangeTarget)) {
+      LOG.info("Invalid RoundChange payload, proposal does not match roundChangeTarget.");
       return false;
     }
 
     final SignedDataValidator signedDataValidator =
         signedDataValidatorFactory.createAt(proposalRoundIdentifier);
 
-    return validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator);
+    if(!validateConsistencyOfPrepareCertificateMessages(certificate, signedDataValidator)) {
+      LOG.info("Invalid RoundChange payload, prepare certificate message are not consistent.");
+      return false;
+    }
+
+    return true;
   }
 
   private boolean validateConsistencyOfPrepareCertificateMessages(
       final PreparedCertificate certificate, final SignedDataValidator dataValidator) {
 
     if (!dataValidator.addSignedProposalPayload(certificate.getProposalPayload())) {
-      LOG.info("Invalid RoundChange message, embedded Proposal message failed validation.");
+      LOG.info("Invalid RoundChange payload, embedded Proposal message failed validation.");
       return false;
     }
 
     if (certificate.getPreparePayloads().size() < minimumPrepareMessages) {
       LOG.info(
-          "Invalid RoundChange message, insufficient Prepare messages exist to justify "
+          "Invalid RoundChange payload, insufficient Prepare messages exist to justify "
               + "prepare certificate.");
       return false;
     }
 
     for (final SignedData<PreparePayload> prepareMsg : certificate.getPreparePayloads()) {
-      dataValidator.validatePreparePayload(prepareMsg);
-      LOG.info("Invalid RoundChange message, embedded Prepare message failed validation.");
-      return false;
+      if(!dataValidator.validatePreparePayload(prepareMsg)) {
+        LOG.info("Invalid RoundChange payload, embedded Prepare message failed validation.");
+        return false;
+      }
     }
 
     return true;
@@ -115,13 +128,13 @@ public class RoundChangeSignedDataValidator {
       final ConsensusRoundIdentifier roundChangeTarget) {
 
     if (prepareCertRound.getSequenceNumber() != roundChangeTarget.getSequenceNumber()) {
-      LOG.info("Invalid RoundChange message, PreparedCertificate is not for local chain height.");
+      LOG.info("Invalid RoundChange payload, PreparedCertificate is not for local chain height.");
       return false;
     }
 
     if (prepareCertRound.getRoundNumber() >= roundChangeTarget.getRoundNumber()) {
       LOG.info(
-          "Invalid RoundChange message, PreparedCertificate not older than RoundChange target.");
+          "Invalid RoundChange payload, PreparedCertificate not older than RoundChange target.");
       return false;
     }
     return true;

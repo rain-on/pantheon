@@ -34,7 +34,7 @@ public class RoundChangeMessageValidator {
 
   public boolean validateMessage(final RoundChange msg) {
 
-    if (signedDataValidator.validatePayload(msg.getSignedPayload())) {
+    if (!signedDataValidator.validatePayload(msg.getSignedPayload())) {
       LOG.info("Invalid RoundChange message, signed data did not validate correctly.");
       return false;
     }
