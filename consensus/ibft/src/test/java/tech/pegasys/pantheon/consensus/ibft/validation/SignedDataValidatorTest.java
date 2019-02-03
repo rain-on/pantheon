@@ -18,9 +18,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.consensus.common.ConsensusHelpers;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
+import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
@@ -63,16 +65,17 @@ public class SignedDataValidatorTest {
   private final List<Address> validators = Lists.newArrayList();
 
   @Mock private BlockValidator<IbftContext> blockValidator;
-  private final BlockHeader parentHeader = mock(BlockHeader.class);
   private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(2, 0);
   private SignedDataValidator validator;
 
-  private final Block block = mock(Block.class);
+  private Block block;
 
   @Before
   public void setup() {
     validators.add(Util.publicKeyToAddress(proposerKey.getPublicKey()));
     validators.add(Util.publicKeyToAddress(validatorKey.getPublicKey()));
+
+    block = TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
 
     final ProtocolContext<IbftContext> protocolContext =
         new ProtocolContext<>(
@@ -82,19 +85,8 @@ public class SignedDataValidatorTest {
         new SignedDataValidator(
             validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), roundIdentifier);
 
-    when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
     when(blockValidator.validateAndProcessBlock(any(), any(), any(), any()))
         .thenReturn(Optional.of(new BlockProcessingOutputs(null, null)));
-    insertRoundToBlockHeader(0);
-  }
-
-  private void insertRoundToBlockHeader(final int round) {
-    final IbftExtraData extraData =
-        new IbftExtraData(
-            BytesValue.wrap(new byte[32]), Collections.emptyList(), empty(), round, validators);
-    final BlockHeader header = mock(BlockHeader.class);
-    when(header.getExtraData()).thenReturn(extraData.encode());
-    when(block.getHeader()).thenReturn(header);
   }
 
   @Test
@@ -117,16 +109,7 @@ public class SignedDataValidatorTest {
   @Test
   public void receivingProposalMessageFromNonProposerFails() {
     final Proposal proposalMsg =
-        validatorMessageFactory.createSignedProposalPayload(roundIdentifier, mock(Block.class));
-
-    assertThat(validator.addSignedProposalPayload(proposalMsg.getSignedPayload())).isFalse();
-  }
-
-  @Test
-  public void receivingProposalMessageWithIllegalBlockFails() {
-    when(blockValidator.validateAndProcessBlock(any(), any(), any(), any())).thenReturn(empty());
-    final Proposal proposalMsg =
-        proposerMessageFactory.createSignedProposalPayload(roundIdentifier, mock(Block.class));
+        validatorMessageFactory.createSignedProposalPayload(roundIdentifier, block);
 
     assertThat(validator.addSignedProposalPayload(proposalMsg.getSignedPayload())).isFalse();
   }
@@ -252,10 +235,10 @@ public class SignedDataValidatorTest {
 
   @Test
   public void blockRoundMisMatchWithMessageRoundFails() {
-    insertRoundToBlockHeader(roundIdentifier.getRoundNumber() + 1);
+    final ConsensusRoundIdentifier futureRound = TestHelpers.createFrom(roundIdentifier, 0, +1);
 
     final Proposal proposalMsg =
-        proposerMessageFactory.createSignedProposalPayload(roundIdentifier, block);
+        proposerMessageFactory.createSignedProposalPayload(futureRound, block);
 
     assertThat(validator.addSignedProposalPayload(proposalMsg.getSignedPayload())).isFalse();
   }

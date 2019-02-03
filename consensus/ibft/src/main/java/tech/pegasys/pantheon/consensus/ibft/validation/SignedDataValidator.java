@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
+import static java.util.Optional.empty;
+
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.Payload;
@@ -36,7 +38,7 @@ public class SignedDataValidator {
   private final Address expectedProposer;
   private final ConsensusRoundIdentifier roundIdentifier;
 
-  private Optional<SignedData<ProposalPayload>> proposal;
+  private Optional<SignedData<ProposalPayload>> proposal = empty();
 
   public SignedDataValidator(
       final Collection<Address> validators,
