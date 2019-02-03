@@ -36,7 +36,8 @@ public class ProposalBlockConsistencyChecker {
   private final ProtocolContext<IbftContext> protocolContext;
 
   public ProposalBlockConsistencyChecker(
-      BlockValidator<IbftContext> blockValidator, ProtocolContext<IbftContext> protocolContext) {
+      final BlockValidator<IbftContext> blockValidator,
+      final ProtocolContext<IbftContext> protocolContext) {
     this.blockValidator = blockValidator;
     this.protocolContext = protocolContext;
   }

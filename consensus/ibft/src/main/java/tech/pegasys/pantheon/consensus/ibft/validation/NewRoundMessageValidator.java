@@ -178,8 +178,8 @@ public class NewRoundMessageValidator {
     final Hash oldRoundHash =
         IbftBlockHashing.calculateDataHashForCommittedSeal(currentBlockWithOldRound.getHeader());
 
-    if (!oldRoundHash
-        .equals(latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest()) {
+    if (!oldRoundHash.equals(
+        latestPreparedCertificate.get().getProposalPayload().getPayload().getDigest())) {
       LOG.info(
           "Invalid NewRound message, block in latest RoundChange does not match proposed block.");
       return false;
