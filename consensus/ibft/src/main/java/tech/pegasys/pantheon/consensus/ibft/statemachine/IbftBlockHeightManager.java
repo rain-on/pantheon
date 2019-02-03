@@ -253,7 +253,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
 
   @Override
   public long getChainHeight() {
-    return currentRound.getRoundIdentifier().getSequenceNumber();
+    return parentHeader.getNumber() + 1;
   }
 
   @Override

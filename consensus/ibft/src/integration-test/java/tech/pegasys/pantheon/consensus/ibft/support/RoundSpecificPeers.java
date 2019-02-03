@@ -184,8 +184,8 @@ public class RoundSpecificPeers {
       final int index = i;
       final IbftMessage<? extends Payload> msg = msgList.get(index);
       candidates.forEach(
-          n -> {
-            final List<MessageData> rxMsgs = n.getReceivedMessages();
+          candidate -> {
+            final List<MessageData> rxMsgs = candidate.getReceivedMessages();
             final MessageData rxMsgData = rxMsgs.get(index);
             verifyMessage(rxMsgData, msg);
           });

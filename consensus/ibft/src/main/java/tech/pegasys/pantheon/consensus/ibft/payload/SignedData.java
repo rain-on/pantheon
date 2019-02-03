@@ -51,12 +51,6 @@ public class SignedData<M extends Payload> implements Authored {
     output.endList();
   }
 
-  public BytesValue encode() {
-    final BytesValueRLPOutput rlpEncode = new BytesValueRLPOutput();
-    writeTo(rlpEncode);
-    return rlpEncode.encoded();
-  }
-
   public static SignedData<ProposalPayload> readSignedProposalPayloadFrom(final RLPInput rlpInput) {
 
     rlpInput.enterList();

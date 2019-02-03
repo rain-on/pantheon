@@ -48,8 +48,8 @@ public class NewRound extends IbftMessage<NewRoundPayload> {
   public BytesValue encode() {
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     rlpOut.startList();
-    rlpOut.writeBytesValue(getSignedPayload().encode());
-    rlpOut.writeBytesValue(proposedBlock.toRlp());
+    getSignedPayload().writeTo(rlpOut);
+    proposedBlock.writeTo(rlpOut);
     rlpOut.endList();
     return rlpOut.encoded();
   }

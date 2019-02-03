@@ -46,9 +46,9 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
   public BytesValue encode() {
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     rlpOut.startList();
-    rlpOut.writeBytesValue(getSignedPayload().encode());
+    getSignedPayload().writeTo(rlpOut);
     if (proposedBlock.isPresent()) {
-      rlpOut.writeBytesValue(proposedBlock.get().toRlp());
+      proposedBlock.get().writeTo(rlpOut);
     } else {
       rlpOut.writeNull();
     }
