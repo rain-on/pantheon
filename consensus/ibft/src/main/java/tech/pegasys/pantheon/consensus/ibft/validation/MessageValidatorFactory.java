@@ -41,12 +41,12 @@ public class MessageValidatorFactory {
     this.protocolContext = protocolContext;
   }
 
-  public MessageValidator createMessageValidator(
+  private SignedDataValidator createSignedDataValidator(
       final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
 
-    return new MessageValidator(
+    return new SignedDataValidator(
         protocolContext.getConsensusState().getVoteTally().getValidators(),
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier,
@@ -55,12 +55,17 @@ public class MessageValidatorFactory {
         parentHeader);
   }
 
+  public MessageValidator createMessageValidator(
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
+    return new MessageValidator(createSignedDataValidator(roundIdentifier, parentHeader));
+  }
+
   public RoundChangeMessageValidator createRoundChangeMessageValidator(
       final BlockHeader parentHeader) {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
     return new RoundChangeMessageValidator(
-        roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
+        roundIdentifier -> createSignedDataValidator(roundIdentifier, parentHeader),
         validators,
         prepareMessageCountForQuorum(
             IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
@@ -73,7 +78,7 @@ public class MessageValidatorFactory {
     return new NewRoundMessageValidator(
         validators,
         proposerSelector,
-        roundIdentifier -> createMessageValidator(roundIdentifier, parentHeader),
+        roundIdentifier -> createSignedDataValidator(roundIdentifier, parentHeader),
         IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
         parentHeader.getNumber() + 1);
   }

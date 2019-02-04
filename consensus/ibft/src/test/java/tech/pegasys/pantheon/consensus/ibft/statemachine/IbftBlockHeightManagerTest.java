@@ -127,7 +127,7 @@ public class IbftBlockHeightManagerTest {
 
     final MessageValidator messageValidator = mock(MessageValidator.class);
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
     when(messageValidator.validatePrepareMessage(any())).thenReturn(true);
     when(finalState.getTransmitter()).thenReturn(messageTransmitter);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
