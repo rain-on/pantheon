@@ -113,7 +113,7 @@ public class SignedDataValidatorTest {
   public void receivingACommitMessageBeforeProposalFails() {
     final Commit commitMsg =
         proposerMessageFactory.createSignedCommitPayload(
-            roundIdentifier, Hash.ZERO, SECP256K1.sign(Hash.ZERO, proposerKey));
+            roundIdentifier, Hash.ZERO, SECP256K1.sign(block.getHash(), proposerKey));
 
     assertThat(validator.validateCommmitMessage(commitMsg.getSignedPayload())).isFalse();
   }
