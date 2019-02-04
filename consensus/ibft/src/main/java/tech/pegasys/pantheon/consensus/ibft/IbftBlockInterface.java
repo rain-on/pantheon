@@ -53,11 +53,6 @@ public class IbftBlockInterface implements BlockInterface {
     return ibftExtraData.getValidators();
   }
 
-  public int roundOfBlock(final BlockHeader header) {
-    final IbftExtraData ibftExtraData = IbftExtraData.decode(header.getExtraData());
-    return ibftExtraData.getRound();
-  }
-
   public static Block replaceRoundInBlock(
       final Block block, final int round, final BlockHashFunction blockHashFunction) {
     final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader().getExtraData());
@@ -70,12 +65,7 @@ public class IbftBlockInterface implements BlockInterface {
             prevExtraData.getValidators());
 
     final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
-    headerBuilder
-        .extraData(substituteExtraData.encode())
-        .blockHashFunction(
-            blockHeader ->
-                IbftBlockHashing.calculateDataHashForCommittedSeal(
-                    blockHeader, substituteExtraData));
+    headerBuilder.extraData(substituteExtraData.encode()).blockHashFunction(blockHashFunction);
 
     final BlockHeader newHeader = headerBuilder.buildBlockHeader();
 

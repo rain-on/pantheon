@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -30,7 +32,6 @@ import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
@@ -107,8 +108,7 @@ public class IbftRoundTest {
     headerTestFixture.number(1);
 
     final BlockHeader header = headerTestFixture.buildHeader();
-    proposedBlock =
-        new Block(header, new BlockBody(Collections.emptyList(), Collections.emptyList()));
+    proposedBlock = new Block(header, new BlockBody(emptyList(), emptyList()));
 
     when(blockCreator.createBlock(anyLong())).thenReturn(proposedBlock);
 
@@ -298,10 +298,9 @@ public class IbftRoundTest {
                 messageFactory.createSignedRoundChangePayload(
                     roundIdentifier,
                     Optional.of(
-                        new PreparedCertificate(
-                            messageFactory
-                                .createSignedProposalPayload(priorRoundChange, proposedBlock)
-                                .getSignedPayload(),
+                        new TerminatedRoundArtefacts(
+                            messageFactory.createSignedProposalPayload(
+                                priorRoundChange, proposedBlock),
                             emptyList())))));
 
     // NOTE: IbftRound assumes the prepare's are valid
