@@ -12,7 +12,8 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
+import static java.util.Optional.empty;
+
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
@@ -47,16 +48,35 @@ public class RoundChangeArtifacts {
   public static RoundChangeArtifacts create(final Collection<RoundChange> roundChanges) {
 
     final Collection<SignedData<RoundChangePayload>> payloads =
-        roundChanges
-            .stream()
-            .map(roundChange -> roundChange.getSignedPayload())
-            .collect(Collectors.toList());
+        roundChanges.stream().map(RoundChange::getSignedPayload).collect(Collectors.toList());
 
-    final Optional<PreparedCertificate> latestPreparedCertificate =
-        IbftHelpers.findLatestPreparedCertificate(payloads);
+    Optional<RoundChange> newestRoundChange = empty();
+    for (final RoundChange roundChange : roundChanges) {
+      if (roundChange.getPreparedCertificate().isPresent()) {
+        if (!newestRoundChange.isPresent()) {
+          newestRoundChange = Optional.of(roundChange);
+        } else {
+          newestRoundChange =
+              Optional.of(selectNewestRoundChange(newestRoundChange.get(), roundChange));
+        }
+      }
+    }
+    if (!newestRoundChange.isPresent()) {
+      return new RoundChangeArtifacts(empty(), payloads);
+    } else {
+      return new RoundChangeArtifacts(newestRoundChange.get().getProposedBlock(), payloads);
+    }
+  }
 
-    return new RoundChangeArtifacts(
-        latestPreparedCertificate.map(cert -> cert.getProposalPayload().getPayload().getBlock()),
-        payloads);
+  private static RoundChange selectNewestRoundChange(
+      final RoundChange first, final RoundChange second) {
+    final PreparedCertificate firstCert = first.getPreparedCertificate().get();
+    final PreparedCertificate secondCert = second.getPreparedCertificate().get();
+
+    if (secondCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
+        > firstCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
+      return second;
+    }
+    return first;
   }
 }

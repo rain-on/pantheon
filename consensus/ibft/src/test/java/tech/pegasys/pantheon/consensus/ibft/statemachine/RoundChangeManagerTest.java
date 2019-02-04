@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.validation.ProposalBlockConsistencyValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
@@ -62,6 +63,8 @@ public class RoundChangeManagerTest {
   private final ConsensusRoundIdentifier ri2 = new ConsensusRoundIdentifier(2, 2);
   private final ConsensusRoundIdentifier ri3 = new ConsensusRoundIdentifier(2, 3);
   private final List<Address> validators = Lists.newArrayList();
+  private ProposalBlockConsistencyValidator proposalConsistencyChecker =
+      mock(ProposalBlockConsistencyValidator.class);
 
   @Before
   public void setup() {
@@ -88,29 +91,17 @@ public class RoundChangeManagerTest {
         .thenAnswer(
             invocation ->
                 new SignedDataValidator(
-                    validators,
-                    Util.publicKeyToAddress(proposerKey.getPublicKey()),
-                    ri1,
-                    blockValidator,
-                    protocolContext));
+                    validators, Util.publicKeyToAddress(proposerKey.getPublicKey()), ri1));
     when(messageValidatorFactory.createAt(ri2))
         .thenAnswer(
             invocation ->
                 new SignedDataValidator(
-                    validators,
-                    Util.publicKeyToAddress(validator1Key.getPublicKey()),
-                    ri2,
-                    blockValidator,
-                    protocolContext));
+                    validators, Util.publicKeyToAddress(validator1Key.getPublicKey()), ri2));
     when(messageValidatorFactory.createAt(ri3))
         .thenAnswer(
             invocation ->
                 new SignedDataValidator(
-                    validators,
-                    Util.publicKeyToAddress(validator2Key.getPublicKey()),
-                    ri3,
-                    blockValidator,
-                    protocolContext));
+                    validators, Util.publicKeyToAddress(validator2Key.getPublicKey()), ri3));
 
     final RoundChangeMessageValidator roundChangeMessageValidator =
         new RoundChangeMessageValidator(
@@ -119,8 +110,11 @@ public class RoundChangeManagerTest {
                 validators,
                 IbftHelpers.calculateRequiredValidatorQuorum(
                     IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
-                2));
+                2),
+            proposalConsistencyChecker);
     manager = new RoundChangeManager(2, roundChangeMessageValidator);
+
+    when(proposalConsistencyChecker.validateProposalMatchesBlock(any(), any())).thenReturn(true);
   }
 
   private RoundChange makeRoundChangeMessage(

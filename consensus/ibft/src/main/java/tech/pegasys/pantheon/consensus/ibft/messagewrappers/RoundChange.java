@@ -12,9 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
@@ -24,8 +26,20 @@ import java.util.Optional;
 
 public class RoundChange extends IbftMessage<RoundChangePayload> {
 
+  private final Optional<Block> proposedBlock;
+
+  public RoundChange(final SignedData<RoundChangePayload> payload, final Block proposedBlock) {
+    super(payload);
+    this.proposedBlock = Optional.of(proposedBlock);
+  }
+
   public RoundChange(final SignedData<RoundChangePayload> payload) {
     super(payload);
+    this.proposedBlock = Optional.empty();
+  }
+
+  public Optional<Block> getProposedBlock() {
+    return proposedBlock;
   }
 
   public Optional<PreparedCertificate> getPreparedCertificate() {
@@ -37,16 +51,32 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();
     rlpOut.startList();
     getSignedPayload().writeTo(rlpOut);
+    if (proposedBlock.isPresent()) {
+      proposedBlock.get().writeTo(rlpOut);
+    } else {
+      rlpOut.writeNull();
+    }
     rlpOut.endList();
     return rlpOut.encoded();
   }
 
   public static RoundChange decode(final BytesValue data) {
-    RLPInput rlpIn = RLP.input(data);
+    RoundChange result;
+
+    final RLPInput rlpIn = RLP.input(data);
     rlpIn.enterList();
     final SignedData<RoundChangePayload> payload =
         SignedData.readSignedRoundChangePayloadFrom(rlpIn);
+    if (!rlpIn.nextIsNull()) {
+      result =
+          new RoundChange(
+              payload, Block.readFrom(rlpIn, IbftBlockHashing::calculateDataHashForCommittedSeal));
+    } else {
+      result = new RoundChange(payload);
+      rlpIn.skipNext();
+    }
     rlpIn.leaveList();
-    return new RoundChange(payload);
+
+    return result;
   }
 }

@@ -114,7 +114,8 @@ public class ValidatorPeer {
       final Proposal proposal) {
 
     final NewRound payload =
-        messageFactory.createNewRound(rId, roundChangeCertificate, proposal.getSignedPayload());
+        messageFactory.createNewRound(
+            rId, roundChangeCertificate, proposal.getSignedPayload(), proposal.getBlock());
     injectMessage(NewRoundMessageData.create(payload));
     return payload;
   }
@@ -124,7 +125,8 @@ public class ValidatorPeer {
       final List<SignedData<RoundChangePayload>> roundChangePayloads,
       final Block blockToPropose) {
 
-    final Proposal proposal = messageFactory.createProposal(targetRoundId, blockToPropose);
+    final Proposal proposal =
+        messageFactory.createProposal(targetRoundId, blockToPropose);
 
     return injectNewRound(targetRoundId, new RoundChangeCertificate(roundChangePayloads), proposal);
   }
