@@ -300,7 +300,11 @@ public class TestContextBuilder {
             new IbftBlockHeightManagerFactory(
                 finalState,
                 new IbftRoundFactory(
-                    finalState, protocolContext, protocolSchedule, minedBlockObservers),
+                    finalState,
+                    protocolContext,
+                    protocolSchedule,
+                    minedBlockObservers,
+                    messageValidatorFactory),
                 messageValidatorFactory),
             gossiper,
             new HashMap<>());

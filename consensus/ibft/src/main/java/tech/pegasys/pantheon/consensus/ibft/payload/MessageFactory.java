@@ -40,9 +40,9 @@ public class MessageFactory {
   public Proposal createProposal(
       final ConsensusRoundIdentifier roundIdentifier, final Block block) {
 
-    final ProposalPayload payload = new ProposalPayload(roundIdentifier, block);
+    final ProposalPayload payload = new ProposalPayload(roundIdentifier, block.getHash());
 
-    return new Proposal(createSignedMessage(payload));
+    return new Proposal(createSignedMessage(payload), block);
   }
 
   public Prepare createPrepare(final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
@@ -66,23 +66,27 @@ public class MessageFactory {
       final ConsensusRoundIdentifier roundIdentifier,
       final Optional<PreparedRoundArtifacts> preparedRoundArtifacts) {
 
-    final RoundChangePayload payload =
-        new RoundChangePayload(
-            roundIdentifier,
-            preparedRoundArtifacts.map(PreparedRoundArtifacts::getPreparedCertificate));
+    if (preparedRoundArtifacts.isPresent()) {
+      final RoundChangePayload payload =
+          new RoundChangePayload(
+              roundIdentifier, Optional.of(preparedRoundArtifacts.get().getPreparedCertificate()));
+      return new RoundChange(createSignedMessage(payload), preparedRoundArtifacts.get().getBlock());
+    }
 
+    final RoundChangePayload payload = new RoundChangePayload(roundIdentifier, Optional.empty());
     return new RoundChange(createSignedMessage(payload));
   }
 
   public NewRound createNewRound(
       final ConsensusRoundIdentifier roundIdentifier,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final SignedData<ProposalPayload> proposalPayload,
+      final Block block) {
 
     final NewRoundPayload payload =
         new NewRoundPayload(roundIdentifier, roundChangeCertificate, proposalPayload);
 
-    return new NewRound(createSignedMessage(payload));
+    return new NewRound(createSignedMessage(payload), block);
   }
 
   private <M extends Payload> SignedData<M> createSignedMessage(final M payload) {

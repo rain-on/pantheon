@@ -72,8 +72,6 @@ public class TestHelpers {
         proposer.getMessageFactory().createProposal(targetRoundId, blockToPropose);
 
     return proposer.injectNewRound(
-        targetRoundId,
-        new RoundChangeCertificate(roundChangePayloads),
-        proposal.getSignedPayload());
+        targetRoundId, new RoundChangeCertificate(roundChangePayloads), proposal);
   }
 }

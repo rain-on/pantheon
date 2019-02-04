@@ -80,8 +80,7 @@ public class ValidatorPeer {
 
   public Proposal injectProposal(final ConsensusRoundIdentifier rId, final Block block) {
     final Proposal payload = messageFactory.createProposal(rId, block);
-
-    injectMessage(ProposalMessageData.create(payload));
+    injectMessage(ProposalMesageData.create(payload));
     return payload;
   }
 
@@ -97,7 +96,6 @@ public class ValidatorPeer {
 
   public Commit injectCommit(final ConsensusRoundIdentifier rId, final Hash digest) {
     final Signature commitSeal = SECP256K1.sign(digest, nodeKeys);
-
     return injectCommit(rId, digest, commitSeal);
   }
 
@@ -111,10 +109,11 @@ public class ValidatorPeer {
   public NewRound injectNewRound(
       final ConsensusRoundIdentifier rId,
       final RoundChangeCertificate roundChangeCertificate,
-      final SignedData<ProposalPayload> proposalPayload) {
+      final Proposal proposal) {
 
     final NewRound payload =
-        messageFactory.createNewRound(rId, roundChangeCertificate, proposalPayload);
+        messageFactory.createNewRound(
+            rId, roundChangeCertificate, proposal.getSignedPayload(), proposal.getBlock());
     injectMessage(NewRoundMessageData.create(payload));
     return payload;
   }

@@ -103,10 +103,11 @@ public class TestHelpers {
     final MessageFactory messageFactory = new MessageFactory(signerKeys);
     final ConsensusRoundIdentifier roundIdentifier =
         new ConsensusRoundIdentifier(0x1234567890ABCDEFL, 0xFEDCBA98);
-    final Proposal proposalPayload = createSignedProposalPayload(signerKeys);
+    final Proposal proposal = createSignedProposalPayload(signerKeys);
     return messageFactory.createNewRound(
         roundIdentifier,
         new RoundChangeCertificate(newArrayList()),
-        proposalPayload.getSignedPayload());
+        proposal.getSignedPayload(),
+        proposal.getBlock());
   }
 }

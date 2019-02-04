@@ -14,16 +14,45 @@ package tech.pegasys.pantheon.consensus.ibft.validation;
 
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class RoundChangeMessageValidator {
 
-  private final RoundChangePayloadValidator roundChangePayloadValidator;
+  private static final Logger LOG = LogManager.getLogger();
+
+  private final RoundChangePayloadValidator signedDataValidator;
+  private final ProposalBlockConsistencyValidator proposalBlockConsistencyChecker;
 
   public RoundChangeMessageValidator(
-      final RoundChangePayloadValidator roundChangePayloadValidator) {
-    this.roundChangePayloadValidator = roundChangePayloadValidator;
+      final RoundChangePayloadValidator signedDataValidator,
+      final ProposalBlockConsistencyValidator proposalBlockConsistencyChecker) {
+    this.proposalBlockConsistencyChecker = proposalBlockConsistencyChecker;
+    this.signedDataValidator = signedDataValidator;
   }
 
   public boolean validateRoundChange(final RoundChange msg) {
-    return roundChangePayloadValidator.validateRoundChange(msg.getSignedPayload());
+
+    if (!signedDataValidator.validateRoundChange(msg.getSignedPayload())) {
+      LOG.info("Invalid RoundChange message, signed data did not validate correctly.");
+      return false;
+    }
+
+    if (msg.getPreparedCertificate().isPresent() != msg.getProposedBlock().isPresent()) {
+      LOG.info(
+          "Invalid RoundChange message, availability of certificate does not correlate with"
+              + "availability of block.");
+      return false;
+    }
+
+    if (msg.getPreparedCertificate().isPresent()) {
+      if (!proposalBlockConsistencyChecker.validateProposalMatchesBlock(
+          msg.getPreparedCertificate().get().getProposalPayload(), msg.getProposedBlock().get())) {
+        LOG.info("Invalid RoundChange message, proposal did not align with supplied block.");
+        return false;
+      }
+    }
+
+    return true;
   }
 }

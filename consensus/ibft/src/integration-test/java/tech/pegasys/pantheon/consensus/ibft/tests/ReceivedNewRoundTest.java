@@ -71,10 +71,7 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         targetRound,
         new RoundChangeCertificate(roundChanges),
-        nextProposer
-            .getMessageFactory()
-            .createProposal(targetRound, blockToPropose)
-            .getSignedPayload());
+        nextProposer.getMessageFactory().createProposal(targetRound, blockToPropose));
 
     final Prepare expectedPrepare =
         localNodeMessageFactory.createPrepare(targetRound, blockToPropose.getHash());
@@ -97,10 +94,7 @@ public class ReceivedNewRoundTest {
     illegalProposer.injectNewRound(
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
-        illegalProposer
-            .getMessageFactory()
-            .createProposal(nextRoundId, blockToPropose)
-            .getSignedPayload());
+        illegalProposer.getMessageFactory().createProposal(nextRoundId, blockToPropose));
 
     peers.verifyNoMessagesReceived();
   }
@@ -122,11 +116,7 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
-        peers
-            .getNonProposing(0)
-            .getMessageFactory()
-            .createProposal(nextRoundId, reproposedBlock)
-            .getSignedPayload());
+        peers.getNonProposing(0).getMessageFactory().createProposal(nextRoundId, reproposedBlock));
 
     peers.verifyMessagesReceived(
         localNodeMessageFactory.createPrepare(nextRoundId, reproposedBlock.getHash()));
@@ -152,7 +142,7 @@ public class ReceivedNewRoundTest {
             .createProposal(interimRound, context.createBlockForProposalFromChainHead(1, 30));
 
     interimRoundProposer.injectNewRound(
-        interimRound, new RoundChangeCertificate(roundChangePayloads), proposal.getSignedPayload());
+        interimRound, new RoundChangeCertificate(roundChangePayloads), proposal);
 
     peers.verifyNoMessagesReceived();
   }
@@ -175,11 +165,7 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
-        peers
-            .getNonProposing(0)
-            .getMessageFactory()
-            .createProposal(nextRoundId, reproposedBlock)
-            .getSignedPayload());
+        peers.getNonProposing(0).getMessageFactory().createProposal(nextRoundId, reproposedBlock));
 
     peers.verifyMessagesReceived(
         localNodeMessageFactory.createPrepare(nextRoundId, reproposedBlock.getHash()));
@@ -191,11 +177,7 @@ public class ReceivedNewRoundTest {
     nextProposer.injectNewRound(
         nextRoundId,
         new RoundChangeCertificate(roundChanges),
-        peers
-            .getNonProposing(0)
-            .getMessageFactory()
-            .createProposal(nextRoundId, reproposedBlock)
-            .getSignedPayload());
+        peers.getNonProposing(0).getMessageFactory().createProposal(nextRoundId, reproposedBlock));
 
     peers.verifyNoMessagesReceived();
 

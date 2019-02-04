@@ -37,8 +37,11 @@ public class RoundChangeMessageValidatorTest {
   private final Block block =
       TestHelpers.createProposalBlock(emptyList(), roundIdentifier.getRoundNumber());
 
+  private ProposalBlockConsistencyValidator proposalBlockConsistencyValidator =
+      mock(ProposalBlockConsistencyValidator.class);
+
   private final RoundChangeMessageValidator validator =
-      new RoundChangeMessageValidator(payloadValidator);
+      new RoundChangeMessageValidator(payloadValidator, proposalBlockConsistencyValidator);
 
   @Test
   public void underlyingPayloadValidatorIsInvokedWithCorrectParameters() {
