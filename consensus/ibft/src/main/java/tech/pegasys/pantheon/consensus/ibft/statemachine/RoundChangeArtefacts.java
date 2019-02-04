@@ -52,11 +52,11 @@ public class RoundChangeArtefacts {
             .map(roundChange -> roundChange.getSignedPayload())
             .collect(Collectors.toList());
 
-    final Optional<PreparedCertificate> latestdPreparedCertificate =
+    final Optional<PreparedCertificate> latestPreparedCertificate =
         IbftHelpers.findLatestPreparedCertificate(payloads);
 
     return new RoundChangeArtefacts(
-        latestdPreparedCertificate.map(cert -> cert.getProposalPayload().getPayload().getBlock()),
+        latestPreparedCertificate.map(cert -> cert.getProposalPayload().getPayload().getBlock()),
         payloads);
   }
 }
