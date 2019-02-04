@@ -112,7 +112,7 @@ public class RoundStateTest {
   @Test
   public void singleValidatorRequiresCommitMessageToBeCommitted() {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 1, messageValidator);
 
@@ -189,9 +189,8 @@ public class RoundStateTest {
     final RoundState roundState = new RoundState(roundIdentifier, 3, messageValidator);
 
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(firstPrepare.getSignedPayload())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(secondPrepare.getSignedPayload()))
-        .thenReturn(false);
+    when(messageValidator.validatePrepareMessage(firstPrepare)).thenReturn(true);
+    when(messageValidator.validatePrepareMessage(secondPrepare)).thenReturn(false);
 
     roundState.addPrepareMessage(firstPrepare);
     roundState.addPrepareMessage(secondPrepare);
@@ -224,10 +223,8 @@ public class RoundStateTest {
         validatorMessageFactories.get(0).createSignedProposalPayload(roundIdentifier, block);
 
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validatePrepareMessage(firstPrepare.getSignedPayload()))
-        .thenReturn(false);
-    when(messageValidator.validatePrepareMessage(secondPrepare.getSignedPayload()))
-        .thenReturn(true);
+    when(messageValidator.validatePrepareMessage(firstPrepare)).thenReturn(false);
+    when(messageValidator.validatePrepareMessage(secondPrepare)).thenReturn(true);
 
     roundState.setProposedBlock(proposal);
     assertThat(roundState.isPrepared()).isFalse();
@@ -242,7 +239,7 @@ public class RoundStateTest {
   @Test
   public void commitSealsAreExtractedFromReceivedMessages() {
     when(messageValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(messageValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(messageValidator.validateCommitMessage(any())).thenReturn(true);
 
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
 

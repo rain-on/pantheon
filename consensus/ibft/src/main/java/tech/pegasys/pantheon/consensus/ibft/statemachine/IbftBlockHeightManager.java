@@ -97,7 +97,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
             new RoundState(
                 roundIdentifier,
                 finalState.getQuorum(),
-                messageValidatorFactory.createMessageValidator(roundIdentifier, parentHeader));
+                messageValidatorFactory.createMessageValidator(roundIdentifier));
   }
 
   @Override
