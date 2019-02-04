@@ -62,8 +62,7 @@ public class IbftRoundFactory {
                     finalState.getProposerForRound(roundIdentifier),
                     roundIdentifier,
                     blockValidator,
-                    protocolContext,
-                    parentHeader)));
+                    protocolContext)));
 
     return createNewRoundWithState(parentHeader, roundState);
   }

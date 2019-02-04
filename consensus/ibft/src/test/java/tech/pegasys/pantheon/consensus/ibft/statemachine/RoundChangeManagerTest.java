@@ -93,8 +93,7 @@ public class RoundChangeManagerTest {
                     Util.publicKeyToAddress(proposerKey.getPublicKey()),
                     ri1,
                     blockValidator,
-                    protocolContext,
-                    parentHeader));
+                    protocolContext));
     when(messageValidatorFactory.createAt(ri2))
         .thenAnswer(
             invocation ->
@@ -103,8 +102,7 @@ public class RoundChangeManagerTest {
                     Util.publicKeyToAddress(validator1Key.getPublicKey()),
                     ri2,
                     blockValidator,
-                    protocolContext,
-                    parentHeader));
+                    protocolContext));
     when(messageValidatorFactory.createAt(ri3))
         .thenAnswer(
             invocation ->
@@ -113,8 +111,7 @@ public class RoundChangeManagerTest {
                     Util.publicKeyToAddress(validator2Key.getPublicKey()),
                     ri3,
                     blockValidator,
-                    protocolContext,
-                    parentHeader));
+                    protocolContext));
 
     final RoundChangeMessageValidator roundChangeMessageValidator =
         new RoundChangeMessageValidator(

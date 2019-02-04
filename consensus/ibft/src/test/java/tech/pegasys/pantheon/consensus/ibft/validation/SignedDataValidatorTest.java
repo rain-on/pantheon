@@ -84,8 +84,7 @@ public class SignedDataValidatorTest {
             Util.publicKeyToAddress(proposerKey.getPublicKey()),
             roundIdentifier,
             blockValidator,
-            protocolContext,
-            parentHeader);
+            protocolContext);
 
     when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
     when(blockValidator.validateAndProcessBlock(any(), any(), any(), any()))

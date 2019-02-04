@@ -25,7 +25,6 @@ import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
@@ -45,7 +44,6 @@ public class SignedDataValidator {
   private final ConsensusRoundIdentifier roundIdentifier;
   private final BlockValidator<IbftContext> blockValidator;
   private final ProtocolContext<IbftContext> protocolContext;
-  private final BlockHeader parentHeader;
 
   private Optional<SignedData<ProposalPayload>> proposal = Optional.empty();
 
@@ -54,14 +52,12 @@ public class SignedDataValidator {
       final Address expectedProposer,
       final ConsensusRoundIdentifier roundIdentifier,
       final BlockValidator<IbftContext> blockValidator,
-      final ProtocolContext<IbftContext> protocolContext,
-      final BlockHeader parentHeader) {
+      final ProtocolContext<IbftContext> protocolContext) {
     this.validators = validators;
     this.expectedProposer = expectedProposer;
     this.roundIdentifier = roundIdentifier;
     this.blockValidator = blockValidator;
     this.protocolContext = protocolContext;
-    this.parentHeader = parentHeader;
   }
 
   public boolean addSignedProposalPayload(final SignedData<ProposalPayload> msg) {

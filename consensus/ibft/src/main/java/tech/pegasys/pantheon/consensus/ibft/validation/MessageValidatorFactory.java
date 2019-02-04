@@ -42,7 +42,7 @@ public class MessageValidatorFactory {
   }
 
   private SignedDataValidator createSignedDataValidator(
-      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
+      final ConsensusRoundIdentifier roundIdentifier) {
     final BlockValidator<IbftContext> blockValidator =
         protocolSchedule.getByBlockNumber(roundIdentifier.getSequenceNumber()).getBlockValidator();
 
@@ -51,13 +51,11 @@ public class MessageValidatorFactory {
         proposerSelector.selectProposerForRound(roundIdentifier),
         roundIdentifier,
         blockValidator,
-        protocolContext,
-        parentHeader);
+        protocolContext);
   }
 
-  public MessageValidator createMessageValidator(
-      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
-    return new MessageValidator(createSignedDataValidator(roundIdentifier, parentHeader));
+  public MessageValidator createMessageValidator(final ConsensusRoundIdentifier roundIdentifier) {
+    return new MessageValidator(createSignedDataValidator(roundIdentifier));
   }
 
   public RoundChangeMessageValidator createRoundChangeMessageValidator(
@@ -65,7 +63,7 @@ public class MessageValidatorFactory {
     final Collection<Address> validators =
         protocolContext.getConsensusState().getVoteTally().getValidators();
     return new RoundChangeMessageValidator(
-        roundIdentifier -> createSignedDataValidator(roundIdentifier, parentHeader),
+        this::createSignedDataValidator,
         validators,
         prepareMessageCountForQuorum(
             IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
@@ -78,7 +76,7 @@ public class MessageValidatorFactory {
     return new NewRoundMessageValidator(
         validators,
         proposerSelector,
-        roundIdentifier -> createSignedDataValidator(roundIdentifier, parentHeader),
+        this::createSignedDataValidator,
         IbftHelpers.calculateRequiredValidatorQuorum(validators.size()),
         parentHeader.getNumber() + 1);
   }
