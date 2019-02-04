@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -109,7 +107,8 @@ public class IbftRoundTest {
     headerTestFixture.number(1);
 
     final BlockHeader header = headerTestFixture.buildHeader();
-    proposedBlock = new Block(header, new BlockBody(emptyList(), emptyList()));
+    proposedBlock =
+        new Block(header, new BlockBody(Collections.emptyList(), Collections.emptyList()));
 
     when(blockCreator.createBlock(anyLong())).thenReturn(proposedBlock);
 
@@ -258,7 +257,7 @@ public class IbftRoundTest {
   }
 
   @Test
-  public void aNewRoundMessageWithANewBlockIsSentUponReceptionOfARoundChangeWithNoCertificate() {
+  public void aNewRoundMessageWithAnewBlockIsSentUponReceptionOfARoundChangeWithNoCertificate() {
     final RoundState roundState = new RoundState(roundIdentifier, 2, messageValidator);
     final IbftRound round =
         new IbftRound(
