@@ -152,10 +152,10 @@ public class RoundChangeManagerTest {
                 })
             .collect(Collectors.toList());
 
-    final PreparedRoundArtefacts preparedRoundArtects =
+    final PreparedRoundArtefacts preparedRoundArtefacts =
         new PreparedRoundArtefacts(proposal, preparePayloads);
 
-    return messageFactory.createRoundChange(round, Optional.of(preparedRoundArtects));
+    return messageFactory.createRoundChange(round, Optional.of(preparedRoundArtefacts));
   }
 
   @Test

@@ -133,11 +133,11 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     LOG.info(
         "Round has expired, creating PreparedCertificate and notifying peers. round={}",
         currentRound.getRoundIdentifier());
-    final Optional<PreparedRoundArtefacts> preparedRoundArtefats =
+    final Optional<PreparedRoundArtefacts> preparedRoundArtefacts =
         currentRound.constructPreparedRoundArtefacts();
 
-    if (preparedRoundArtefats.isPresent()) {
-      latestPreparedRoundArtefacts = preparedRoundArtefats;
+    if (preparedRoundArtefacts.isPresent()) {
+      latestPreparedRoundArtefacts = preparedRoundArtefacts;
     }
 
     startNewRound(currentRound.getRoundIdentifier().getRoundNumber() + 1);
