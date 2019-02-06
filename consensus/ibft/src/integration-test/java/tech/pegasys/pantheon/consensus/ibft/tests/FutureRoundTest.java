@@ -91,10 +91,10 @@ public class FutureRoundTest {
 
     // inject a newRound to move to 'futureRoundId', and ensure localnode sends prepare, commit
     // and updates blockchain
-    futurePeers.getProposer().injectEmptyNewRound(
-        futureRoundId,
-        futurePeers.createSignedRoundChangePayload(futureRoundId),
-        futureBlock);
+    futurePeers
+        .getProposer()
+        .injectEmptyNewRound(
+            futureRoundId, futurePeers.createSignedRoundChangePayload(futureRoundId), futureBlock);
 
     final Prepare expectedPrepare =
         localNodeMessageFactory.createPrepare(futureRoundId, futureBlock.getHash());
@@ -134,10 +134,10 @@ public class FutureRoundTest {
 
     peers.clearReceivedMessages();
 
-    futurePeers.getProposer().injectEmptyNewRound(
-        futureRoundId,
-        futurePeers.createSignedRoundChangePayload(futureRoundId),
-        futureBlock);
+    futurePeers
+        .getProposer()
+        .injectEmptyNewRound(
+            futureRoundId, futurePeers.createSignedRoundChangePayload(futureRoundId), futureBlock);
 
     final Prepare expectedFuturePrepare =
         localNodeMessageFactory.createPrepare(futureRoundId, futureBlock.getHash());

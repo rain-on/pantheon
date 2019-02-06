@@ -75,9 +75,9 @@ public class MessageValidatorTest {
 
   @Before
   public void setup() {
-    when(signedDataValidator.addSignedProposalPayload(any())).thenReturn(true);
-    when(signedDataValidator.validatePrepareMessage(any())).thenReturn(true);
-    when(signedDataValidator.validateCommmitMessage(any())).thenReturn(true);
+    when(signedDataValidator.validateProposal(any())).thenReturn(true);
+    when(signedDataValidator.validatePrepare(any())).thenReturn(true);
+    when(signedDataValidator.validateCommit(any())).thenReturn(true);
 
     when(proposalBlockConsistencyValidator.validateProposalMatchesBlock(any(), any()))
         .thenReturn(true);
@@ -108,13 +108,13 @@ public class MessageValidatorTest {
             roundIdentifier, block.getHash(), SECP256K1.sign(block.getHash(), keyPair));
 
     assertThat(messageValidator.validateProposal(proposal)).isTrue();
-    verify(signedDataValidator, times(1)).addSignedProposalPayload(proposal.getSignedPayload());
+    verify(signedDataValidator, times(1)).validateProposal(proposal.getSignedPayload());
 
     messageValidator.validatePrepare(prepare);
-    verify(signedDataValidator, times(1)).validatePrepareMessage(prepare.getSignedPayload());
+    verify(signedDataValidator, times(1)).validatePrepare(prepare.getSignedPayload());
 
     messageValidator.validateCommit(commit);
-    verify(signedDataValidator, times(1)).validateCommmitMessage(commit.getSignedPayload());
+    verify(signedDataValidator, times(1)).validateCommit(commit.getSignedPayload());
   }
 
   @Test

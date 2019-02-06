@@ -48,7 +48,7 @@ public class MessageValidator {
   }
 
   public boolean validateProposal(final Proposal msg) {
-    if (!signedDataValidator.addSignedProposalPayload(msg.getSignedPayload())) {
+    if (!signedDataValidator.validateProposal(msg.getSignedPayload())) {
       LOG.debug("Illegal Proposal message, embedded signed data failed validation");
       return false;
     }
@@ -75,10 +75,10 @@ public class MessageValidator {
   }
 
   public boolean validatePrepare(final Prepare msg) {
-    return signedDataValidator.validatePrepareMessage(msg.getSignedPayload());
+    return signedDataValidator.validatePrepare(msg.getSignedPayload());
   }
 
   public boolean validateCommit(final Commit msg) {
-    return signedDataValidator.validateCommmitMessage(msg.getSignedPayload());
+    return signedDataValidator.validateCommit(msg.getSignedPayload());
   }
 }

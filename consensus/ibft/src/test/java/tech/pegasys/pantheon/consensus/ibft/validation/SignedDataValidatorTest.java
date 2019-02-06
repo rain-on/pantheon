@@ -88,7 +88,7 @@ public class SignedDataValidatorTest {
     final Block block = TestHelpers.createProposalBlock(emptyList(), 1);
     final Proposal proposalMsg = validatorMessageFactory.createProposal(roundIdentifier, block);
 
-    assertThat(validator.addSignedProposalPayload(proposalMsg.getSignedPayload())).isFalse();
+    assertThat(validator.validateProposal(proposalMsg.getSignedPayload())).isFalse();
   }
 
   @Test
@@ -199,14 +199,5 @@ public class SignedDataValidatorTest {
     final Proposal secondProposalMsg =
         proposerMessageFactory.createProposal(roundIdentifier, block);
     assertThat(validator.validateProposal(secondProposalMsg.getSignedPayload())).isTrue();
-  }
-
-  @Test
-  public void blockRoundMisMatchWithMessageRoundFails() {
-    insertRoundToBlockHeader(roundIdentifier.getRoundNumber() + 1);
-
-    final Proposal proposalMsg = proposerMessageFactory.createProposal(roundIdentifier, block);
-
-    assertThat(validator.validateProposal(proposalMsg.getSignedPayload())).isFalse();
   }
 }
