@@ -66,15 +66,12 @@ public class MessageFactory {
       final ConsensusRoundIdentifier roundIdentifier,
       final Optional<PreparedRoundArtifacts> preparedRoundArtifacts) {
 
-    if (preparedRoundArtifacts.isPresent()) {
-      final RoundChangePayload payload =
-          new RoundChangePayload(
-              roundIdentifier, Optional.of(preparedRoundArtifacts.get().getPreparedCertificate()));
-      return new RoundChange(createSignedMessage(payload), preparedRoundArtifacts.get().getBlock());
-    }
-
-    final RoundChangePayload payload = new RoundChangePayload(roundIdentifier, Optional.empty());
-    return new RoundChange(createSignedMessage(payload));
+    final RoundChangePayload payload =
+        new RoundChangePayload(
+            roundIdentifier,
+            preparedRoundArtifacts.map(PreparedRoundArtifacts::getPreparedCertificate));
+    return new RoundChange(createSignedMessage(payload),
+        preparedRoundArtifacts.map(PreparedRoundArtifacts::getBlock));
   }
 
   public NewRound createNewRound(

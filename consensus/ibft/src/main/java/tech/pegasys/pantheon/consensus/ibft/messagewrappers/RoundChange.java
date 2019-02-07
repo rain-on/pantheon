@@ -29,14 +29,10 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
 
   private final Optional<Block> proposedBlock;
 
-  public RoundChange(final SignedData<RoundChangePayload> payload, final Block proposedBlock) {
+  public RoundChange(final SignedData<RoundChangePayload> payload,
+      final Optional<Block> proposedBlock) {
     super(payload);
-    this.proposedBlock = Optional.of(proposedBlock);
-  }
-
-  public RoundChange(final SignedData<RoundChangePayload> payload) {
-    super(payload);
-    this.proposedBlock = Optional.empty();
+    this.proposedBlock = proposedBlock;
   }
 
   public Optional<Block> getProposedBlock() {
@@ -67,22 +63,20 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
   }
 
   public static RoundChange decode(final BytesValue data) {
-    RoundChange result;
 
     final RLPInput rlpIn = RLP.input(data);
     rlpIn.enterList();
     final SignedData<RoundChangePayload> payload =
         SignedData.readSignedRoundChangePayloadFrom(rlpIn);
+    Optional<Block> block = Optional.empty();
     if (!rlpIn.nextIsNull()) {
-      result =
-          new RoundChange(
-              payload, Block.readFrom(rlpIn, IbftBlockHashing::calculateDataHashForCommittedSeal));
+      block =
+          Optional.of(Block.readFrom(rlpIn, IbftBlockHashing::calculateDataHashForCommittedSeal));
     } else {
-      result = new RoundChange(payload);
       rlpIn.skipNext();
     }
     rlpIn.leaveList();
 
-    return result;
+    return new RoundChange(payload, block);
   }
 }

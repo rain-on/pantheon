@@ -12,16 +12,15 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Block;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RoundChangeArtifacts {
 
@@ -59,7 +58,8 @@ public class RoundChangeArtifacts {
         };
 
     final Collection<SignedData<RoundChangePayload>> payloads =
-        roundChanges.stream().map(RoundChange::getSignedPayload).collect(Collectors.toList());
+        roundChanges.stream().map(RoundChange::getSignedPayload).collect(
+            Collectors.toList());
 
     final Optional<RoundChange> roundChangeWithNewestPrepare =
         roundChanges.stream().sorted(preparedRoundComparator).reduce((first, second) -> second);
