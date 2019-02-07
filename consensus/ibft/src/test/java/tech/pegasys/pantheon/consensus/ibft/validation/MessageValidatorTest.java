@@ -70,8 +70,7 @@ public class MessageValidatorTest {
           AddressHelpers.ofValue(2),
           AddressHelpers.ofValue(3));
 
-  private final Block block =
-      TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
+  private final Block block = TestHelpers.createProposalBlock(validators, roundIdentifier);
 
   @Before
   public void setup() {

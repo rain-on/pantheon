@@ -33,6 +33,12 @@ public class ProposalBlockConsistencyValidator {
       return false;
     }
 
+    if (proposedBlock.getHeader().getNumber()
+        != signedPayload.getPayload().getRoundIdentifier().getRoundNumber()) {
+      LOG.info("Invalid proposal/block - message sequence does not align with block number.");
+      return false;
+    }
+
     if (!validateBlockMatchesProposalRound(signedPayload.getPayload(), proposedBlock)) {
       return false;
     }

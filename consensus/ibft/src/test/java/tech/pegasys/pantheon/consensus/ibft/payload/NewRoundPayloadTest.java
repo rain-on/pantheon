@@ -41,7 +41,7 @@ public class NewRoundPayloadTest {
   @Test
   public void roundTripRlpWithNoRoundChangePayloads() {
     final Block block =
-        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
+        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), ROUND_IDENTIFIER);
     final ProposalPayload proposalPayload = new ProposalPayload(ROUND_IDENTIFIER, block.getHash());
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
     final SignedData<ProposalPayload> proposalPayloadSignedData =
@@ -65,7 +65,7 @@ public class NewRoundPayloadTest {
   @Test
   public void roundTripRlpWithRoundChangePayloads() {
     final Block block =
-        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
+        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), ROUND_IDENTIFIER);
     final ProposalPayload proposalPayload = new ProposalPayload(ROUND_IDENTIFIER, block.getHash());
     final Signature signature = Signature.create(BigInteger.ONE, BigInteger.TEN, (byte) 0);
     final SignedData<ProposalPayload> signedProposal = SignedData.from(proposalPayload, signature);

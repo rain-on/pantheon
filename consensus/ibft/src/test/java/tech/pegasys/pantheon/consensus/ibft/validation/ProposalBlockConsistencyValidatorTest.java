@@ -40,7 +40,7 @@ public class ProposalBlockConsistencyValidatorTest {
       new ConsensusRoundIdentifier(chainHeight, 4);
 
   private final Block block =
-      TestHelpers.createProposalBlock(Collections.emptyList(), roundIdentifier.getRoundNumber());
+      TestHelpers.createProposalBlock(Collections.emptyList(), roundIdentifier);
   private ProposalBlockConsistencyValidator consistencyChecker;
 
   @Before
@@ -74,4 +74,7 @@ public class ProposalBlockConsistencyValidatorTest {
             consistencyChecker.validateProposalMatchesBlock(proposalMsg.getSignedPayload(), block))
         .isFalse();
   }
+
+  @Test
+  public void blockWithMismatchedNumberFails() {}
 }

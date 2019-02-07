@@ -70,7 +70,7 @@ public class NewRoundSignedDataValidatorTest {
     validators.add(Util.publicKeyToAddress(validatorKey.getPublicKey()));
     validators.add(Util.publicKeyToAddress(otherValidatorKey.getPublicKey()));
 
-    proposedBlock = TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
+    proposedBlock = TestHelpers.createProposalBlock(validators, roundIdentifier);
     validMsg = createValidNewRoundMessageSignedBy(proposerKey);
     validPayload = validMsg.getSignedPayload().getPayload();
     msgBuilder = NewRoundPayload.Builder.fromExisting(validMsg);

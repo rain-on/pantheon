@@ -34,7 +34,7 @@ public class ProposalPayloadTest {
   @Test
   public void roundTripRlp() {
     final Block block =
-        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), 0);
+        TestHelpers.createProposalBlock(singletonList(AddressHelpers.ofValue(1)), ROUND_IDENTIFIER);
     final ProposalPayload expectedProposalPayload =
         new ProposalPayload(ROUND_IDENTIFIER, block.getHash());
     final BytesValueRLPOutput rlpOut = new BytesValueRLPOutput();

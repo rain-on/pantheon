@@ -85,7 +85,7 @@ public class SignedDataValidatorTest {
 
   @Test
   public void receivingProposalMessageFromNonProposerFails() {
-    final Block block = TestHelpers.createProposalBlock(emptyList(), 1);
+    final Block block = TestHelpers.createProposalBlock(emptyList(), roundIdentifier);
     final Proposal proposalMsg = validatorMessageFactory.createProposal(roundIdentifier, block);
 
     assertThat(validator.validateProposal(proposalMsg.getSignedPayload())).isFalse();

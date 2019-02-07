@@ -63,8 +63,7 @@ public class NewRoundMessageValidatorTest {
   private final List<Address> validators = Lists.newArrayList(proposerAddress, validatorAddress);
 
   private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 1);
-  private final Block proposedBlock =
-      TestHelpers.createProposalBlock(validators, roundIdentifier.getRoundNumber());
+  private final Block proposedBlock = TestHelpers.createProposalBlock(validators, roundIdentifier);
 
   private ProposalBlockConsistencyValidator proposalBlockConsistencyValidator =
       mock(ProposalBlockConsistencyValidator.class);
@@ -163,7 +162,7 @@ public class NewRoundMessageValidatorTest {
     // identical
     // to the proposedBlock in the new proposal (so should fail).
     final Block prevProposedBlock =
-        TestHelpers.createProposalBlock(validators.subList(0, 1), preparedRound.getRoundNumber());
+        TestHelpers.createProposalBlock(validators.subList(0, 1), preparedRound);
 
     final PreparedRoundArtifacts mismatchedRoundArtefacts =
         new PreparedRoundArtifacts(
@@ -191,8 +190,7 @@ public class NewRoundMessageValidatorTest {
   public void lastestPreparedCertificateMatchesNewRoundProposalIsSuccessful() {
     final ConsensusRoundIdentifier latterPrepareRound =
         TestHelpers.createFrom(roundIdentifier, 0, -1);
-    final Block latterBlock =
-        TestHelpers.createProposalBlock(validators, latterPrepareRound.getRoundNumber());
+    final Block latterBlock = TestHelpers.createProposalBlock(validators, latterPrepareRound);
     final Proposal latterProposal =
         proposerMessageFactory.createProposal(latterPrepareRound, latterBlock);
     final Optional<PreparedRoundArtifacts> latterTerminatedRoundArtefacts =
@@ -209,8 +207,7 @@ public class NewRoundMessageValidatorTest {
         new ConsensusRoundIdentifier(
             roundIdentifier.getSequenceNumber(), roundIdentifier.getRoundNumber() - 2);
     final Block earlierBlock =
-        TestHelpers.createProposalBlock(
-            validators.subList(0, 1), earlierPreparedRound.getRoundNumber());
+        TestHelpers.createProposalBlock(validators.subList(0, 1), earlierPreparedRound);
     final Proposal earlierProposal =
         proposerMessageFactory.createProposal(earlierPreparedRound, earlierBlock);
     final Optional<PreparedRoundArtifacts> earlierTerminatedRoundArtefacts =

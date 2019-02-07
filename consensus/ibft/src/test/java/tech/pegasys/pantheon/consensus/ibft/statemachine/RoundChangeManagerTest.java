@@ -132,7 +132,7 @@ public class RoundChangeManagerTest {
     final MessageFactory messageFactory = new MessageFactory(key);
 
     final ConsensusRoundIdentifier proposalRound = TestHelpers.createFrom(round, 0, -1);
-    final Block block = TestHelpers.createProposalBlock(validators, proposalRound.getRoundNumber());
+    final Block block = TestHelpers.createProposalBlock(validators, proposalRound);
     // Proposal must come from an earlier round.
     final Proposal proposal = messageFactory.createProposal(proposalRound, block);
 

@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.RoundSpecific;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class IbftMessage<P extends Payload> implements Authored, RoundSpecific {
@@ -49,9 +48,6 @@ public class IbftMessage<P extends Payload> implements Authored, RoundSpecific {
   public SignedData<P> getSignedPayload() {
     return payload;
   }
-
-
-
 
   public int getMessageType() {
     return payload.getPayload().getMessageType();
