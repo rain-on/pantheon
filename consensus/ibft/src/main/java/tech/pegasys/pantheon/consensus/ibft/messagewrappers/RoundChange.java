@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.messagewrappers;
 
+import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
@@ -44,6 +45,11 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
 
   public Optional<PreparedCertificate> getPreparedCertificate() {
     return getPayload().getPreparedCertificate();
+  }
+
+  public Optional<ConsensusRoundIdentifier> getPreparedCertificateRound() {
+    return getPreparedCertificate()
+        .map(prepCert -> prepCert.getProposalPayload().getPayload().getRoundIdentifier());
   }
 
   @Override

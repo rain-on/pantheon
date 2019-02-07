@@ -12,15 +12,14 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
-import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,36 +45,27 @@ public class RoundChangeArtifacts {
 
   public static RoundChangeArtifacts create(final Collection<RoundChange> roundChanges) {
 
+    final Comparator<RoundChange> preparedRoundComparator =
+        (o1, o2) -> {
+          if (!o1.getPreparedCertificateRound().isPresent()) {
+            return -1;
+          }
+          if (!o2.getPreparedCertificateRound().isPresent()) {
+            return 1;
+          }
+          return o1.getPreparedCertificateRound()
+              .get()
+              .compareTo(o2.getPreparedCertificateRound().get());
+        };
+
     final Collection<SignedData<RoundChangePayload>> payloads =
         roundChanges.stream().map(RoundChange::getSignedPayload).collect(Collectors.toList());
 
-    Optional<RoundChange> newestRoundChange = empty();
-    for (final RoundChange roundChange : roundChanges) {
-      if (roundChange.getPreparedCertificate().isPresent()) {
-        if (!newestRoundChange.isPresent()) {
-          newestRoundChange = Optional.of(roundChange);
-        } else {
-          newestRoundChange =
-              Optional.of(selectNewestRoundChange(newestRoundChange.get(), roundChange));
-        }
-      }
-    }
-    if (!newestRoundChange.isPresent()) {
-      return new RoundChangeArtifacts(empty(), payloads);
-    } else {
-      return new RoundChangeArtifacts(newestRoundChange.get().getProposedBlock(), payloads);
-    }
-  }
+    final Optional<RoundChange> roundChangeWithNewestPrepare =
+        roundChanges.stream().sorted(preparedRoundComparator).reduce((first, second) -> second);
 
-  private static RoundChange selectNewestRoundChange(
-      final RoundChange first, final RoundChange second) {
-    final PreparedCertificate firstCert = first.getPreparedCertificate().get();
-    final PreparedCertificate secondCert = second.getPreparedCertificate().get();
-
-    if (secondCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()
-        > firstCert.getProposalPayload().getPayload().getRoundIdentifier().getRoundNumber()) {
-      return second;
-    }
-    return first;
+    final Optional<Block> proposedBlock =
+        roundChangeWithNewestPrepare.flatMap(RoundChange::getProposedBlock);
+    return new RoundChangeArtifacts(proposedBlock, payloads);
   }
 }
