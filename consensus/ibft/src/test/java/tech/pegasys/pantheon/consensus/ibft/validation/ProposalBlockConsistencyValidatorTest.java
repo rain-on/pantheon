@@ -81,7 +81,7 @@ public class ProposalBlockConsistencyValidatorTest {
     final Proposal proposalMsg = proposerMessageFactory.createProposal(futureHeight, block);
 
     assertThat(
-        consistencyChecker.validateProposalMatchesBlock(proposalMsg.getSignedPayload(), block))
+            consistencyChecker.validateProposalMatchesBlock(proposalMsg.getSignedPayload(), block))
         .isFalse();
   }
 }
