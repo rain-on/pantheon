@@ -143,7 +143,7 @@ public class IbftRound {
     }
     actionReceivedProposal(new Proposal(msg.getProposalPayload(), msg.getBlock()));
   }
-G
+
   private void actionReceivedProposal(final Proposal msg) {
     final Block block = msg.getBlock();
 
