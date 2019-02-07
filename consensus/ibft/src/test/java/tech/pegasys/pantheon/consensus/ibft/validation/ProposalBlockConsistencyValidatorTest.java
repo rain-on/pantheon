@@ -76,5 +76,12 @@ public class ProposalBlockConsistencyValidatorTest {
   }
 
   @Test
-  public void blockWithMismatchedNumberFails() {}
+  public void blockWithMismatchedNumberFails() {
+    final ConsensusRoundIdentifier futureHeight = TestHelpers.createFrom(roundIdentifier, +1, 0);
+    final Proposal proposalMsg = proposerMessageFactory.createProposal(futureHeight, block);
+
+    assertThat(
+        consistencyChecker.validateProposalMatchesBlock(proposalMsg.getSignedPayload(), block))
+        .isFalse();
+  }
 }
