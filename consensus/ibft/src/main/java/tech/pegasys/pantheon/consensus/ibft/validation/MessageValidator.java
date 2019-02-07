@@ -32,17 +32,17 @@ public class MessageValidator {
   private static final Logger LOG = LogManager.getLogger();
 
   private final SignedDataValidator signedDataValidator;
-  private final ProposalBlockConsistencyValidator proposalConsistencyChecker;
+  private final ProposalBlockConsistencyValidator proposalConsistencyValidator;
   private final BlockValidator<IbftContext> blockValidator;
   private final ProtocolContext<IbftContext> protocolContext;
 
   public MessageValidator(
       final SignedDataValidator signedDataValidator,
-      final ProposalBlockConsistencyValidator proposalConsistencyChecker,
+      final ProposalBlockConsistencyValidator proposalConsistencyValidator,
       final BlockValidator<IbftContext> blockValidator,
       final ProtocolContext<IbftContext> protocolContext) {
     this.signedDataValidator = signedDataValidator;
-    this.proposalConsistencyChecker = proposalConsistencyChecker;
+    this.proposalConsistencyValidator = proposalConsistencyValidator;
     this.blockValidator = blockValidator;
     this.protocolContext = protocolContext;
   }
@@ -57,7 +57,7 @@ public class MessageValidator {
       return false;
     }
 
-    return proposalConsistencyChecker.validateProposalMatchesBlock(
+    return proposalConsistencyValidator.validateProposalMatchesBlock(
         msg.getSignedPayload(), msg.getBlock());
   }
 

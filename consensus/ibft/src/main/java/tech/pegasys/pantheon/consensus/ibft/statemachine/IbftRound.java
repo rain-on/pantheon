@@ -110,7 +110,6 @@ public class IbftRound {
     transmitter.multicastNewRound(
         getRoundIdentifier(),
         roundChangeArtifacts.getRoundChangeCertificate(),
-        proposal.getSignedPayload(),
         proposal.getBlock());
     updateStateWithProposedBlock(proposal);
   }

@@ -69,7 +69,7 @@ public class MainnetBlockValidator<C> implements BlockValidator<C> {
     final BlockHeader parentHeader = maybeParentHeader.get();
 
     if (!blockHeaderValidator.validateHeader(header, parentHeader, context, headerValidationMode)) {
-      return Optional.empty();
+        return Optional.empty();
     }
 
     final MutableBlockchain blockchain = context.getBlockchain();

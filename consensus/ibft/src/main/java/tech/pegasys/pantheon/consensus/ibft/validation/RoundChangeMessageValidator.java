@@ -21,19 +21,19 @@ public class RoundChangeMessageValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private final RoundChangePayloadValidator signedDataValidator;
-  private final ProposalBlockConsistencyValidator proposalBlockConsistencyChecker;
+  private final RoundChangePayloadValidator roundChangePayloadValidator;
+  private final ProposalBlockConsistencyValidator proposalBlockConsistencyValidator;
 
   public RoundChangeMessageValidator(
-      final RoundChangePayloadValidator signedDataValidator,
-      final ProposalBlockConsistencyValidator proposalBlockConsistencyChecker) {
-    this.proposalBlockConsistencyChecker = proposalBlockConsistencyChecker;
-    this.signedDataValidator = signedDataValidator;
+      final RoundChangePayloadValidator roundChangePayloadValidator,
+      final ProposalBlockConsistencyValidator proposalBlockConsistencyValidator) {
+    this.proposalBlockConsistencyValidator = proposalBlockConsistencyValidator;
+    this.roundChangePayloadValidator = roundChangePayloadValidator;
   }
 
   public boolean validateRoundChange(final RoundChange msg) {
 
-    if (!signedDataValidator.validateRoundChange(msg.getSignedPayload())) {
+    if (!roundChangePayloadValidator.validateRoundChange(msg.getSignedPayload())) {
       LOG.info("Invalid RoundChange message, signed data did not validate correctly.");
       return false;
     }
@@ -46,7 +46,7 @@ public class RoundChangeMessageValidator {
     }
 
     if (msg.getPreparedCertificate().isPresent()) {
-      if (!proposalBlockConsistencyChecker.validateProposalMatchesBlock(
+      if (!proposalBlockConsistencyValidator.validateProposalMatchesBlock(
           msg.getPreparedCertificate().get().getProposalPayload(), msg.getProposedBlock().get())) {
         LOG.info("Invalid RoundChange message, proposal did not align with supplied block.");
         return false;

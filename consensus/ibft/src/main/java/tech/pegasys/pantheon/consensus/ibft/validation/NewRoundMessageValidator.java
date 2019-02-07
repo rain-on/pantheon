@@ -73,7 +73,7 @@ public class NewRoundMessageValidator {
     }
 
     return proposalConsistencyChecker.validateProposalMatchesBlock(
-        msg.getSignedPayload().getPayload().getProposalPayload(), msg.getBlock());
+        msg.getProposalPayload(), msg.getBlock());
   }
 
   private boolean validateBlock(final Block block) {

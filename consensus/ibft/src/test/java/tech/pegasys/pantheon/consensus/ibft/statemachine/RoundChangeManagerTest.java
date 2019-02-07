@@ -63,7 +63,7 @@ public class RoundChangeManagerTest {
   private final ConsensusRoundIdentifier ri2 = new ConsensusRoundIdentifier(2, 2);
   private final ConsensusRoundIdentifier ri3 = new ConsensusRoundIdentifier(2, 3);
   private final List<Address> validators = Lists.newArrayList();
-  private ProposalBlockConsistencyValidator proposalConsistencyChecker =
+  private ProposalBlockConsistencyValidator proposalConsistencyValidator =
       mock(ProposalBlockConsistencyValidator.class);
 
   @Before
@@ -111,10 +111,10 @@ public class RoundChangeManagerTest {
                 IbftHelpers.calculateRequiredValidatorQuorum(
                     IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
                 2),
-            proposalConsistencyChecker);
+            proposalConsistencyValidator);
     manager = new RoundChangeManager(2, roundChangeMessageValidator);
 
-    when(proposalConsistencyChecker.validateProposalMatchesBlock(any(), any())).thenReturn(true);
+    when(proposalConsistencyValidator.validateProposalMatchesBlock(any(), any())).thenReturn(true);
   }
 
   private RoundChange makeRoundChangeMessage(
