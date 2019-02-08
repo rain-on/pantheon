@@ -144,7 +144,7 @@ public class NewRoundPayloadValidator {
         findLatestPreparedCertificate(roundChangeMsgs);
 
     if (!latestPreparedCertificate.isPresent()) {
-      LOG.info(
+      LOG.trace(
           "No round change messages have a preparedCertificate, any valid block may be proposed.");
       return true;
     }

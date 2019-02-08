@@ -145,8 +145,9 @@ public class IbftController {
   public void handleNewBlockEvent(final NewChainHead newChainHead) {
     final BlockHeader newBlockHeader = newChainHead.getNewChainHeadHeader();
     final BlockHeader currentMiningParent = currentHeightManager.getParentBlockHeader();
+    LOG.info("Handling New Chain head event, chain length = {}", currentMiningParent.getNumber());
     if (newBlockHeader.getNumber() < currentMiningParent.getNumber()) {
-      LOG.debug(
+      LOG.trace(
           "Discarding NewChainHead event, was for previous block height. chainHeight={} eventHeight={}",
           currentMiningParent.getNumber(),
           newBlockHeader.getNumber());
@@ -155,7 +156,7 @@ public class IbftController {
 
     if (newBlockHeader.getNumber() == currentMiningParent.getNumber()) {
       if (newBlockHeader.getHash().equals(currentMiningParent.getHash())) {
-        LOG.debug(
+        LOG.trace(
             "Discarding duplicate NewChainHead event. chainHeight={} newBlockHash={} parentBlockHash",
             newBlockHeader.getNumber(),
             newBlockHeader.getHash(),
@@ -175,7 +176,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundIndentifier)) {
       currentHeightManager.handleBlockTimerExpiry(roundIndentifier);
     } else {
-      LOG.debug(
+      LOG.trace(
           "Block timer event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundIndentifier.getSequenceNumber());
@@ -186,7 +187,7 @@ public class IbftController {
     if (isMsgForCurrentHeight(roundExpiry.getView())) {
       currentHeightManager.roundExpired(roundExpiry);
     } else {
-      LOG.debug(
+      LOG.trace(
           "Round expiry event discarded as it is not for current block height chainHeight={} eventHeight={}",
           currentHeightManager.getChainHeight(),
           roundExpiry.getView().getSequenceNumber());
