@@ -62,7 +62,7 @@ public class RoundChangeArtifacts {
         roundChanges.stream().map(RoundChange::getSignedPayload).collect(Collectors.toList());
 
     final Optional<RoundChange> roundChangeWithNewestPrepare =
-        roundChanges.stream().sorted(preparedRoundComparator).reduce((first, second) -> second);
+        roundChanges.stream().max(preparedRoundComparator);
 
     final Optional<Block> proposedBlock =
         roundChangeWithNewestPrepare.flatMap(RoundChange::getProposedBlock);
