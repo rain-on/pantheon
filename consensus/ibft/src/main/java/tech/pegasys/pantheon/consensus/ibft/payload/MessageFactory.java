@@ -70,8 +70,8 @@ public class MessageFactory {
         new RoundChangePayload(
             roundIdentifier,
             preparedRoundArtifacts.map(PreparedRoundArtifacts::getPreparedCertificate));
-    return new RoundChange(createSignedMessage(payload),
-        preparedRoundArtifacts.map(PreparedRoundArtifacts::getBlock));
+    return new RoundChange(
+        createSignedMessage(payload), preparedRoundArtifacts.map(PreparedRoundArtifacts::getBlock));
   }
 
   public NewRound createNewRound(

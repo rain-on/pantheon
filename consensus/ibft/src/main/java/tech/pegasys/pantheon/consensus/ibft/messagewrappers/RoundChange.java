@@ -29,8 +29,8 @@ public class RoundChange extends IbftMessage<RoundChangePayload> {
 
   private final Optional<Block> proposedBlock;
 
-  public RoundChange(final SignedData<RoundChangePayload> payload,
-      final Optional<Block> proposedBlock) {
+  public RoundChange(
+      final SignedData<RoundChangePayload> payload, final Optional<Block> proposedBlock) {
     super(payload);
     this.proposedBlock = proposedBlock;
   }

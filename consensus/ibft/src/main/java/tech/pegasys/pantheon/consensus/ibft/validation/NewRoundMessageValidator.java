@@ -40,17 +40,17 @@ public class NewRoundMessageValidator {
   private static final Logger LOG = LogManager.getLogger();
 
   private final NewRoundPayloadValidator payloadValidator;
-  private final ProposalBlockConsistencyValidator proposalConsistencyChecker;
+  private final ProposalBlockConsistencyValidator proposalConsistencyValidator;
   private final BlockValidator<IbftContext> blockValidator;
   private final ProtocolContext<IbftContext> protocolContext;
 
   public NewRoundMessageValidator(
       final NewRoundPayloadValidator payloadValidator,
-      final ProposalBlockConsistencyValidator proposalConsistencyChecker,
+      final ProposalBlockConsistencyValidator proposalConsistencyValidator,
       final BlockValidator<IbftContext> blockValidator,
       final ProtocolContext<IbftContext> protocolContext) {
     this.payloadValidator = payloadValidator;
-    this.proposalConsistencyChecker = proposalConsistencyChecker;
+    this.proposalConsistencyValidator = proposalConsistencyValidator;
     this.blockValidator = blockValidator;
     this.protocolContext = protocolContext;
   }
@@ -72,7 +72,7 @@ public class NewRoundMessageValidator {
       return false;
     }
 
-    return proposalConsistencyChecker.validateProposalMatchesBlock(
+    return proposalConsistencyValidator.validateProposalMatchesBlock(
         msg.getProposalPayload(), msg.getBlock());
   }
 
