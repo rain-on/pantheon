@@ -60,8 +60,8 @@ public class RoundChangeArtifactsTest {
             .collect(Collectors.toList()));
   }
 
-  private RoundChange createRoundChange(final int fromRound,
-      final boolean containsPrepareCertificate) {
+  private RoundChange createRoundChange(
+      final int fromRound, final boolean containsPrepareCertificate) {
     if (containsPrepareCertificate) {
       return messageFactories
           .get(0)
