@@ -220,7 +220,9 @@ public class IbftRound {
 
     final long blockNumber = blockToImport.getHeader().getNumber();
     final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader().getExtraData());
-    LOG.info("Importing block to chain. round={}, hash={}", getRoundIdentifier(),
+    LOG.info(
+        "Importing block to chain. round={}, hash={}",
+        getRoundIdentifier(),
         blockToImport.getHash());
     LOG.debug("ExtraData = {}", extraData);
     final boolean result =

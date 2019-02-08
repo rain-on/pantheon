@@ -205,7 +205,8 @@ public class IbftBlockHeightManager implements BlockHeightManager {
     final Optional<Collection<RoundChange>> result =
         roundChangeManager.appendRoundChangeMessage(message);
     if (result.isPresent()) {
-      LOG.debug("Received sufficient RoundChange messages to change round to targetRound={}",
+      LOG.debug(
+          "Received sufficient RoundChange messages to change round to targetRound={}",
           targetRound);
       if (messageAge == FUTURE_ROUND) {
         startNewRound(targetRound.getRoundNumber());
