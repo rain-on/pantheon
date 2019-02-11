@@ -61,10 +61,6 @@ public class IbftExtraData {
   }
 
   public static IbftExtraData decode(final BytesValue input) {
-    checkArgument(
-        input.size() > EXTRA_VANITY_LENGTH,
-        "Invalid BytesValue supplied - too short to produce a valid IBFT Extra Data object.");
-
     final RLPInput rlpInput = new BytesValueRLPInput(input, false);
 
     rlpInput.enterList(); // This accounts for the "root node" which contains IBFT data items.
