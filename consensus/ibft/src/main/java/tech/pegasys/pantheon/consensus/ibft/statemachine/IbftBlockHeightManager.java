@@ -193,7 +193,7 @@ public class IbftBlockHeightManager implements BlockHeightManager {
   @Override
   public void handleRoundChangePayload(final RoundChange message) {
     final ConsensusRoundIdentifier targetRound = message.getRoundIdentifier();
-    LOG.trace("Received a RoundChange Payload for {}", targetRound.toString());
+    LOG.trace("Received a RoundChange Payload for {}", targetRound);
 
     final MessageAge messageAge =
         determineAgeOfPayload(message.getRoundIdentifier().getRoundNumber());
