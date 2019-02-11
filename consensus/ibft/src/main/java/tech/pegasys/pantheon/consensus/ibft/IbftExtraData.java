@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
