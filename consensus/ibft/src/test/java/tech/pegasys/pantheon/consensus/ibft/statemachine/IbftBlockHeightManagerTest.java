@@ -41,6 +41,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.NewRoundMessageValidator;
@@ -77,7 +78,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class IbftBlockHeightManagerTest {
 
   private final KeyPair localNodeKeys = KeyPair.generate();
-  private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
+  private final MessageFactory messageFactory =
+      new MessageFactory(new SignedDataFactory(localNodeKeys));
   private final BlockHeaderTestFixture headerTestFixture = new BlockHeaderTestFixture();
 
   @Mock private IbftFinalState finalState;
@@ -119,7 +121,7 @@ public class IbftBlockHeightManagerTest {
       final KeyPair key = KeyPair.generate();
       validatorKeys.add(key);
       validators.add(Util.publicKeyToAddress(key.getPublicKey()));
-      validatorMessageFactory.add(new MessageFactory(key));
+      validatorMessageFactory.add(new MessageFactory(new SignedDataFactory(key)));
     }
 
     buildCreatedBlock();

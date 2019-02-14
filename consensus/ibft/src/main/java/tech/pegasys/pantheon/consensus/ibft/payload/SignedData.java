@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class SignedData<M extends Payload> implements Authored {
+
   private final Address sender;
   private final Signature signature;
   private final M unsignedPayload;
@@ -123,7 +124,8 @@ public class SignedData<M extends Payload> implements Authored {
   protected static Address recoverSender(
       final Payload unsignedMessageData, final Signature signature) {
 
-    return Util.signatureToAddress(signature, MessageFactory.hashForSignature(unsignedMessageData));
+    return Util.signatureToAddress(
+        signature, SignedDataFactory.hashForSignature(unsignedMessageData));
   }
 
   @Override

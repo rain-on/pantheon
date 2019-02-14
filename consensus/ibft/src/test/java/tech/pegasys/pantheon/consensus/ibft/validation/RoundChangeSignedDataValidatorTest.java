@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -46,9 +47,12 @@ public class RoundChangeSignedDataValidatorTest {
   private final KeyPair proposerKey = KeyPair.generate();
   private final KeyPair validatorKey = KeyPair.generate();
   private final KeyPair nonValidatorKey = KeyPair.generate();
-  private final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
-  private final MessageFactory validatorMessageFactory = new MessageFactory(validatorKey);
-  private final MessageFactory nonValidatorMessageFactory = new MessageFactory(nonValidatorKey);
+  private final MessageFactory proposerMessageFactory =
+      new MessageFactory(new SignedDataFactory(proposerKey));
+  private final MessageFactory validatorMessageFactory =
+      new MessageFactory(new SignedDataFactory(validatorKey));
+  private final MessageFactory nonValidatorMessageFactory =
+      new MessageFactory(new SignedDataFactory(nonValidatorKey));
 
   private final long chainHeight = 2;
   private final ConsensusRoundIdentifier currentRound =

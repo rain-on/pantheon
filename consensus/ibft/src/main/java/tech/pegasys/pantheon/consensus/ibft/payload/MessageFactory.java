@@ -19,37 +19,27 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.util.Optional;
 
 public class MessageFactory {
 
-  private final KeyPair validatorKeyPair;
+  private final SignedDataFactory signedDataFactory;
 
-  public MessageFactory(final KeyPair validatorKeyPair) {
-    this.validatorKeyPair = validatorKeyPair;
+  public MessageFactory(final SignedDataFactory signedDataFactory) {
+    this.signedDataFactory = signedDataFactory;
   }
 
   public Proposal createProposal(
       final ConsensusRoundIdentifier roundIdentifier, final Block block) {
-
-    final ProposalPayload payload = new ProposalPayload(roundIdentifier, block.getHash());
-
-    return new Proposal(createSignedMessage(payload), block);
+    return new Proposal(signedDataFactory.createProposal(roundIdentifier, block), block);
   }
 
   public Prepare createPrepare(final ConsensusRoundIdentifier roundIdentifier, final Hash digest) {
-
-    final PreparePayload payload = new PreparePayload(roundIdentifier, digest);
-
-    return new Prepare(createSignedMessage(payload));
+    return new Prepare(signedDataFactory.createPrepare(roundIdentifier, digest));
   }
 
   public Commit createCommit(
@@ -57,21 +47,19 @@ public class MessageFactory {
       final Hash digest,
       final Signature commitSeal) {
 
-    final CommitPayload payload = new CommitPayload(roundIdentifier, digest, commitSeal);
-
-    return new Commit(createSignedMessage(payload));
+    return new Commit(signedDataFactory.createCommit(roundIdentifier, digest, commitSeal));
   }
 
   public RoundChange createRoundChange(
       final ConsensusRoundIdentifier roundIdentifier,
       final Optional<PreparedRoundArtifacts> preparedRoundArtifacts) {
 
-    final RoundChangePayload payload =
-        new RoundChangePayload(
+    final SignedData<RoundChangePayload> payload =
+        signedDataFactory.createRoundChange(
             roundIdentifier,
             preparedRoundArtifacts.map(PreparedRoundArtifacts::getPreparedCertificate));
-    return new RoundChange(
-        createSignedMessage(payload), preparedRoundArtifacts.map(PreparedRoundArtifacts::getBlock));
+
+    return new RoundChange(payload, preparedRoundArtifacts.map(PreparedRoundArtifacts::getBlock));
   }
 
   public NewRound createNewRound(
@@ -80,27 +68,9 @@ public class MessageFactory {
       final SignedData<ProposalPayload> proposalPayload,
       final Block block) {
 
-    final NewRoundPayload payload =
-        new NewRoundPayload(roundIdentifier, roundChangeCertificate, proposalPayload);
+    final SignedData<NewRoundPayload> payload =
+        signedDataFactory.createNewRound(roundIdentifier, roundChangeCertificate, proposalPayload);
 
-    return new NewRound(createSignedMessage(payload), block);
-  }
-
-  private <M extends Payload> SignedData<M> createSignedMessage(final M payload) {
-    final Signature signature = sign(payload, validatorKeyPair);
-
-    return new SignedData<>(
-        payload, Util.publicKeyToAddress(validatorKeyPair.getPublicKey()), signature);
-  }
-
-  public static Hash hashForSignature(final Payload unsignedMessageData) {
-    return Hash.hash(
-        BytesValues.concatenate(
-            BytesValues.ofUnsignedByte(unsignedMessageData.getMessageType()),
-            unsignedMessageData.encoded()));
-  }
-
-  private static Signature sign(final Payload unsignedMessageData, final KeyPair nodeKeys) {
-    return SECP256K1.sign(hashForSignature(unsignedMessageData), nodeKeys);
+    return new NewRound(payload, block);
   }
 }

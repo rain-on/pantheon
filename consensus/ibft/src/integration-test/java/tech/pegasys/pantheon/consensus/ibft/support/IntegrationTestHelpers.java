@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.payload.CommitPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -39,7 +40,7 @@ public class IntegrationTestHelpers {
             IbftBlockHashing.calculateDataHashForCommittedSeal(block.getHeader(), extraData),
             signingKeyPair);
 
-    final MessageFactory messageFactory = new MessageFactory(signingKeyPair);
+    final MessageFactory messageFactory = new MessageFactory(new SignedDataFactory(signingKeyPair));
 
     return messageFactory.createCommit(roundId, block.getHash(), commitSeal).getSignedPayload();
   }

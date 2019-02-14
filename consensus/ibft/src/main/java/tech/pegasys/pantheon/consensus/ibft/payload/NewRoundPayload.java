@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.payload;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
 
@@ -123,7 +122,7 @@ public class NewRoundPayload implements Payload {
       this.proposalPayload = proposalPayload;
     }
 
-    public static Builder fromExisting(final NewRound payload) {
+    public static Builder fromExisting(final NewRoundPayload payload) {
       return new Builder(
           payload.getRoundIdentifier(),
           payload.getRoundChangeCertificate(),

@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.IbftV2;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.support.NodeParams;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
@@ -96,7 +97,7 @@ public class SpuriousBehaviourTest {
   }
 
   @Test
-  public void nonValidatorsCannotTriggerReponses() {
+  public void nonValidatorsCannotTriggerResponses() {
     final KeyPair nonValidatorKeys = KeyPair.generate();
     final NodeParams nonValidatorParams =
         new NodeParams(Util.publicKeyToAddress(nonValidatorKeys.getPublicKey()), nonValidatorKeys);
@@ -104,7 +105,7 @@ public class SpuriousBehaviourTest {
     final ValidatorPeer nonvalidator =
         new ValidatorPeer(
             nonValidatorParams,
-            new MessageFactory(nonValidatorParams.getNodeKeyPair()),
+            new MessageFactory(new SignedDataFactory(nonValidatorParams.getNodeKeyPair())),
             context.getEventMultiplexer());
 
     nonvalidator.injectProposal(new ConsensusRoundIdentifier(1, 0), proposedBlock);

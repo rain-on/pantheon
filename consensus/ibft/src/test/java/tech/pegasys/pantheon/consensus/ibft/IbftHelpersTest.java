@@ -20,6 +20,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.calculateRequired
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -84,7 +85,8 @@ public class IbftHelpersTest {
     // contains the newest
     // NOTE: This capability is tested as part of the NewRoundMessageValidationTests.
     final KeyPair proposerKey = KeyPair.generate();
-    final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
+    final MessageFactory proposerMessageFactory =
+        new MessageFactory(new SignedDataFactory(proposerKey));
     final Block proposedBlock = mock(Block.class);
     when(proposedBlock.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
     final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 4);
@@ -135,7 +137,8 @@ public class IbftHelpersTest {
   @Test
   public void allRoundChangeHaveNoPreparedReturnsEmptyOptional() {
     final KeyPair proposerKey = KeyPair.generate();
-    final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
+    final MessageFactory proposerMessageFactory =
+        new MessageFactory(new SignedDataFactory(proposerKey));
     final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 4);
 
     final Optional<PreparedCertificate> newestCert =

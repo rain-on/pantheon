@@ -39,6 +39,7 @@ import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
@@ -179,7 +180,7 @@ public class TestContextBuilder {
                     nodeParams ->
                         new ValidatorPeer(
                             nodeParams,
-                            new MessageFactory(nodeParams.getNodeKeyPair()),
+                            new MessageFactory(new SignedDataFactory(nodeParams.getNodeKeyPair())),
                             controllerAndState.getEventMultiplexer()),
                     (u, v) -> {
                       throw new IllegalStateException(String.format("Duplicate key %s", u));
@@ -285,7 +286,7 @@ public class TestContextBuilder {
                 Executors.newScheduledThreadPool(1),
                 Clock.systemUTC()),
             blockCreatorFactory,
-            new MessageFactory(nodeKeys),
+            new MessageFactory(new SignedDataFactory(nodeKeys)),
             clock);
 
     final MessageValidatorFactory messageValidatorFactory =

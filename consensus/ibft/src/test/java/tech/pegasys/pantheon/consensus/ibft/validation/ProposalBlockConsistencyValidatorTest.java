@@ -18,8 +18,9 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
-import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
-import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -34,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ProposalBlockConsistencyValidatorTest {
 
   private final KeyPair proposerKey = KeyPair.generate();
-  private final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
+  private final SignedDataFactory proposerMessageFactory = new SignedDataFactory(proposerKey);
   private final long chainHeight = 2;
   private final ConsensusRoundIdentifier roundIdentifier =
       new ConsensusRoundIdentifier(chainHeight, 4);
@@ -51,7 +52,8 @@ public class ProposalBlockConsistencyValidatorTest {
 
   @Test
   public void blockDigestMisMatchWithMessageRoundFails() {
-    final Proposal proposalMsg = proposerMessageFactory.createProposal(roundIdentifier, block);
+    final SignedData<ProposalPayload> proposal =
+        proposerMessageFactory.createProposal(roundIdentifier, block);
 
     final Block misMatchedBlock =
         IbftBlockInterface.replaceRoundInBlock(
@@ -59,29 +61,25 @@ public class ProposalBlockConsistencyValidatorTest {
             roundIdentifier.getRoundNumber() + 1,
             IbftBlockHashing::calculateDataHashForCommittedSeal);
 
-    assertThat(
-            consistencyChecker.validateProposalMatchesBlock(
-                proposalMsg.getSignedPayload(), misMatchedBlock))
+    assertThat(consistencyChecker.validateProposalMatchesBlock(proposal, misMatchedBlock))
         .isFalse();
   }
 
   @Test
   public void blockDigestMatchesButRoundDiffersFails() {
     final ConsensusRoundIdentifier futureRound = TestHelpers.createFrom(roundIdentifier, 0, +1);
-    final Proposal proposalMsg = proposerMessageFactory.createProposal(futureRound, block);
+    final SignedData<ProposalPayload> proposal =
+        proposerMessageFactory.createProposal(futureRound, block);
 
-    assertThat(
-            consistencyChecker.validateProposalMatchesBlock(proposalMsg.getSignedPayload(), block))
-        .isFalse();
+    assertThat(consistencyChecker.validateProposalMatchesBlock(proposal, block)).isFalse();
   }
 
   @Test
   public void blockWithMismatchedNumberFails() {
     final ConsensusRoundIdentifier futureHeight = TestHelpers.createFrom(roundIdentifier, +1, 0);
-    final Proposal proposalMsg = proposerMessageFactory.createProposal(futureHeight, block);
+    final SignedData<ProposalPayload> proposal =
+        proposerMessageFactory.createProposal(futureHeight, block);
 
-    assertThat(
-            consistencyChecker.validateProposalMatchesBlock(proposalMsg.getSignedPayload(), block))
-        .isFalse();
+    assertThat(consistencyChecker.validateProposalMatchesBlock(proposal, block)).isFalse();
   }
 }

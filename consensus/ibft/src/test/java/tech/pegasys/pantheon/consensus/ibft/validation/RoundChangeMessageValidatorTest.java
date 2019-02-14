@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -32,7 +33,7 @@ public class RoundChangeMessageValidatorTest {
   private final RoundChangePayloadValidator payloadValidator =
       mock(RoundChangePayloadValidator.class);
   private final KeyPair keyPair = KeyPair.generate();
-  private final MessageFactory messageFactory = new MessageFactory(keyPair);
+  private final MessageFactory messageFactory = new MessageFactory(new SignedDataFactory(keyPair));
   private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 1);
   private final Block block = TestHelpers.createProposalBlock(emptyList(), roundIdentifier);
 

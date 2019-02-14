@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
@@ -60,7 +61,7 @@ public class RoundStateTest {
       final KeyPair newKeyPair = KeyPair.generate();
       validatorKeys.add(newKeyPair);
       validators.add(Util.publicKeyToAddress(newKeyPair.getPublicKey()));
-      validatorMessageFactories.add(new MessageFactory(newKeyPair));
+      validatorMessageFactories.add(new MessageFactory(new SignedDataFactory(newKeyPair)));
     }
     when(block.getHash()).thenReturn(Hash.fromHexStringLenient("1"));
   }

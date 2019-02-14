@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.TestHelpers;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
@@ -42,7 +43,7 @@ public class RoundChangeArtifactsTest {
   public void setup() {
     for (int i = 0; i < 4; i++) {
       final KeyPair keyPair = KeyPair.generate();
-      final MessageFactory messageFactory = new MessageFactory(keyPair);
+      final MessageFactory messageFactory = new MessageFactory(new SignedDataFactory(keyPair));
       messageFactories.add(messageFactory);
     }
   }

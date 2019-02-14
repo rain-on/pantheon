@@ -37,6 +37,7 @@ import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorPeers;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftProtocolManager;
 import tech.pegasys.pantheon.consensus.ibft.protocol.IbftSubProtocol;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
@@ -222,7 +223,7 @@ public class IbftPantheonController implements PantheonController<IbftContext> {
                 Executors.newScheduledThreadPool(1),
                 Clock.systemUTC()),
             blockCreatorFactory,
-            new MessageFactory(nodeKeys),
+            new MessageFactory(new SignedDataFactory(nodeKeys)),
             Clock.systemUTC());
 
     final MessageValidatorFactory messageValidatorFactory =

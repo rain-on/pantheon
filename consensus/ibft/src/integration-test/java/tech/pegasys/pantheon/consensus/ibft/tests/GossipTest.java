@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.support.RoundSpecificPeers;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContext;
 import tech.pegasys.pantheon.consensus.ibft.support.TestContextBuilder;
@@ -117,7 +118,8 @@ public class GossipTest {
   @Test
   public void messageWithUnknownValidatorIsNotGossiped() {
     final KeyPair unknownKeyPair = KeyPair.generate();
-    final MessageFactory unknownMsgFactory = new MessageFactory(unknownKeyPair);
+    final MessageFactory unknownMsgFactory =
+        new MessageFactory(new SignedDataFactory(unknownKeyPair));
     final Proposal unknownProposal = unknownMsgFactory.createProposal(roundId, block);
 
     sender.injectMessage(ProposalMessageData.create(unknownProposal));

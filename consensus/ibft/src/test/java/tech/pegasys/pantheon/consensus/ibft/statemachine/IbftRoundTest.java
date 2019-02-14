@@ -35,6 +35,7 @@ import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidator;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -69,7 +70,8 @@ public class IbftRoundTest {
 
   private final KeyPair localNodeKeys = KeyPair.generate();
   private final ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
-  private final MessageFactory messageFactory = new MessageFactory(localNodeKeys);
+  private final MessageFactory messageFactory =
+      new MessageFactory(new SignedDataFactory(localNodeKeys));
   private final Subscribers<MinedBlockObserver> subscribers = new Subscribers<>();
   private ProtocolContext<IbftContext> protocolContext;
 

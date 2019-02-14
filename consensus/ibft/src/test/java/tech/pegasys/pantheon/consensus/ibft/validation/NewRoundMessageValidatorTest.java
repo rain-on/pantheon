@@ -28,6 +28,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.NewRound;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
@@ -56,8 +57,10 @@ public class NewRoundMessageValidatorTest {
 
   private final KeyPair proposerKey = KeyPair.generate();
   private final KeyPair validatorKey = KeyPair.generate();
-  private final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
-  private final MessageFactory validatorMessageFactory = new MessageFactory(validatorKey);
+  private final MessageFactory proposerMessageFactory =
+      new MessageFactory(new SignedDataFactory(proposerKey));
+  private final MessageFactory validatorMessageFactory =
+      new MessageFactory(new SignedDataFactory(validatorKey));
   private final Address proposerAddress = Util.publicKeyToAddress(proposerKey.getPublicKey());
   private final Address validatorAddress = Util.publicKeyToAddress(validatorKey.getPublicKey());
   private final List<Address> validators = Lists.newArrayList(proposerAddress, validatorAddress);

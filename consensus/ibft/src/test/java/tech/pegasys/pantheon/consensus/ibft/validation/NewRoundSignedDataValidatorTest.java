@@ -25,6 +25,8 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.NewRoundPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.PreparedRoundArtifacts;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator.MessageValidatorForHeightFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -45,8 +47,10 @@ public class NewRoundSignedDataValidatorTest {
   private final KeyPair proposerKey = KeyPair.generate();
   private final KeyPair validatorKey = KeyPair.generate();
   private final KeyPair otherValidatorKey = KeyPair.generate();
-  private final MessageFactory proposerMessageFactory = new MessageFactory(proposerKey);
-  private final MessageFactory validatorMessageFactory = new MessageFactory(validatorKey);
+  private final MessageFactory proposerMessageFactory =
+      new MessageFactory(new SignedDataFactory(proposerKey));
+  private final MessageFactory validatorMessageFactory =
+      new MessageFactory(new SignedDataFactory(validatorKey));
   private final Address proposerAddress = Util.publicKeyToAddress(proposerKey.getPublicKey());
   private final List<Address> validators = Lists.newArrayList();
   private final long chainHeight = 2;
@@ -60,9 +64,9 @@ public class NewRoundSignedDataValidatorTest {
   private final SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);
 
   private Block proposedBlock;
-  private NewRound validMsg;
-  private NewRoundPayload validPayload;
-  private NewRoundPayload.Builder msgBuilder;
+  private SignedData<NewRoundPayload> signedPayload;
+  private NewRoundPayload payload;
+  private NewRoundPayload.Builder payloadBuilder;
 
   @Before
   public void setup() {
@@ -71,9 +75,9 @@ public class NewRoundSignedDataValidatorTest {
     validators.add(Util.publicKeyToAddress(otherValidatorKey.getPublicKey()));
 
     proposedBlock = TestHelpers.createProposalBlock(validators, roundIdentifier);
-    validMsg = createValidNewRoundMessageSignedBy(proposerKey);
-    validPayload = validMsg.getSignedPayload().getPayload();
-    msgBuilder = NewRoundPayload.Builder.fromExisting(validMsg);
+    signedPayload = createValidNewRoundMessageSignedBy(proposerKey);
+    payload = signedPayload.getPayload();
+    payloadBuilder = NewRoundPayload.Builder.fromExisting(payload);
 
     when(proposerSelector.selectProposerForRound(any())).thenReturn(proposerAddress);
 
@@ -90,8 +94,8 @@ public class NewRoundSignedDataValidatorTest {
    * message.
    */
 
-  private NewRound createValidNewRoundMessageSignedBy(final KeyPair signingKey) {
-    final MessageFactory messageCreator = new MessageFactory(signingKey);
+  private SignedData<NewRoundPayload> createValidNewRoundMessageSignedBy(final KeyPair signingKey) {
+    final SignedDataFactory messageCreator = new SignedDataFactory(signingKey);
 
     final RoundChangeCertificate.Builder builder = new RoundChangeCertificate.Builder();
     builder.appendRoundChangeMessage(
@@ -100,61 +104,62 @@ public class NewRoundSignedDataValidatorTest {
     return messageCreator.createNewRound(
         roundIdentifier,
         builder.buildCertificate(),
-        messageCreator.createProposal(roundIdentifier, proposedBlock).getSignedPayload(),
-        proposedBlock);
+        messageCreator.createProposal(roundIdentifier, proposedBlock));
   }
 
-  private NewRound signPayload(
-      final NewRoundPayload payload, final KeyPair signingKey, final Block block) {
+  private SignedData<NewRoundPayload> signPayload(
+      final NewRoundPayload payload, final KeyPair signingKey) {
 
-    final MessageFactory messageCreator = new MessageFactory(signingKey);
+    final SignedDataFactory messageCreator = new SignedDataFactory(signingKey);
 
     return messageCreator.createNewRound(
         payload.getRoundIdentifier(),
         payload.getRoundChangeCertificate(),
-        payload.getProposalPayload(),
-        block);
+        payload.getProposalPayload());
   }
 
   @Test
   public void basicNewRoundMessageIsValid() {
-    assertThat(validator.validateNewRoundMessage(validMsg.getSignedPayload())).isTrue();
+    assertThat(validator.validateNewRoundMessage(signedPayload)).isTrue();
   }
 
   @Test
   public void newRoundFromNonProposerFails() {
-    final NewRound msg = signPayload(validPayload, validatorKey, proposedBlock);
+    final SignedData<NewRoundPayload> signedPayload = signPayload(payload, validatorKey);
 
-    assertThat(validator.validateNewRoundMessage(msg.getSignedPayload())).isFalse();
+    assertThat(validator.validateNewRoundMessage(signedPayload)).isFalse();
   }
 
   @Test
   public void newRoundTargetingRoundZeroFails() {
-    msgBuilder.setRoundChangeIdentifier(
+    payloadBuilder.setRoundChangeIdentifier(
         new ConsensusRoundIdentifier(roundIdentifier.getSequenceNumber(), 0));
 
-    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
+    final SignedData<NewRoundPayload> invalidPayload =
+        signPayload(payloadBuilder.build(), proposerKey);
 
-    assertThat(validator.validateNewRoundMessage(inValidMsg.getSignedPayload())).isFalse();
+    assertThat(validator.validateNewRoundMessage(invalidPayload)).isFalse();
   }
 
   @Test
   public void newRoundTargetingDifferentSequenceNumberFails() {
     final ConsensusRoundIdentifier futureRound = TestHelpers.createFrom(roundIdentifier, 1, 0);
-    msgBuilder.setRoundChangeIdentifier(futureRound);
+    payloadBuilder.setRoundChangeIdentifier(futureRound);
 
-    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
+    final SignedData<NewRoundPayload> invalidPayload =
+        signPayload(payloadBuilder.build(), proposerKey);
 
-    assertThat(validator.validateNewRoundMessage(inValidMsg.getSignedPayload())).isFalse();
+    assertThat(validator.validateNewRoundMessage(invalidPayload)).isFalse();
   }
 
   @Test
   public void newRoundWithEmptyRoundChangeCertificateFails() {
-    msgBuilder.setRoundChangeCertificate(new RoundChangeCertificate(Collections.emptyList()));
+    payloadBuilder.setRoundChangeCertificate(new RoundChangeCertificate(Collections.emptyList()));
 
-    final NewRound inValidMsg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
+    final SignedData<NewRoundPayload> invalidPayload =
+        signPayload(payloadBuilder.build(), proposerKey);
 
-    assertThat(validator.validateNewRoundMessage(inValidMsg.getSignedPayload())).isFalse();
+    assertThat(validator.validateNewRoundMessage(invalidPayload)).isFalse();
   }
 
   @Test
@@ -167,11 +172,12 @@ public class NewRoundSignedDataValidatorTest {
     roundChangeBuilder.appendRoundChangeMessage(
         proposerMessageFactory.createRoundChange(prevRound, Optional.empty()));
 
-    msgBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
+    payloadBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
 
-    final NewRound msg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
+    final SignedData<NewRoundPayload> signedPayload =
+        signPayload(payloadBuilder.build(), proposerKey);
 
-    assertThat(validator.validateNewRoundMessage(msg.getSignedPayload())).isFalse();
+    assertThat(validator.validateNewRoundMessage(signedPayload)).isFalse();
   }
 
   @Test
@@ -189,14 +195,15 @@ public class NewRoundSignedDataValidatorTest {
                         validatorMessageFactory.createPrepare(
                             prevRound, proposedBlock.getHash()))))));
 
-    msgBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
+    payloadBuilder.setRoundChangeCertificate(roundChangeBuilder.buildCertificate());
 
     // The prepare Message in the RoundChange Cert will be deemed illegal.
     when(signedDataValidator.validatePrepare(any())).thenReturn(false);
 
-    final NewRound msg = signPayload(msgBuilder.build(), proposerKey, proposedBlock);
+    final SignedData<NewRoundPayload> signedPayload =
+        signPayload(payloadBuilder.build(), proposerKey);
 
-    assertThat(validator.validateNewRoundMessage(msg.getSignedPayload())).isFalse();
+    assertThat(validator.validateNewRoundMessage(signedPayload)).isFalse();
   }
 
   @Test

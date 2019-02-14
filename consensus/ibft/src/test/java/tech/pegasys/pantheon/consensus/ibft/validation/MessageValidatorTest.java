@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
@@ -51,7 +52,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class MessageValidatorTest {
 
   private KeyPair keyPair = KeyPair.generate();
-  private MessageFactory messageFactory = new MessageFactory(keyPair);
+  private MessageFactory messageFactory = new MessageFactory(new SignedDataFactory(keyPair));
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 1);
 
   private SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);

@@ -25,6 +25,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
+import tech.pegasys.pantheon.consensus.ibft.payload.SignedDataFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.ProposalBlockConsistencyValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator;
@@ -119,7 +120,7 @@ public class RoundChangeManagerTest {
 
   private RoundChange makeRoundChangeMessage(
       final KeyPair key, final ConsensusRoundIdentifier round) {
-    MessageFactory messageFactory = new MessageFactory(key);
+    MessageFactory messageFactory = new MessageFactory(new SignedDataFactory(key));
     return messageFactory.createRoundChange(round, Optional.empty());
   }
 
@@ -129,7 +130,8 @@ public class RoundChangeManagerTest {
       final List<KeyPair> prepareProviders) {
     Preconditions.checkArgument(!prepareProviders.contains(key));
 
-    final MessageFactory messageFactory = new MessageFactory(key);
+    final SignedDataFactory signedDataFactory = new SignedDataFactory(key);
+    final MessageFactory messageFactory = new MessageFactory(signedDataFactory);
 
     final ConsensusRoundIdentifier proposalRound = TestHelpers.createFrom(round, 0, -1);
     final Block block = TestHelpers.createProposalBlock(validators, proposalRound);
@@ -140,7 +142,8 @@ public class RoundChangeManagerTest {
         prepareProviders.stream()
             .map(
                 k -> {
-                  final MessageFactory prepareFactory = new MessageFactory(k);
+                  final MessageFactory prepareFactory =
+                      new MessageFactory(new SignedDataFactory(k));
                   return prepareFactory.createPrepare(proposalRound, block.getHash());
                 })
             .collect(Collectors.toList());
