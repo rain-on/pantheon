@@ -58,6 +58,10 @@ public class RoundChangeCertificateValidator {
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
         roundChangeCert.getRoundChangePayloads();
 
+    if (!validateDistinctAuthors(roundChangeMsgs)) {
+      return false;
+    }
+
     if (roundChangeMsgs.size() < quorum) {
       LOG.info("Invalid RoundChangeCertificate, insufficient RoundChange messages.");
       return false;
@@ -81,6 +85,18 @@ public class RoundChangeCertificateValidator {
       return false;
     }
 
+    return true;
+  }
+
+  private boolean validateDistinctAuthors(
+      final Collection<SignedData<RoundChangePayload>> roundChangeMsgs) {
+    final long distinctAuthorCount =
+        roundChangeMsgs.stream().map(SignedData::getAuthor).distinct().count();
+
+    if (distinctAuthorCount != roundChangeMsgs.size()) {
+      LOG.info("Invalid RoundChangeCertificate, multiple RoundChanges from the same author.");
+      return false;
+    }
     return true;
   }
 
