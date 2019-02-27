@@ -58,7 +58,7 @@ public class RoundChangeCertificateValidator {
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
         roundChangeCert.getRoundChangePayloads();
 
-    if (!validateDistinctAuthors(roundChangeMsgs)) {
+    if (hasDuplicateAuthors(roundChangeMsgs)) {
       return false;
     }
 
@@ -88,7 +88,7 @@ public class RoundChangeCertificateValidator {
     return true;
   }
 
-  private boolean validateDistinctAuthors(
+  private boolean hasDuplicateAuthors(
       final Collection<SignedData<RoundChangePayload>> roundChangeMsgs) {
     final long distinctAuthorCount =
         roundChangeMsgs.stream().map(SignedData::getAuthor).distinct().count();
