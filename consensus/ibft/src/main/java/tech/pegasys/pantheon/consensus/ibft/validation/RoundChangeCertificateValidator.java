@@ -95,9 +95,9 @@ public class RoundChangeCertificateValidator {
 
     if (distinctAuthorCount != roundChangeMsgs.size()) {
       LOG.info("Invalid RoundChangeCertificate, multiple RoundChanges from the same author.");
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 
   public boolean validateProposalMessageMatchesLatestPrepareCertificate(
