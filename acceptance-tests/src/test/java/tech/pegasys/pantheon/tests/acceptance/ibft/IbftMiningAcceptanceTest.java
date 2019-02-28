@@ -27,6 +27,7 @@ public class IbftMiningAcceptanceTest extends AcceptanceTestBase {
   public void shouldMineOnSingleNode() throws IOException {
     final PantheonNode minerNode = pantheon.createIbftNode("miner1");
     cluster.start(minerNode);
+    
     cluster.waitUntil(wait.chainHeadHasProgressedByAtLeast(minerNode, 1));
 
     final Account sender = accounts.createAccount("account1");
