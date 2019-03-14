@@ -14,8 +14,11 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
@@ -25,6 +28,10 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
 import tech.pegasys.pantheon.ethereum.p2p.PeerNotWhitelistedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
+import java.math.BigInteger;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,13 +43,23 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class AdminAddPeerTest {
 
   @Mock private P2PNetwork p2pNetwork;
+  @Mock private PeerCache peerCache;
   private final JsonRpcParameter parameter = new JsonRpcParameter();
 
   private AdminAddPeer method;
 
+  private final EnodeURL validEnodeURL =
+      new EnodeURL(
+          PublicKey.create(BigInteger.valueOf(0)).toString().substring(2), "127.0.0.1", 30303);
+
+  private final JsonRpcRequest validRequest =
+      new JsonRpcRequest("2.0", "admin_addPeer", new String[] {validEnodeURL.toString()});
+
   @Before
   public void setup() {
-    method = new AdminAddPeer(p2pNetwork, parameter);
+
+    method = new AdminAddPeer(p2pNetwork, parameter, peerCache);
+    when(peerCache.add(any())).thenReturn(true);
   }
 
   @Test
@@ -94,46 +111,38 @@ public class AdminAddPeerTest {
   public void requestAddsValidEnode() {
     when(p2pNetwork.addMaintainConnectionPeer(any())).thenReturn(true);
 
-    final JsonRpcRequest request =
-        new JsonRpcRequest(
-            "2.0",
-            "admin_addPeer",
-            new String[] {
-              "enode://"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "@127.0.0.1:30303"
-            });
+    final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(validRequest.getId(), true);
 
-    final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(request.getId(), true);
+    final JsonRpcResponse actualResponse = method.response(validRequest);
+
+    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    verify(peerCache).add(eq(validEnodeURL));
+  }
+
+  @Test
+  public void ifPeerIsNotAddedToCacheFalseIsReturned() {
+    when(p2pNetwork.addMaintainConnectionPeer(any())).thenReturn(true);
+    when(peerCache.add(any())).thenReturn(false);
+
+    final JsonRpcRequest request =
+        new JsonRpcRequest("2.0", "admin_addPeer", new String[] {validEnodeURL.toString()});
+
+    final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(request.getId(), false);
 
     final JsonRpcResponse actualResponse = method.response(request);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    verify(peerCache).add(eq(validEnodeURL));
   }
 
   @Test
   public void requestRefusesListOfNodes() {
+
     final JsonRpcRequest request =
         new JsonRpcRequest(
             "2.0",
             "admin_addPeer",
-            new String[] {
-              "enode://"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "@127.0.0.1:30303",
-              "enode://"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000001"
-                  + "@127.0.0.2:30303"
-            });
+            new String[] {validEnodeURL.toString(), validEnodeURL.toString()});
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
@@ -147,22 +156,10 @@ public class AdminAddPeerTest {
   public void requestReturnsFalseIfAddFails() {
     when(p2pNetwork.addMaintainConnectionPeer(any())).thenReturn(false);
 
-    final JsonRpcRequest request =
-        new JsonRpcRequest(
-            "2.0",
-            "admin_addPeer",
-            new String[] {
-              "enode://"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "@127.0.0.1:30303"
-            });
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcSuccessResponse(validRequest.getId(), false);
 
-    final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(request.getId(), false);
-
-    final JsonRpcResponse actualResponse = method.response(request);
+    final JsonRpcResponse actualResponse = method.response(validRequest);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
   }
@@ -173,23 +170,10 @@ public class AdminAddPeerTest {
         .thenThrow(
             new P2pDisabledException("P2P networking disabled.  Unable to connect to add peer."));
 
-    final JsonRpcRequest request =
-        new JsonRpcRequest(
-            "2.0",
-            "admin_addPeer",
-            new String[] {
-              "enode://"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "@127.0.0.1:30303"
-            });
-
     final JsonRpcResponse expectedResponse =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.P2P_DISABLED);
+        new JsonRpcErrorResponse(validRequest.getId(), JsonRpcError.P2P_DISABLED);
 
-    final JsonRpcResponse actualResponse = method.response(request);
+    final JsonRpcResponse actualResponse = method.response(validRequest);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
   }
@@ -199,24 +183,11 @@ public class AdminAddPeerTest {
     when(p2pNetwork.addMaintainConnectionPeer(any()))
         .thenThrow(new PeerNotWhitelistedException("Cannot add peer that is not whitelisted"));
 
-    final JsonRpcRequest request =
-        new JsonRpcRequest(
-            "2.0",
-            "admin_addPeer",
-            new String[] {
-              "enode://"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "00000000000000000000000000000000"
-                  + "@127.0.0.1:30303"
-            });
-
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(
-            request.getId(), JsonRpcError.NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
+            validRequest.getId(), JsonRpcError.NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
 
-    final JsonRpcResponse actualResponse = method.response(request);
+    final JsonRpcResponse actualResponse = method.response(validRequest);
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
   }

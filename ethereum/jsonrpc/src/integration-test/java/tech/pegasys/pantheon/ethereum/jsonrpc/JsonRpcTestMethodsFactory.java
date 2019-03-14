@@ -35,6 +35,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -85,6 +86,7 @@ public class JsonRpcTestMethodsFactory {
     final Optional<AccountWhitelistController> accountWhitelistController =
         Optional.of(mock(AccountWhitelistController.class));
     final PrivacyParameters privacyParameters = mock(PrivacyParameters.class);
+    final PeerCache peerCache = mock(PeerCache.class);
 
     return new JsonRpcMethodsFactory()
         .methods(
@@ -102,6 +104,7 @@ public class JsonRpcTestMethodsFactory {
             new HashSet<>(),
             accountWhitelistController,
             RpcApis.DEFAULT_JSON_RPC_APIS,
-            privacyParameters);
+            privacyParameters,
+            peerCache);
   }
 }

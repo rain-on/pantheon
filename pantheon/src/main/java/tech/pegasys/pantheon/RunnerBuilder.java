@@ -49,7 +49,10 @@ import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
@@ -91,6 +94,7 @@ public class RunnerBuilder {
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
+  private PeerCache peerCache;
 
   private EnodeURL getSelfEnode() {
     String nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().toString();
@@ -170,6 +174,11 @@ public class RunnerBuilder {
 
   public RunnerBuilder metricsSystem(final MetricsSystem metricsSystem) {
     this.metricsSystem = metricsSystem;
+    return this;
+  }
+
+  public RunnerBuilder peerCache(final PeerCache peerCache) {
+    this.peerCache = peerCache;
     return this;
   }
 
@@ -270,6 +279,9 @@ public class RunnerBuilder {
     final PrivacyParameters privacyParameters = pantheonController.getPrivacyParameters();
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
+    final P2PNetwork peerNetwork = networkRunner.getNetwork();
+    addCachedPeersToNetwork(peerNetwork);
+
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
       final Map<String, JsonRpcMethod> jsonRpcMethods =
@@ -277,7 +289,7 @@ public class RunnerBuilder {
               context,
               protocolSchedule,
               pantheonController,
-              networkRunner.getNetwork(),
+              peerNetwork,
               synchronizer,
               transactionPool,
               miningCoordinator,
@@ -286,7 +298,8 @@ public class RunnerBuilder {
               jsonRpcConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
-              privacyParameters);
+              privacyParameters,
+              peerCache);
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -300,7 +313,7 @@ public class RunnerBuilder {
               context,
               protocolSchedule,
               pantheonController,
-              networkRunner.getNetwork(),
+              peerNetwork,
               synchronizer,
               transactionPool,
               miningCoordinator,
@@ -309,7 +322,8 @@ public class RunnerBuilder {
               webSocketConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
-              privacyParameters);
+              privacyParameters,
+              peerCache);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(vertx, transactionPool);
@@ -368,7 +382,8 @@ public class RunnerBuilder {
       final Collection<RpcApi> jsonRpcApis,
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
-      final PrivacyParameters privacyParameters) {
+      final PrivacyParameters privacyParameters,
+      final PeerCache peerCache) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -387,7 +402,8 @@ public class RunnerBuilder {
                 jsonRpcApis,
                 filterManager,
                 accountWhitelistController,
-                privacyParameters);
+                privacyParameters,
+                peerCache);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }
@@ -446,5 +462,14 @@ public class RunnerBuilder {
   private MetricsService createMetricsService(
       final Vertx vertx, final MetricsConfiguration configuration) {
     return MetricsService.create(vertx, configuration, metricsSystem);
+  }
+
+  private void addCachedPeersToNetwork(final P2PNetwork peerNetwork) {
+    peerCache.getStaticNodes().stream()
+        .forEach(
+            enodeURL -> {
+              final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
+              peerNetwork.addMaintainConnectionPeer(peer);
+            });
   }
 }

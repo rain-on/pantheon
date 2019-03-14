@@ -24,18 +24,24 @@ import tech.pegasys.pantheon.ethereum.p2p.PeerNotWhitelistedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class AdminAddPeer implements JsonRpcMethod {
+
   private static final Logger LOG = LogManager.getLogger();
   private final P2PNetwork peerNetwork;
   private final JsonRpcParameter parameters;
+  private final PeerCache peerCache;
 
-  public AdminAddPeer(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
+  public AdminAddPeer(
+      final P2PNetwork peerNetwork, final JsonRpcParameter parameters, final PeerCache peerCache) {
     this.peerNetwork = peerNetwork;
     this.parameters = parameters;
+    this.peerCache = peerCache;
   }
 
   @Override
@@ -50,9 +56,11 @@ public class AdminAddPeer implements JsonRpcMethod {
     }
     try {
       final String enodeString = parameters.required(req.getParams(), 0, String.class);
-      final Peer peer = DefaultPeer.fromURI(enodeString);
-      final boolean added = peerNetwork.addMaintainConnectionPeer(peer);
-      return new JsonRpcSuccessResponse(req.getId(), added);
+      final EnodeURL enodeURL = new EnodeURL(enodeString);
+      final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
+      boolean addedToNetwork = peerNetwork.addMaintainConnectionPeer(peer);
+      boolean addedToCache = peerCache.add(enodeURL);
+      return new JsonRpcSuccessResponse(req.getId(), addedToNetwork && addedToCache);
     } catch (final InvalidJsonRpcParameters e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
     } catch (final IllegalArgumentException e) {

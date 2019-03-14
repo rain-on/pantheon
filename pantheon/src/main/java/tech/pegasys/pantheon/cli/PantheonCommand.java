@@ -48,6 +48,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PersistentJsonPeerCache;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -618,6 +620,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       permissioningConfiguration.ifPresent(
           p -> ensureAllBootnodesAreInWhitelist(ethNetworkConfig, p));
 
+      final PeerCache peerCache = createStaticNodesCache();
+
       synchronize(
           buildController(),
           p2pEnabled,
@@ -629,7 +633,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           jsonRpcConfiguration,
           webSocketConfiguration,
           metricsConfiguration(),
-          permissioningConfiguration);
+          permissioningConfiguration,
+          peerCache);
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
@@ -847,7 +852,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<LocalPermissioningConfiguration> permissioningConfiguration) {
+      final Optional<LocalPermissioningConfiguration> permissioningConfiguration,
+      final PeerCache peerCache) {
 
     checkNotNull(runnerBuilder);
 
@@ -869,6 +875,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .bannedNodeIds(bannedNodeIds)
             .metricsSystem(metricsSystem.get())
             .metricsConfiguration(metricsConfiguration)
+            .peerCache(peerCache)
             .build();
 
     addShutdownHook(runner);
@@ -1085,5 +1092,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public PantheonExceptionHandler exceptionHandler() {
     return exceptionHandlerSupplier.get();
+  }
+
+  private PeerCache createStaticNodesCache() throws IOException {
+    final String STATIC_NODES_FILENAME = "static_nodes.json";
+    final Path staticNodesPath = dataDir().resolve(STATIC_NODES_FILENAME);
+
+    return PersistentJsonPeerCache.fromPath(staticNodesPath);
   }
 }

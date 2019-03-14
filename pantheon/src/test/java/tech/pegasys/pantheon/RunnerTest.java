@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.cli.EthNetworkConfig.DEV_NETWORK_ID;
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
@@ -39,6 +40,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PersistentJsonPeerCache;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
@@ -52,6 +55,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -138,6 +142,8 @@ public final class RunnerTest {
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
     final LocalPermissioningConfiguration aheadPermissioningConfiguration =
         permissioningConfiguration();
+    final PeerCache peerCache =
+        new PersistentJsonPeerCache(emptySet(), Paths.get("./arbitraryPath.txt"));
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -146,7 +152,8 @@ public final class RunnerTest {
             .discoveryPort(0)
             .maxPeers(3)
             .metricsSystem(noOpMetricsSystem)
-            .bannedNodeIds(Collections.emptySet());
+            .bannedNodeIds(emptySet())
+            .peerCache(peerCache);
 
     Runner runnerBehind = null;
     final Runner runnerAhead =
