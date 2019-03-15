@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -139,8 +138,7 @@ public class PersistentJsonPeerCacheTest {
   }
 
   @Test
-  public void removePeerReturnsTrueAndRemovesItemIfPeerIsInList()
-      throws IOException {
+  public void removePeerReturnsTrueAndRemovesItemIfPeerIsInList() throws IOException {
     final URL resource = PersistentJsonPeerCacheTest.class.getResource("valid_static_nodes.json");
     final Path original = Paths.get(resource.getPath());
     final File tempFile = testFolder.newFile("file.txt");
