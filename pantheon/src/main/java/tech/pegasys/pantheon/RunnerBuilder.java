@@ -298,8 +298,7 @@ public class RunnerBuilder {
               jsonRpcConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
-              privacyParameters,
-              peerCache);
+              privacyParameters);
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -322,8 +321,7 @@ public class RunnerBuilder {
               webSocketConfiguration.getRpcApis(),
               filterManager,
               accountWhitelistController,
-              privacyParameters,
-              peerCache);
+              privacyParameters);
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(vertx, transactionPool);
@@ -382,8 +380,7 @@ public class RunnerBuilder {
       final Collection<RpcApi> jsonRpcApis,
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountWhitelistController,
-      final PrivacyParameters privacyParameters,
-      final PeerCache peerCache) {
+      final PrivacyParameters privacyParameters) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -402,8 +399,7 @@ public class RunnerBuilder {
                 jsonRpcApis,
                 filterManager,
                 accountWhitelistController,
-                privacyParameters,
-                peerCache);
+                privacyParameters);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }

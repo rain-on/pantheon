@@ -42,7 +42,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.TransactionWithMe
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -130,8 +129,7 @@ public class JsonRpcHttpServiceTest {
                     supportedCapabilities,
                     Optional.of(mock(AccountWhitelistController.class)),
                     JSON_RPC_APIS,
-                    mock(PrivacyParameters.class),
-                    mock(PeerCache.class)));
+                    mock(PrivacyParameters.class)));
     service = createJsonRpcHttpService();
     service.start().join();
 
