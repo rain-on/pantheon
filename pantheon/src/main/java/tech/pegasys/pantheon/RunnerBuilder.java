@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
+import java.io.IOException;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -53,6 +54,8 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PersistentJsonPeerCache;
+import tech.pegasys.pantheon.ethereum.p2p.peers.cache.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
@@ -94,7 +97,6 @@ public class RunnerBuilder {
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
-  private PeerCache peerCache;
 
   private EnodeURL getSelfEnode() {
     String nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().toString();
@@ -177,12 +179,7 @@ public class RunnerBuilder {
     return this;
   }
 
-  public RunnerBuilder peerCache(final PeerCache peerCache) {
-    this.peerCache = peerCache;
-    return this;
-  }
-
-  public Runner build() {
+  public Runner build() throws IOException {
 
     Preconditions.checkNotNull(pantheonController);
 
@@ -280,7 +277,7 @@ public class RunnerBuilder {
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
     final P2PNetwork peerNetwork = networkRunner.getNetwork();
-    addCachedPeersToNetwork(peerNetwork);
+    addStaticPeersToNetwork(peerNetwork);
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
@@ -460,12 +457,19 @@ public class RunnerBuilder {
     return MetricsService.create(vertx, configuration, metricsSystem);
   }
 
-  private void addCachedPeersToNetwork(final P2PNetwork peerNetwork) {
-    peerCache.getStaticNodes().stream()
-        .forEach(
-            enodeURL -> {
-              final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
-              peerNetwork.addMaintainConnectionPeer(peer);
-            });
+
+  private PeerCache addStaticPeersToNetwork(final P2PNetwork peerNetwork) throws IOException {
+    final String STATIC_NODES_FILENAME = "static_nodes.json";
+    final Path staticNodesPath = dataDir.resolve(STATIC_NODES_FILENAME);
+
+    final Set<EnodeURL> staticPeers = StaticNodesParser.fromPath(staticNodesPath);
+
+    staticPeers.stream().forEach(enodeURL -> {
+      final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
+      peerNetwork.addMaintainConnectionPeer(peer);
+    });)
+
+
+
   }
 }
