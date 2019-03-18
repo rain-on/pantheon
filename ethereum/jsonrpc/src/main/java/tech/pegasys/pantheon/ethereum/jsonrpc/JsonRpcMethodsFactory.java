@@ -90,7 +90,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.BlockResultFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
@@ -125,8 +124,7 @@ public class JsonRpcMethodsFactory {
       final Collection<RpcApi> rpcApis,
       final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountsWhitelistController,
-      final PrivacyParameters privacyParameters,
-      final PeerCache peerCache) {
+      final PrivacyParameters privacyParameters) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
     return methods(
@@ -144,8 +142,7 @@ public class JsonRpcMethodsFactory {
         supportedCapabilities,
         accountsWhitelistController,
         rpcApis,
-        privacyParameters,
-        peerCache);
+        privacyParameters);
   }
 
   public Map<String, JsonRpcMethod> methods(
@@ -163,8 +160,7 @@ public class JsonRpcMethodsFactory {
       final Set<Capability> supportedCapabilities,
       final Optional<AccountWhitelistController> accountsWhitelistController,
       final Collection<RpcApi> rpcApis,
-      final PrivacyParameters privacyParameters,
-      final PeerCache peerCache) {
+      final PrivacyParameters privacyParameters) {
     final Map<String, JsonRpcMethod> enabledMethods = new HashMap<>();
     if (!rpcApis.isEmpty()) {
       addMethods(enabledMethods, new RpcModules(rpcApis));
@@ -271,7 +267,7 @@ public class JsonRpcMethodsFactory {
     if (rpcApis.contains(RpcApis.ADMIN)) {
       addMethods(
           enabledMethods,
-          new AdminAddPeer(p2pNetwork, parameter, peerCache),
+          new AdminAddPeer(p2pNetwork, parameter),
           new AdminNodeInfo(
               clientVersion, networkId, genesisConfigOptions, p2pNetwork, blockchainQueries),
           new AdminPeers(p2pNetwork));
