@@ -15,6 +15,8 @@ package tech.pegasys.pantheon.ethereum.p2p.peers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.google.common.collect.Lists;
+import java.util.List;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
@@ -37,22 +39,34 @@ public class StaticeNodesParserTest {
   // to "A".
 
   // First peer ion the valid_static_nodes file.
-  private final EnodeURL firstItemInValidList =
+  private final List<EnodeURL> validFileItems = Lists.newArrayList(
       new EnodeURL(
           "50203c6bfca6874370e71aecc8958529fd723feb05013dc1abca8fc1fff845c5259faba05852e9dfe5ce172a7d6e7c2a3a5eaa8b541c8af15ea5518bbff5f2fa",
           "127.0.0.1",
-          30303);
+          30303),
+      new EnodeURL(
+          "02beb46bc17227616be44234071dfa18516684e45eed88049190b6cb56b0bae218f045fd0450f123b8f55c60b96b78c45e8e478004293a8de6818aa4e02eff97",
+              "127.0.0.1",
+              30304),
+      new EnodeURL(
+          "819e5cbd81f123516b10f04bf620daa2b385efef06d77253148b814bf1bb6197ff58ebd1fd7bf5dc765b49a4440c733bf941e479c800173f2bfeb887e4fbcbc2",
+              "127.0.0.1",
+              30305),
+      new EnodeURL(
+          "6cf53e25d2a98a22e7e205a86bda7077e3c8a7bc99e5ff88ddfd2037a550969ab566f069ffa455df0cfae0c21f7aec3447e414eccc473a3e8b20984b90f164ac",
+              "127.0.0.1",
+              30306));
 
   @Rule public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Test
-  public void validFileLoadsWithExpectedNumberOfPeers() throws IOException {
+  public void validFileLoadsWithExpectedEnodes() throws IOException {
     final URL resource = StaticeNodesParserTest.class.getResource("valid_static_nodes.json");
     final Path path = Paths.get(resource.getPath());
 
     final Set<EnodeURL> enodes = StaticNodesParser.fromPath(path);
 
-    assertThat(enodes.size()).isEqualTo(4);
+    assertThat(enodes).containsExactly(validFileItems.toArray(new EnodeURL[validFileItems.size()]));
   }
 
   @Test
