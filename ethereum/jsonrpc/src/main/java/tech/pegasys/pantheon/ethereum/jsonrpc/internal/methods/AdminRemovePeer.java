@@ -15,31 +15,28 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AdminAddPeer extends AdminPeerModification {
+public class AdminRemovePeer extends AdminPeerModification {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  public AdminAddPeer(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
+  public AdminRemovePeer(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
     super(peerNetwork, parameters);
   }
 
   @Override
   public String getName() {
-    return "admin_addPeer";
+    return "admin_removePeer";
   }
 
   @Override
   protected boolean performOperation(final String enode) {
-    LOG.debug("Adding ({}) to peers", enode);
+    LOG.debug("Remove ({}) to peer cache", enode);
     final EnodeURL enodeURL = new EnodeURL(enode);
-    final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
-    boolean addedToNetwork = peerNetwork.addMaintainConnectionPeer(peer);
-    return addedToNetwork;
+    return peerNetwork.removeMaintainedConnectionPeer(DefaultPeer.fromEnodeURL(enodeURL));
   }
 }
