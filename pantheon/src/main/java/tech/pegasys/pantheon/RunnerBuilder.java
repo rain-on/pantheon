@@ -12,7 +12,17 @@
  */
 package tech.pegasys.pantheon;
 
+import com.google.common.base.Preconditions;
+import io.vertx.core.Vertx;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -53,9 +63,7 @@ import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PersistentJsonPeerCache;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.StaticNodesParser;
+import tech.pegasys.pantheon.ethereum.p2p.peers.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
@@ -67,18 +75,6 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
-
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import com.google.common.base.Preconditions;
-import io.vertx.core.Vertx;
 
 public class RunnerBuilder {
 
@@ -97,6 +93,7 @@ public class RunnerBuilder {
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
+  private Set<EnodeURL> staticNodes;
 
   private EnodeURL getSelfEnode() {
     String nodeId = pantheonController.getLocalNodeKeyPair().getPublicKey().toString();
@@ -179,7 +176,12 @@ public class RunnerBuilder {
     return this;
   }
 
-  public Runner build() throws IOException {
+  public RunnerBuilder staticNodes(final Set<EnodeURL> staticNodes) {
+    this.staticNodes = staticNodes;
+    return this;
+  }
+
+  public Runner build() {
 
     Preconditions.checkNotNull(pantheonController);
 
@@ -277,7 +279,10 @@ public class RunnerBuilder {
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
     final P2PNetwork peerNetwork = networkRunner.getNetwork();
-    addStaticPeersToNetwork(peerNetwork);
+    staticNodes.stream().forEach(enodeURL -> {
+      final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
+      peerNetwork.addMaintainConnectionPeer(peer);
+    });
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {
@@ -455,21 +460,5 @@ public class RunnerBuilder {
   private MetricsService createMetricsService(
       final Vertx vertx, final MetricsConfiguration configuration) {
     return MetricsService.create(vertx, configuration, metricsSystem);
-  }
-
-
-  private PeerCache addStaticPeersToNetwork(final P2PNetwork peerNetwork) throws IOException {
-    final String STATIC_NODES_FILENAME = "static_nodes.json";
-    final Path staticNodesPath = dataDir.resolve(STATIC_NODES_FILENAME);
-
-    final Set<EnodeURL> staticPeers = StaticNodesParser.fromPath(staticNodesPath);
-
-    staticPeers.stream().forEach(enodeURL -> {
-      final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
-      peerNetwork.addMaintainConnectionPeer(peer);
-    });)
-
-
-
   }
 }

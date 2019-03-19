@@ -18,6 +18,30 @@ import static tech.pegasys.pantheon.cli.EthNetworkConfig.DEV_NETWORK_ID;
 import static tech.pegasys.pantheon.cli.NetworkName.DEV;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import okhttp3.Call;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import org.awaitility.Awaitility;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.MainnetPantheonController;
@@ -40,8 +64,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PeerCache;
-import tech.pegasys.pantheon.ethereum.p2p.peers.cache.PersistentJsonPeerCache;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
@@ -50,33 +72,6 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
-import okhttp3.Call;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.awaitility.Awaitility;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 /** Tests for {@link Runner}. */
 public final class RunnerTest {
@@ -142,8 +137,7 @@ public final class RunnerTest {
     final MetricsConfiguration aheadMetricsConfiguration = metricsConfiguration();
     final LocalPermissioningConfiguration aheadPermissioningConfiguration =
         permissioningConfiguration();
-    final PeerCache peerCache =
-        new PersistentJsonPeerCache(emptySet(), Paths.get("./arbitraryPath.txt"));
+
     final RunnerBuilder runnerBuilder =
         new RunnerBuilder()
             .vertx(Vertx.vertx())
@@ -152,8 +146,7 @@ public final class RunnerTest {
             .discoveryPort(0)
             .maxPeers(3)
             .metricsSystem(noOpMetricsSystem)
-            .bannedNodeIds(emptySet())
-            .peerCache(peerCache);
+            .bannedNodeIds(emptySet());
 
     Runner runnerBehind = null;
     final Runner runnerAhead =
