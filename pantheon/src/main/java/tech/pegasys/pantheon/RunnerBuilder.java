@@ -52,7 +52,6 @@ import tech.pegasys.pantheon.ethereum.p2p.netty.NettyP2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerBlacklist;
-import tech.pegasys.pantheon.ethereum.p2p.peers.StaticNodesParser;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
@@ -300,10 +299,12 @@ public class RunnerBuilder {
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
     final P2PNetwork peerNetwork = networkRunner.getNetwork();
-    staticNodes.stream().forEach(enodeURL -> {
-      final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
-      peerNetwork.addMaintainConnectionPeer(peer);
-    });
+    staticNodes.stream()
+        .forEach(
+            enodeURL -> {
+              final Peer peer = DefaultPeer.fromEnodeURL(enodeURL);
+              peerNetwork.addMaintainConnectionPeer(peer);
+            });
 
     Optional<JsonRpcHttpService> jsonRpcHttpService = Optional.empty();
     if (jsonRpcConfiguration.isEnabled()) {

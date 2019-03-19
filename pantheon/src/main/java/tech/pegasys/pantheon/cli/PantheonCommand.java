@@ -910,7 +910,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
-      final Optional<PermissioningConfiguration> permissioningConfiguration) {
+      final Optional<PermissioningConfiguration> permissioningConfiguration)
+      throws IOException {
 
     checkNotNull(runnerBuilder);
 
@@ -1165,11 +1166,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private Set<EnodeURL> loadStaticNodes() throws IOException {
-    final String STATIC_NODES_FILENAME = "static_nodes.json";
+    final String STATIC_NODES_FILENAME = "static-nodes.json";
     final Path staticNodesPath = dataDir().resolve(STATIC_NODES_FILENAME);
 
     return StaticNodesParser.fromPath(staticNodesPath);
-
   }
-
 }

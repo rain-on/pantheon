@@ -15,7 +15,8 @@ package tech.pegasys.pantheon.ethereum.p2p.peers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.vertx.core.json.DecodeException;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -24,10 +25,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+
+import io.vertx.core.json.DecodeException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public class StaticeNodesParserTest {
 

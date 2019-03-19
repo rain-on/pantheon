@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.ethereum.p2p.peers;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.JsonArray;
+import tech.pegasys.pantheon.util.enode.EnodeURL;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,9 +23,11 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 public class StaticNodesParser {
 
