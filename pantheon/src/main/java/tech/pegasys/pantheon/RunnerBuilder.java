@@ -12,17 +12,6 @@
  */
 package tech.pegasys.pantheon;
 
-import com.google.common.base.Preconditions;
-import io.vertx.core.Vertx;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -69,12 +58,28 @@ import tech.pegasys.pantheon.ethereum.p2p.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
+import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.enode.EnodeURL;
+
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Preconditions;
+import io.vertx.core.Vertx;
 
 public class RunnerBuilder {
 
@@ -92,7 +97,7 @@ public class RunnerBuilder {
   private Collection<String> bannedNodeIds;
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
-  private Optional<LocalPermissioningConfiguration> permissioningConfiguration = Optional.empty();
+  private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
   private Set<EnodeURL> staticNodes;
 
   private EnodeURL getSelfEnode() {
@@ -151,7 +156,7 @@ public class RunnerBuilder {
   }
 
   public RunnerBuilder permissioningConfiguration(
-      final LocalPermissioningConfiguration permissioningConfiguration) {
+      final PermissioningConfiguration permissioningConfiguration) {
     this.permissioningConfiguration = Optional.of(permissioningConfiguration);
     return this;
   }
@@ -232,8 +237,12 @@ public class RunnerBuilder {
         discoveryConfiguration.getBootstrapPeers().stream()
             .map(p -> new EnodeURL(p.getEnodeURI()))
             .collect(Collectors.toList());
+
+    final Optional<LocalPermissioningConfiguration> localPermissioningConfiguration =
+        permissioningConfiguration.flatMap(PermissioningConfiguration::getLocalConfig);
+
     final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController =
-        permissioningConfiguration
+        localPermissioningConfiguration
             .filter(LocalPermissioningConfiguration::isNodeWhitelistEnabled)
             .map(
                 config ->
@@ -241,6 +250,13 @@ public class RunnerBuilder {
                         config, bootnodesAsEnodeURLs, getSelfEnode()));
 
     final Synchronizer synchronizer = pantheonController.getSynchronizer();
+
+    final TransactionSimulator transactionSimulator =
+        new TransactionSimulator(
+            context.getBlockchain(), context.getWorldStateArchive(), protocolSchedule);
+
+    final Optional<NodePermissioningController> nodePermissioningController =
+        buildNodePermissioningController(bootnodesAsEnodeURLs, synchronizer, transactionSimulator);
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()
@@ -257,7 +273,12 @@ public class RunnerBuilder {
                             synchronizer::hasSufficientPeers,
                             peerBlacklist,
                             metricsSystem,
-                            nodeWhitelistController)
+                            nodeWhitelistController,
+                            nodePermissioningController,
+                            // TODO this dependency on the Blockchain will be removed in PAN-2442
+                            nodePermissioningController.isPresent()
+                                ? context.getBlockchain()
+                                : null)
                     : caps -> new NoopP2PNetwork())
             .metricsSystem(metricsSystem)
             .build();
@@ -265,7 +286,7 @@ public class RunnerBuilder {
     final TransactionPool transactionPool = pantheonController.getTransactionPool();
     final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
     final Optional<AccountWhitelistController> accountWhitelistController =
-        permissioningConfiguration
+        localPermissioningConfiguration
             .filter(LocalPermissioningConfiguration::isAccountWhitelistEnabled)
             .map(
                 configuration -> {
@@ -355,6 +376,21 @@ public class RunnerBuilder {
         metricsService,
         pantheonController,
         dataDir);
+  }
+
+  private Optional<NodePermissioningController> buildNodePermissioningController(
+      final List<EnodeURL> bootnodesAsEnodeURLs,
+      final Synchronizer synchronizer,
+      final TransactionSimulator transactionSimulator) {
+    return permissioningConfiguration.map(
+        config ->
+            new NodePermissioningControllerFactory()
+                .create(
+                    config,
+                    synchronizer,
+                    bootnodesAsEnodeURLs,
+                    getSelfEnode(),
+                    transactionSimulator));
   }
 
   private FilterManager createFilterManager(
