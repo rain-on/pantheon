@@ -18,9 +18,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParamet
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.p2p.P2pDisabledException;
-import tech.pegasys.pantheon.ethereum.p2p.PeerNotWhitelistedException;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,21 +42,18 @@ public abstract class AdminPeerModification implements JsonRpcMethod {
     }
     try {
       final String enodeString = parameters.required(req.getParams(), 0, String.class);
-      return new JsonRpcSuccessResponse(req.getId(), performOperation(enodeString));
+      return performOperation(req.getId(), enodeString);
     } catch (final InvalidJsonRpcParameters e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
     } catch (final IllegalArgumentException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.PARSE_ERROR);
     } catch (final P2pDisabledException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
-    } catch (final PeerNotWhitelistedException e) {
-      return new JsonRpcErrorResponse(
-          req.getId(), JsonRpcError.NON_WHITELISTED_NODE_CANNOT_BE_ADDED_AS_A_PEER);
     } catch (final Exception e) {
       LOG.error(getName() + " - Error processing request: " + req, e);
       throw e;
     }
   }
 
-  protected abstract boolean performOperation(final String enode);
+  protected abstract JsonRpcResponse performOperation(final Object id, final String enode);
 }
