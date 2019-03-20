@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.p2p.peers;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptySet;
 
 import tech.pegasys.pantheon.util.enode.EnodeURL;
 
@@ -21,8 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonArray;
@@ -35,28 +36,15 @@ public class StaticNodesParser {
 
   public static Set<EnodeURL> fromPath(final Path path)
       throws IOException, IllegalArgumentException {
-    final Set<EnodeURL> result = new HashSet<>();
 
-    final byte[] staticNodesContent;
     try {
-      staticNodesContent = Files.readAllBytes(path);
-      if (staticNodesContent.length == 0) {
-        return result;
-      }
+      return readEnodesFromPath(path);
     } catch (FileNotFoundException | NoSuchFileException ex) {
       LOG.info("No StaticNodes file  ({}) exists, creating empty cache.", path);
-      return result;
+      return emptySet();
     } catch (IOException ex) {
       LOG.info("Unable to parse static nodes file ({})", path);
       throw ex;
-    }
-
-    try {
-      final JsonArray enodeJsonArray = new JsonArray(new String(staticNodesContent, UTF_8));
-      for (Object jsonObj : enodeJsonArray.getList()) {
-        final String enodeString = (String) jsonObj;
-        result.add(decodeString(enodeString));
-      }
     } catch (DecodeException ex) {
       LOG.info("Content of ({}} was invalid json, and could not be decoded.", path);
       throw ex;
@@ -64,8 +52,18 @@ public class StaticNodesParser {
       LOG.info("Parsing ({}) has failed due incorrectly formatted enode element.", path);
       throw ex;
     }
+  }
 
-    return result;
+  private static Set<EnodeURL> readEnodesFromPath(final Path path) throws IOException {
+    final byte[] staticNodesContent = Files.readAllBytes(path);
+    if (staticNodesContent.length == 0) {
+      return emptySet();
+    }
+
+    final JsonArray enodeJsonArray = new JsonArray(new String(staticNodesContent, UTF_8));
+    return enodeJsonArray.stream()
+        .map(obj -> decodeString((String) obj))
+        .collect(Collectors.toSet());
   }
 
   private static EnodeURL decodeString(final String input) {
