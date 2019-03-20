@@ -67,7 +67,7 @@ public class PeerConnectionRegistry implements DisconnectCallback {
   }
 
   public boolean isAlreadyConnected(final BytesValue nodeId) {
-    return getConnectionForPeer(nodeId).isPresent();
+    return connections.containsKey(nodeId);
   }
 
   public Optional<PeerConnection> getConnectionForPeer(final BytesValue nodeID) {

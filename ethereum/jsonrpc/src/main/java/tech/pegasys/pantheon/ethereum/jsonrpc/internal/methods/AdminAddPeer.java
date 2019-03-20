@@ -26,7 +26,7 @@ import tech.pegasys.pantheon.util.enode.EnodeURL;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AdminAddPeer extends AdminPeerModification {
+public class AdminAddPeer extends AdminModifyPeer {
 
   private static final Logger LOG = LogManager.getLogger();
 

@@ -24,13 +24,13 @@ import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public abstract class AdminPeerModification implements JsonRpcMethod {
+public abstract class AdminModifyPeer implements JsonRpcMethod {
 
   protected final JsonRpcParameter parameters;
   protected final P2PNetwork peerNetwork;
   private static final Logger LOG = LogManager.getLogger();
 
-  public AdminPeerModification(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
+  public AdminModifyPeer(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
     this.peerNetwork = peerNetwork;
     this.parameters = parameters;
   }
