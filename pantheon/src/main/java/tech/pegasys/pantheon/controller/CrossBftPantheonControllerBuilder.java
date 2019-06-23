@@ -48,6 +48,8 @@ import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftRoundFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftLegacyBlockInterface;
+import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64Protocol;
+import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64ProtocolManager;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -98,9 +100,18 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
   protected SubProtocolConfiguration createSubProtocolConfiguration(
       final EthProtocolManager ethProtocolManager) {
     return new SubProtocolConfiguration()
-        .withSubProtocol(EthProtocol.get(), ethProtocolManager)
+        .withSubProtocol(Istanbul64Protocol.get(), ethProtocolManager)
         .withSubProtocol(IbftSubProtocol.get(), new IbftProtocolManager(ibftEventQueue, peers));
   }
+
+/*
+  @Override
+  protected SubProtocolConfiguration createSubProtocolConfiguration(
+      final EthProtocolManager ethProtocolManager) {
+    return new SubProtocolConfiguration()
+        .withSubProtocol(EthProtocol.get(), ethProtocolManager)
+        .withSubProtocol(IbftSubProtocol.get(), new IbftProtocolManager(ibftEventQueue, peers));
+  }*/
 
   @Override
   protected MiningCoordinator createMiningCoordinator(
@@ -238,5 +249,22 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
             epochManager,
             blockInterface),
         new VoteProposer());
+  }
+
+  @Override
+  protected EthProtocolManager createEthProtocolManager(
+      final ProtocolContext<IbftContext> protocolContext, final boolean fastSyncEnabled) {
+    LOG.info("Operating on IBFT-1.0 network.");
+    return new Istanbul64ProtocolManager(
+        protocolContext.getBlockchain(),
+        protocolContext.getWorldStateArchive(),
+        networkId,
+        fastSyncEnabled,
+        syncConfig.downloaderParallelism(),
+        syncConfig.transactionsParallelism(),
+        syncConfig.computationParallelism(),
+        clock,
+        metricsSystem,
+        ethereumWireProtocolConfiguration);
   }
 }
