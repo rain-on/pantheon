@@ -14,18 +14,14 @@ package tech.pegasys.pantheon.controller;
 
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.config.IbftConfigOptions;
 import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.consensus.common.EpochManager;
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
+import tech.pegasys.pantheon.consensus.crossbft.CrossBftProtocolSchedule;
+import tech.pegasys.pantheon.consensus.crossbft.blockcreation.CrossBftBlockOperations;
 import tech.pegasys.pantheon.consensus.crossbft.blockcreation.CrossbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
@@ -34,12 +30,10 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
 import tech.pegasys.pantheon.consensus.ibft.IbftGossip;
 import tech.pegasys.pantheon.consensus.ibft.IbftProcessor;
-import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockCreatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
@@ -72,17 +66,26 @@ import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.Subscribers;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder<IbftContext> {
+
   private static final Logger LOG = LogManager.getLogger();
   private IbftEventQueue ibftEventQueue;
-  private IbftConfigOptions ibftConfig;
+  private IbftConfigOptions configOptions;
   private ValidatorPeers peers;
   private final BlockInterface blockInterface = new IbftLegacyBlockInterface();
 
   @Override
   protected void prepForBuild() {
-    ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
-    ibftEventQueue = new IbftEventQueue(ibftConfig.getMessageQueueLimit());
+    configOptions = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
+    ibftEventQueue = new IbftEventQueue(configOptions.getMessageQueueLimit());
   }
 
   @Override
@@ -127,7 +130,7 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
     peers = new ValidatorPeers(voteTallyCache);
 
     final UniqueMessageMulticaster uniqueMessageMulticaster =
-        new UniqueMessageMulticaster(peers, ibftConfig.getGossipedHistoryLimit());
+        new UniqueMessageMulticaster(peers, configOptions.getGossipedHistoryLimit());
 
     final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
@@ -141,9 +144,9 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
             Util.publicKeyToAddress(nodeKeys.getPublicKey()),
             proposerSelector,
             uniqueMessageMulticaster,
-            new RoundTimer(ibftEventQueue, ibftConfig.getRequestTimeoutSeconds(), timerExecutor),
+            new RoundTimer(ibftEventQueue, configOptions.getRequestTimeoutSeconds(), timerExecutor),
             new BlockTimer(
-                ibftEventQueue, ibftConfig.getBlockPeriodSeconds(), timerExecutor, clock),
+                ibftEventQueue, configOptions.getBlockPeriodSeconds(), timerExecutor, clock),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
             clock);
@@ -156,11 +159,11 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
 
     final FutureMessageBuffer futureMessageBuffer =
         new FutureMessageBuffer(
-            ibftConfig.getFutureMessagesMaxDistance(),
-            ibftConfig.getFutureMessagesLimit(),
+            configOptions.getFutureMessagesMaxDistance(),
+            configOptions.getFutureMessagesLimit(),
             blockchain.getChainHeadBlockNumber());
     final MessageTracker duplicateMessageTracker =
-        new MessageTracker(ibftConfig.getDuplicateMessageLimit());
+        new MessageTracker(configOptions.getDuplicateMessageLimit());
 
     final IbftController ibftController =
         new IbftController(
@@ -174,7 +177,7 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
                     protocolSchedule,
                     minedBlockObservers,
                     messageValidatorFactory,
-                    new IbftBlockOperations(nodeKeys)),
+                    new CrossBftBlockOperations(nodeKeys)),
                 messageValidatorFactory),
             gossiper,
             duplicateMessageTracker,
@@ -211,7 +214,7 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
 
   @Override
   protected ProtocolSchedule<IbftContext> createProtocolSchedule() {
-    return IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), privacyParameters);
+    return CrossBftProtocolSchedule.create(genesisConfig.getConfigOptions(), privacyParameters);
   }
 
   @Override
@@ -226,8 +229,8 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
   @Override
   protected IbftContext createConsensusContext(
       final Blockchain blockchain, final WorldStateArchive worldStateArchive) {
-    final IbftConfigOptions ibftConfig = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
-    final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
+    final IbftConfigOptions config = genesisConfig.getConfigOptions().getCrossBfrConfigOptions();
+    final EpochManager epochManager = new EpochManager(config.getEpochLength());
     return new IbftContext(
         new VoteTallyCache(
             blockchain,

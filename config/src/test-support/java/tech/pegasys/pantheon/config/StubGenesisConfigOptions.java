@@ -79,7 +79,8 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public IbftConfigOptions getCrossBfrConfigOptions() { return IbftConfigOptions.DEFAULT;
+  public IbftConfigOptions getCrossBfrConfigOptions() {
+    return IbftConfigOptions.DEFAULT;
   }
 
   @Override

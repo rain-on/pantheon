@@ -12,16 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
@@ -30,18 +25,19 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.util.Subscribers;
+
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class IbftRound {
 
@@ -52,7 +48,6 @@ public class IbftRound {
   private final AbstractBlockCreator<?> blockCreator;
   private final ProtocolContext<IbftContext> protocolContext;
   private final BlockImporter<IbftContext> blockImporter;
-  private final KeyPair nodeKeys;
   private final MessageFactory messageFactory; // used only to create stored local msgs
   private final IbftMessageTransmitter transmitter;
   private final BlockOperations blockOperations;
@@ -63,7 +58,6 @@ public class IbftRound {
       final ProtocolContext<IbftContext> protocolContext,
       final BlockImporter<IbftContext> blockImporter,
       final Subscribers<MinedBlockObserver> observers,
-      final KeyPair nodeKeys,
       final MessageFactory messageFactory,
       final IbftMessageTransmitter transmitter,
       final RoundTimer roundTimer,
@@ -73,7 +67,6 @@ public class IbftRound {
     this.protocolContext = protocolContext;
     this.blockImporter = blockImporter;
     this.observers = observers;
-    this.nodeKeys = nodeKeys;
     this.messageFactory = messageFactory;
     this.transmitter = transmitter;
     this.blockOperations = blockOperations;
@@ -175,9 +168,7 @@ public class IbftRound {
 
       final Commit localCommitMessage =
           messageFactory.createCommit(
-              roundState.getRoundIdentifier(),
-              block.getHash(),
-              localCommitSeal);
+              roundState.getRoundIdentifier(), block.getHash(), localCommitSeal);
       peerIsCommitted(localCommitMessage);
     }
 
@@ -190,7 +181,9 @@ public class IbftRound {
     if (wasPrepared != roundState.isPrepared()) {
       LOG.debug("Sending commit message. round={}", roundState.getRoundIdentifier());
       final Block block = roundState.getProposedBlock().get();
-      transmitter.multicastCommit(getRoundIdentifier(), block.getHash(),
+      transmitter.multicastCommit(
+          getRoundIdentifier(),
+          block.getHash(),
           blockOperations.createCommitSealForBlock(block.getHeader()));
     }
   }
@@ -204,7 +197,8 @@ public class IbftRound {
   }
 
   private void importBlockToChain() {
-    final Block blockToImport = blockOperations.createSealedBlock(
+    final Block blockToImport =
+        blockOperations.createSealedBlock(
             roundState.getProposedBlock().get(), roundState.getCommitSeals());
 
     final long blockNumber = blockToImport.getHeader().getNumber();

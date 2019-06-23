@@ -12,11 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.blockcreation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import tech.pegasys.pantheon.consensus.common.ConsensusHelpers;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
@@ -31,6 +26,12 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class IbftBlockCreatorFactory extends BlockCreatorFactory {
 
@@ -55,6 +56,7 @@ public class IbftBlockCreatorFactory extends BlockCreatorFactory {
     this.localAddress = localAddress;
   }
 
+  @Override
   public AbstractBlockCreator<?> create(final BlockHeader parentHeader, final int round) {
     return new IbftBlockCreator(
         localAddress,

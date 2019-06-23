@@ -12,10 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.crossbft.blockcreation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
 import tech.pegasys.pantheon.consensus.common.ConsensusHelpers;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
@@ -31,6 +27,11 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
 
 public class CrossbftBlockCreatorFactory extends BlockCreatorFactory {
 
@@ -55,6 +56,7 @@ public class CrossbftBlockCreatorFactory extends BlockCreatorFactory {
     this.nodeKeys = nodeKeys;
   }
 
+  @Override
   public AbstractBlockCreator<?> create(final BlockHeader parentHeader, final int round) {
     return new IbftBlockCreator(
         Address.ZERO,
@@ -64,7 +66,8 @@ public class CrossbftBlockCreatorFactory extends BlockCreatorFactory {
         protocolSchedule,
         gasLimitCalculator,
         getMinTransactionGasPrice(),
-        parentHeader, nodeKeys);
+        parentHeader,
+        nodeKeys);
   }
 
   // This creates an extraData object containing no proposerSeal.

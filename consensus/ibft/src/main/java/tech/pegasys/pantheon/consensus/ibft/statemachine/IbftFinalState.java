@@ -19,7 +19,6 @@ import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockCreatorFactory;
-import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
@@ -74,6 +73,7 @@ public class IbftFinalState {
     return voteTallyCache.getVoteTallyAtHead().getValidators();
   }
 
+  // TODO(tmm): This SHOULD be removed ... no one uses it except testing.
   public KeyPair getNodeKeys() {
     return nodeKeys;
   }

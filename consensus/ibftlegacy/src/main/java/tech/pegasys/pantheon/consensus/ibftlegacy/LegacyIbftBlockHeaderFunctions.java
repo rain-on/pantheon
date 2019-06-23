@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
-import java.util.function.Function;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
+
+import java.util.function.Function;
 
 public class LegacyIbftBlockHeaderFunctions implements BlockHeaderFunctions {
 

@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibftlegacy.blockcreation;
 
-import java.util.Optional;
-import java.util.function.Function;
 import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.common.VoteType;
@@ -34,6 +32,9 @@ import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 // This class is responsible for creating a block without committer seals (basically it was just
 // too hard to coordinate with the state machine).
@@ -92,8 +93,7 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
     final IbftExtraData extraDataWithProposerSignature = constructSignedExtraData(unsignedHeader);
 
     final BlockHeaderBuilder signedBuilder =
-        BlockHeaderBuilder.fromBuilder(builder)
-        .extraData(extraDataWithProposerSignature.encode());
+        BlockHeaderBuilder.fromBuilder(builder).extraData(extraDataWithProposerSignature.encode());
 
     return signedBuilder.buildBlockHeader();
   }
@@ -108,7 +108,6 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
         SECP256K1.sign(hashToSign, nodeKeys),
         extraData.getValidators());
   }
-
 
   private long voteDirectionToLong(final VoteType direction) {
     if (direction == VoteType.ADD) {

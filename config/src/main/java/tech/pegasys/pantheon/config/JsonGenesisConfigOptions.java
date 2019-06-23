@@ -61,7 +61,9 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public boolean isCrossBft() { return configRoot.containsKey(CROSSBFT_CONFIG_KEY); }
+  public boolean isCrossBft() {
+    return configRoot.containsKey(CROSSBFT_CONFIG_KEY);
+  }
 
   @Override
   public IbftConfigOptions getIbftLegacyConfigOptions() {
@@ -97,8 +99,6 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
         ? new IbftConfigOptions(configRoot.getJsonObject(CROSSBFT_CONFIG_KEY))
         : IbftConfigOptions.DEFAULT;
   }
-
-
 
   @Override
   public OptionalLong getHomesteadBlockNumber() {
