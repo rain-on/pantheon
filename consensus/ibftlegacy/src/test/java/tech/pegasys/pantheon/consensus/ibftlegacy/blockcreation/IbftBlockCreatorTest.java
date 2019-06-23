@@ -105,9 +105,9 @@ public class IbftBlockCreatorTest {
             protContext,
             protocolSchedule,
             parentGasLimit -> parentGasLimit,
-            nodeKeys,
             Wei.ZERO,
-            parentHeader);
+            parentHeader,
+            nodeKeys);
 
     final Block block = blockCreator.createBlock(Instant.now().getEpochSecond());
 

@@ -49,6 +49,11 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
+  public boolean isCrossBft() {
+    return false;
+  }
+
+  @Override
   public boolean isIbft2() {
     return false;
   }
@@ -71,6 +76,10 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions {
   @Override
   public EthashConfigOptions getEthashConfigOptions() {
     return EthashConfigOptions.DEFAULT;
+  }
+
+  @Override
+  public IbftConfigOptions getCrossBfrConfigOptions() { return IbftConfigOptions.DEFAULT;
   }
 
   @Override

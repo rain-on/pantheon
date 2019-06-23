@@ -39,6 +39,7 @@ import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.FutureMessageBuffer;
@@ -340,7 +341,8 @@ public class TestContextBuilder {
                     protocolContext,
                     protocolSchedule,
                     minedBlockObservers,
-                    messageValidatorFactory),
+                    messageValidatorFactory,
+                    new IbftBlockOperations(nodeKeys)),
                 messageValidatorFactory),
             gossiper,
             duplicateMessageTracker,

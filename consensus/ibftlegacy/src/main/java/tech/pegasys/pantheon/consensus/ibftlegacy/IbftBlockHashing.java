@@ -46,6 +46,11 @@ public class IbftBlockHashing {
     return Hash.hash(Hash.hash(headerRlp));
   }
 
+  public static Hash calculateDataHashForCommittedSeal(final BlockHeader header) {
+    final IbftExtraData ibftExtraData = IbftExtraData.decode(header);
+    return calculateDataHashForCommittedSeal(header, ibftExtraData);
+  }
+
   /**
    * Constructs a hash of the block header suitable for signing as a committed seal. The extra data
    * in the hash uses an empty list for the committed seals.

@@ -12,10 +12,16 @@
  */
 package tech.pegasys.pantheon.consensus.ibftlegacy.blockcreation;
 
+import java.util.Optional;
+import java.util.function.Function;
+import tech.pegasys.pantheon.consensus.common.ValidatorVote;
+import tech.pegasys.pantheon.consensus.common.VoteTally;
+import tech.pegasys.pantheon.consensus.common.VoteType;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftExtraData;
-import tech.pegasys.pantheon.consensus.ibftlegacy.IbftHelpers;
+import tech.pegasys.pantheon.consensus.ibftlegacy.LegacyIbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -23,84 +29,75 @@ import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 
-import java.util.function.Function;
-
-/**
- * Responsible for producing a Block which conforms to IBFT validation rules (other than missing
- * commit seals). Transactions and associated Hashes (stateroot, receipts etc.) are loaded into the
- * Block in the base class as part of the transaction selection process.
- */
+// This class is responsible for creating a block without committer seals (basically it was just
+// too hard to coordinate with the state machine).
 public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
 
+  private final Address localAddress;
   private final KeyPair nodeKeys;
 
   public IbftBlockCreator(
-      final Address coinbase,
+      final Address localAddress,
       final ExtraDataCalculator extraDataCalculator,
       final PendingTransactions pendingTransactions,
       final ProtocolContext<IbftContext> protocolContext,
       final ProtocolSchedule<IbftContext> protocolSchedule,
       final Function<Long, Long> gasLimitCalculator,
-      final KeyPair nodeKeys,
       final Wei minTransactionGasPrice,
-      final BlockHeader parentHeader) {
+      final BlockHeader parentHeader,
+      final KeyPair nodeKeys) {
     super(
-        coinbase,
+        localAddress,
         extraDataCalculator,
         pendingTransactions,
         protocolContext,
         protocolSchedule,
         gasLimitCalculator,
         minTransactionGasPrice,
-        Util.publicKeyToAddress(nodeKeys.getPublicKey()),
+        localAddress,
         parentHeader);
+    this.localAddress = localAddress;
     this.nodeKeys = nodeKeys;
   }
 
-  /**
-   * Responsible for signing (hash of) the block (including MixHash and Nonce), and then injecting
-   * the seal into the extraData. This is called after a suitable set of transactions have been
-   * identified, and all resulting hashes have been inserted into the passed-in SealableBlockHeader.
-   *
-   * @param sealableBlockHeader A block header containing StateRoots, TransactionHashes etc.
-   * @return The blockhead which is to be added to the block being proposed.
-   */
   @Override
   protected BlockHeader createFinalBlockHeader(final SealableBlockHeader sealableBlockHeader) {
+    final VoteTally voteTally =
+        protocolContext
+            .getConsensusState()
+            .getVoteTallyCache()
+            .getVoteTallyAfterBlock(parentHeader);
 
-    final BlockHeaderFunctions blockHeaderFunctions =
-        ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
+    final Optional<ValidatorVote> proposal =
+        protocolContext.getConsensusState().getVoteProposer().getVote(localAddress, voteTally);
+    final Address coinbase = proposal.map(ValidatorVote::getRecipient).orElse(Address.ZERO);
+    final VoteType voteDirection =
+        proposal.map(ValidatorVote::getVotePolarity).orElse(VoteType.DROP);
 
     final BlockHeaderBuilder builder =
         BlockHeaderBuilder.create()
             .populateFrom(sealableBlockHeader)
+            .coinbase(coinbase)
             .mixHash(IbftHelpers.EXPECTED_MIX_HASH)
-            .nonce(0)
-            .blockHeaderFunctions(blockHeaderFunctions);
+            .nonce(voteDirectionToLong(voteDirection))
+            .blockHeaderFunctions(LegacyIbftBlockHeaderFunctions.forCommittedSeal());
 
-    final IbftExtraData sealedExtraData = constructSignedExtraData(builder.buildBlockHeader());
+    final BlockHeader unsignedHeader = builder.buildBlockHeader();
+    final IbftExtraData extraDataWithProposerSignature = constructSignedExtraData(unsignedHeader);
 
-    // Replace the extraData in the BlockHeaderBuilder, and return header.
-    return builder.extraData(sealedExtraData.encode()).buildBlockHeader();
+    final BlockHeaderBuilder signedBuilder =
+        BlockHeaderBuilder.fromBuilder(builder)
+        .extraData(extraDataWithProposerSignature.encode());
+
+    return signedBuilder.buildBlockHeader();
   }
 
-  /**
-   * Produces an IbftExtraData object with a populated proposerSeal. The signature in the block is
-   * generated from the Hash of the header (minus proposer and committer seals) and the nodeKeys.
-   *
-   * @param headerToSign An almost fully populated header (proposer and committer seals are empty)
-   * @return Extra data containing the same vanity data and validators as extraData, however
-   *     proposerSeal will also be populated.
-   */
   private IbftExtraData constructSignedExtraData(final BlockHeader headerToSign) {
     final IbftExtraData extraData = IbftExtraData.decode(headerToSign);
     final Hash hashToSign =
@@ -110,5 +107,13 @@ public class IbftBlockCreator extends AbstractBlockCreator<IbftContext> {
         extraData.getSeals(),
         SECP256K1.sign(hashToSign, nodeKeys),
         extraData.getValidators());
+  }
+
+
+  private long voteDirectionToLong(final VoteType direction) {
+    if (direction == VoteType.ADD) {
+      return 0xFFFFFFFFFFFFFFFFL;
+    }
+    return 0;
   }
 }

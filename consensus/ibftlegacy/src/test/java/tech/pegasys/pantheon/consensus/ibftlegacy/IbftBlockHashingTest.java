@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibftlegacy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
@@ -124,7 +125,7 @@ public class IbftBlockHashingTest {
     builder.mixHash(
         Hash.fromHexString("0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365"));
     builder.nonce(0);
-    builder.blockHeaderFunctions(new LegacyIbftBlockHeaderFunctions());
+    builder.blockHeaderFunctions(LegacyIbftBlockHeaderFunctions.forOnChainBlock());
 
     return builder.buildBlockHeader();
   }

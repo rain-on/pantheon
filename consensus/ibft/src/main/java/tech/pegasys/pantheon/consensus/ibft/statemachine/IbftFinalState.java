@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
@@ -37,7 +38,7 @@ public class IbftFinalState {
   private final ProposerSelector proposerSelector;
   private final RoundTimer roundTimer;
   private final BlockTimer blockTimer;
-  private final IbftBlockCreatorFactory blockCreatorFactory;
+  private final BlockCreatorFactory blockCreatorFactory;
   private final MessageFactory messageFactory;
   private final IbftMessageTransmitter messageTransmitter;
   private final Clock clock;
@@ -50,7 +51,7 @@ public class IbftFinalState {
       final ValidatorMulticaster validatorMulticaster,
       final RoundTimer roundTimer,
       final BlockTimer blockTimer,
-      final IbftBlockCreatorFactory blockCreatorFactory,
+      final BlockCreatorFactory blockCreatorFactory,
       final MessageFactory messageFactory,
       final Clock clock) {
     this.voteTallyCache = voteTallyCache;
@@ -97,7 +98,7 @@ public class IbftFinalState {
     return blockTimer;
   }
 
-  public IbftBlockCreatorFactory getBlockCreatorFactory() {
+  public BlockCreatorFactory getBlockCreatorFactory() {
     return blockCreatorFactory;
   }
 

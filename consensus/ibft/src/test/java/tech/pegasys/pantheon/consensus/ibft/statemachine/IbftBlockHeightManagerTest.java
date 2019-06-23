@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.RoundExpiry;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
@@ -157,7 +158,8 @@ public class IbftBlockHeightManagerTest {
                   localNodeKeys,
                   messageFactory,
                   messageTransmitter,
-                  roundTimer);
+                  roundTimer,
+                  new IbftBlockOperations(localNodeKeys));
             });
 
     when(roundFactory.createNewRoundWithState(any(), any()))
@@ -173,7 +175,8 @@ public class IbftBlockHeightManagerTest {
                   localNodeKeys,
                   messageFactory,
                   messageTransmitter,
-                  roundTimer);
+                  roundTimer,
+                  new IbftBlockOperations(localNodeKeys));
             });
   }
 

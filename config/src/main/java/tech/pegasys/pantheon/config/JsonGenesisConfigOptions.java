@@ -29,6 +29,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   private static final String IBFT_LEGACY_CONFIG_KEY = "ibft";
   private static final String IBFT2_CONFIG_KEY = "ibft2";
   private static final String CLIQUE_CONFIG_KEY = "clique";
+  private static final String CROSSBFT_CONFIG_KEY = "crossbft";
   private final JsonObject configRoot;
 
   public static JsonGenesisConfigOptions fromJsonObject(final JsonObject configRoot) {
@@ -60,6 +61,9 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
+  public boolean isCrossBft() { return configRoot.containsKey(CROSSBFT_CONFIG_KEY); }
+
+  @Override
   public IbftConfigOptions getIbftLegacyConfigOptions() {
     return isIbftLegacy()
         ? new IbftConfigOptions(configRoot.getJsonObject(IBFT_LEGACY_CONFIG_KEY))
@@ -86,6 +90,15 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
         ? new EthashConfigOptions(configRoot.getJsonObject(ETHASH_CONFIG_KEY))
         : EthashConfigOptions.DEFAULT;
   }
+
+  @Override
+  public IbftConfigOptions getCrossBfrConfigOptions() {
+    return isIbftLegacy()
+        ? new IbftConfigOptions(configRoot.getJsonObject(CROSSBFT_CONFIG_KEY))
+        : IbftConfigOptions.DEFAULT;
+  }
+
+
 
   @Override
   public OptionalLong getHomesteadBlockNumber() {

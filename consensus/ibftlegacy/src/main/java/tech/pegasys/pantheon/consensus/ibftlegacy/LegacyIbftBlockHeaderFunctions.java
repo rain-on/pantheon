@@ -12,19 +12,40 @@
  */
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
+import java.util.function.Function;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
 public class LegacyIbftBlockHeaderFunctions implements BlockHeaderFunctions {
 
+  private static final LegacyIbftBlockHeaderFunctions COMMITTED_SEAL =
+      new LegacyIbftBlockHeaderFunctions(IbftBlockHashing::calculateDataHashForCommittedSeal);
+
+  private final Function<BlockHeader, Hash> hashFunction;
+
+  private LegacyIbftBlockHeaderFunctions(final Function<BlockHeader, Hash> hashFunction) {
+    this.hashFunction = hashFunction;
+  }
+
+  private static final LegacyIbftBlockHeaderFunctions ON_CHAIN =
+      new LegacyIbftBlockHeaderFunctions(IbftBlockHashing::calculateHashOfIbftBlockOnChain);
+
+  public static BlockHeaderFunctions forOnChainBlock() {
+    return ON_CHAIN;
+  }
+
   @Override
   public Hash hash(final BlockHeader header) {
-    return IbftBlockHashing.calculateHashOfIbftBlockOnChain(header);
+    return hashFunction.apply(header);
   }
 
   @Override
   public IbftExtraData parseExtraData(final BlockHeader header) {
     return IbftExtraData.decodeRaw(header.getExtraData());
+  }
+
+  public static BlockHeaderFunctions forCommittedSeal() {
+    return COMMITTED_SEAL;
   }
 }

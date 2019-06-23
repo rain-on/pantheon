@@ -14,10 +14,13 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockCreatorFactory;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -25,24 +28,27 @@ import tech.pegasys.pantheon.util.Subscribers;
 
 public class IbftRoundFactory {
   private final IbftFinalState finalState;
-  private final IbftBlockCreatorFactory blockCreatorFactory;
+  private final BlockCreatorFactory blockCreatorFactory;
   private final ProtocolContext<IbftContext> protocolContext;
   private final ProtocolSchedule<IbftContext> protocolSchedule;
   private final Subscribers<MinedBlockObserver> minedBlockObservers;
   private final MessageValidatorFactory messageValidatorFactory;
+  private final BlockOperations blockOperations;
 
   public IbftRoundFactory(
       final IbftFinalState finalState,
       final ProtocolContext<IbftContext> protocolContext,
       final ProtocolSchedule<IbftContext> protocolSchedule,
       final Subscribers<MinedBlockObserver> minedBlockObservers,
-      final MessageValidatorFactory messageValidatorFactory) {
+      final MessageValidatorFactory messageValidatorFactory,
+      BlockOperations blockOperations) {
     this.finalState = finalState;
     this.blockCreatorFactory = finalState.getBlockCreatorFactory();
     this.protocolContext = protocolContext;
     this.protocolSchedule = protocolSchedule;
     this.minedBlockObservers = minedBlockObservers;
     this.messageValidatorFactory = messageValidatorFactory;
+    this.blockOperations = blockOperations;
   }
 
   public IbftRound createNewRound(final BlockHeader parentHeader, final int round) {
@@ -62,7 +68,7 @@ public class IbftRoundFactory {
   public IbftRound createNewRoundWithState(
       final BlockHeader parentHeader, final RoundState roundState) {
     final ConsensusRoundIdentifier roundIdentifier = roundState.getRoundIdentifier();
-    final IbftBlockCreator blockCreator =
+    final AbstractBlockCreator<?> blockCreator =
         blockCreatorFactory.create(parentHeader, roundIdentifier.getRoundNumber());
 
     return new IbftRound(
@@ -74,6 +80,7 @@ public class IbftRoundFactory {
         finalState.getNodeKeys(),
         finalState.getMessageFactory(),
         finalState.getTransmitter(),
-        finalState.getRoundTimer());
+        finalState.getRoundTimer(),
+        blockOperations);
   }
 }

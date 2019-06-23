@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.network.IbftMessageTransmitter;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
@@ -126,7 +127,8 @@ public class IbftRoundTest {
         localNodeKeys,
         messageFactory,
         transmitter,
-        roundTimer);
+        roundTimer,
+        new IbftBlockOperations(localNodeKeys));
     verify(roundTimer, times(1)).startTimer(roundIdentifier);
   }
 
@@ -143,7 +145,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     round.handleProposalMessage(
         messageFactory.createProposal(roundIdentifier, proposedBlock, Optional.empty()));
@@ -164,7 +167,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     round.createAndSendProposalMessage(15);
     verify(transmitter, times(1))
@@ -186,7 +190,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
     round.createAndSendProposalMessage(15);
     verify(transmitter, times(1))
         .multicastProposal(roundIdentifier, proposedBlock, Optional.empty());
@@ -208,7 +213,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     final Hash commitSealHash =
         IbftBlockHashing.calculateDataHashForCommittedSeal(
@@ -251,7 +257,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     final Hash commitSealHash =
         IbftBlockHashing.calculateDataHashForCommittedSeal(
@@ -287,7 +294,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     final RoundChangeCertificate roundChangeCertificate = new RoundChangeCertificate(emptyList());
 
@@ -310,7 +318,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     final RoundChangeArtifacts roundChangeArtifacts =
         RoundChangeArtifacts.create(
@@ -356,7 +365,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     final RoundChangeArtifacts roundChangeArtifacts =
         RoundChangeArtifacts.create(
@@ -389,7 +399,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
     round.createAndSendProposalMessage(15);
     verify(minedBlockObserver).blockMined(any());
   }
@@ -409,7 +420,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     round.handleCommitMessage(
         messageFactory.createCommit(roundIdentifier, proposedBlock.getHash(), remoteCommitSeal));
@@ -434,7 +446,8 @@ public class IbftRoundTest {
             localNodeKeys,
             messageFactory,
             transmitter,
-            roundTimer);
+            roundTimer,
+            new IbftBlockOperations(localNodeKeys));
 
     round.handleCommitMessage(
         messageFactory.createCommit(roundIdentifier, proposedBlock.getHash(), remoteCommitSeal));

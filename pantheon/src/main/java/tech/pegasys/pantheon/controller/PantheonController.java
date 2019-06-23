@@ -145,6 +145,8 @@ public class PantheonController<C> implements java.io.Closeable {
         builder = new IbftLegacyPantheonControllerBuilder();
       } else if (configOptions.isClique()) {
         builder = new CliquePantheonControllerBuilder();
+      } else if (configOptions.isCrossBft()) {
+        builder = new CrossBftPantheonControllerBuilder();
       } else {
         throw new IllegalArgumentException("Unknown consensus mechanism defined");
       }

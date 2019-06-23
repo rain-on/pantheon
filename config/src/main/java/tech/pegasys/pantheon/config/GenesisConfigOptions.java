@@ -28,6 +28,8 @@ public interface GenesisConfigOptions {
 
   boolean isClique();
 
+  boolean isCrossBft();
+
   IbftConfigOptions getIbftLegacyConfigOptions();
 
   CliqueConfigOptions getCliqueConfigOptions();
@@ -35,6 +37,8 @@ public interface GenesisConfigOptions {
   IbftConfigOptions getIbft2ConfigOptions();
 
   EthashConfigOptions getEthashConfigOptions();
+
+  IbftConfigOptions getCrossBfrConfigOptions();
 
   OptionalLong getHomesteadBlockNumber();
 

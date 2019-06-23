@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
+import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
@@ -20,7 +23,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
-import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreator;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Commit;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
@@ -31,6 +34,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -39,34 +43,31 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.util.Subscribers;
 
-import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class IbftRound {
 
   private static final Logger LOG = LogManager.getLogger();
 
   private final Subscribers<MinedBlockObserver> observers;
   private final RoundState roundState;
-  private final IbftBlockCreator blockCreator;
+  private final AbstractBlockCreator<?> blockCreator;
   private final ProtocolContext<IbftContext> protocolContext;
   private final BlockImporter<IbftContext> blockImporter;
   private final KeyPair nodeKeys;
   private final MessageFactory messageFactory; // used only to create stored local msgs
   private final IbftMessageTransmitter transmitter;
+  private final BlockOperations blockOperations;
 
   public IbftRound(
       final RoundState roundState,
-      final IbftBlockCreator blockCreator,
+      final AbstractBlockCreator<?> blockCreator,
       final ProtocolContext<IbftContext> protocolContext,
       final BlockImporter<IbftContext> blockImporter,
       final Subscribers<MinedBlockObserver> observers,
       final KeyPair nodeKeys,
       final MessageFactory messageFactory,
       final IbftMessageTransmitter transmitter,
-      final RoundTimer roundTimer) {
+      final RoundTimer roundTimer,
+      final BlockOperations blockOperations) {
     this.roundState = roundState;
     this.blockCreator = blockCreator;
     this.protocolContext = protocolContext;
@@ -75,6 +76,7 @@ public class IbftRound {
     this.nodeKeys = nodeKeys;
     this.messageFactory = messageFactory;
     this.transmitter = transmitter;
+    this.blockOperations = blockOperations;
 
     roundTimer.startTimer(getRoundIdentifier());
   }
@@ -85,6 +87,8 @@ public class IbftRound {
 
   public void createAndSendProposalMessage(final long headerTimeStampSeconds) {
     final Block block = blockCreator.createBlock(headerTimeStampSeconds);
+
+    // TODO(tmm): This needs to be changed to either handle custom IBFTExtraDatas, OR not log.
     final IbftExtraData extraData = IbftExtraData.decode(block.getHeader());
     LOG.debug("Creating proposed block. round={}", roundState.getRoundIdentifier());
     LOG.trace(
@@ -157,12 +161,13 @@ public class IbftRound {
     final boolean wasPrepared = roundState.isPrepared();
     final boolean wasCommitted = roundState.isCommitted();
     final boolean blockAccepted = roundState.setProposedBlock(msg);
+    final Block block = roundState.getProposedBlock().get();
+    final Signature localCommitSeal = blockOperations.createCommitSealForBlock(block.getHeader());
     if (blockAccepted) {
       // There are times handling a proposed block is enough to enter prepared.
       if (wasPrepared != roundState.isPrepared()) {
         LOG.debug("Sending commit message. round={}", roundState.getRoundIdentifier());
-        final Block block = roundState.getProposedBlock().get();
-        transmitter.multicastCommit(getRoundIdentifier(), block.getHash(), createCommitSeal(block));
+        transmitter.multicastCommit(getRoundIdentifier(), block.getHash(), localCommitSeal);
       }
       if (wasCommitted != roundState.isCommitted()) {
         importBlockToChain();
@@ -171,8 +176,8 @@ public class IbftRound {
       final Commit localCommitMessage =
           messageFactory.createCommit(
               roundState.getRoundIdentifier(),
-              msg.getBlock().getHash(),
-              createCommitSeal(roundState.getProposedBlock().get()));
+              block.getHash(),
+              localCommitSeal);
       peerIsCommitted(localCommitMessage);
     }
 
@@ -185,7 +190,8 @@ public class IbftRound {
     if (wasPrepared != roundState.isPrepared()) {
       LOG.debug("Sending commit message. round={}", roundState.getRoundIdentifier());
       final Block block = roundState.getProposedBlock().get();
-      transmitter.multicastCommit(getRoundIdentifier(), block.getHash(), createCommitSeal(block));
+      transmitter.multicastCommit(getRoundIdentifier(), block.getHash(),
+          blockOperations.createCommitSealForBlock(block.getHeader()));
     }
   }
 
@@ -198,17 +204,18 @@ public class IbftRound {
   }
 
   private void importBlockToChain() {
-    final Block blockToImport =
-        IbftHelpers.createSealedBlock(
+    final Block blockToImport = blockOperations.createSealedBlock(
             roundState.getProposedBlock().get(), roundState.getCommitSeals());
 
     final long blockNumber = blockToImport.getHeader().getNumber();
-    final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader());
     LOG.info(
         "Importing block to chain. round={}, hash={}",
         getRoundIdentifier(),
         blockToImport.getHash());
+
+    final IbftExtraData extraData = IbftExtraData.decode(blockToImport.getHeader());
     LOG.trace("Importing block with extraData={}", extraData);
+
     final boolean result =
         blockImporter.importBlock(protocolContext, blockToImport, HeaderValidationMode.FULL);
     if (!result) {
@@ -220,14 +227,6 @@ public class IbftRound {
     } else {
       notifyNewBlockListeners(blockToImport);
     }
-  }
-
-  private Signature createCommitSeal(final Block block) {
-    final BlockHeader proposedHeader = block.getHeader();
-    final IbftExtraData extraData = IbftExtraData.decode(proposedHeader);
-    final Hash commitHash =
-        IbftBlockHashing.calculateDataHashForCommittedSeal(proposedHeader, extraData);
-    return SECP256K1.sign(commitHash, nodeKeys);
   }
 
   private void notifyNewBlockListeners(final Block block) {

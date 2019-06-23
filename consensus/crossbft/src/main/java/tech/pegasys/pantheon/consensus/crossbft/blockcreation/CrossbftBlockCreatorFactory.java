@@ -10,19 +10,19 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibft.blockcreation;
+package tech.pegasys.pantheon.consensus.crossbft.blockcreation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import tech.pegasys.pantheon.consensus.common.ConsensusHelpers;
-import tech.pegasys.pantheon.consensus.common.ValidatorVote;
 import tech.pegasys.pantheon.consensus.common.VoteTally;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.consensus.ibft.Vote;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockCreatorFactory;
+import tech.pegasys.pantheon.consensus.ibftlegacy.IbftExtraData;
+import tech.pegasys.pantheon.consensus.ibftlegacy.blockcreation.IbftBlockCreator;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockCreator;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -32,50 +32,48 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-public class IbftBlockCreatorFactory extends BlockCreatorFactory {
+public class CrossbftBlockCreatorFactory extends BlockCreatorFactory {
 
   private final Function<Long, Long> gasLimitCalculator;
   private final PendingTransactions pendingTransactions;
   protected final ProtocolContext<IbftContext> protocolContext;
   protected final ProtocolSchedule<IbftContext> protocolSchedule;
-  private final Address localAddress;
+  private final KeyPair nodeKeys;
 
-  public IbftBlockCreatorFactory(
+  public CrossbftBlockCreatorFactory(
       final Function<Long, Long> gasLimitCalculator,
       final PendingTransactions pendingTransactions,
       final ProtocolContext<IbftContext> protocolContext,
       final ProtocolSchedule<IbftContext> protocolSchedule,
       final MiningParameters miningParams,
-      final Address localAddress) {
+      final KeyPair nodeKeys) {
     super(miningParams.getExtraData(), miningParams.getMinTransactionGasPrice());
     this.gasLimitCalculator = gasLimitCalculator;
     this.pendingTransactions = pendingTransactions;
     this.protocolContext = protocolContext;
     this.protocolSchedule = protocolSchedule;
-    this.localAddress = localAddress;
+    this.nodeKeys = nodeKeys;
   }
 
   public AbstractBlockCreator<?> create(final BlockHeader parentHeader, final int round) {
     return new IbftBlockCreator(
-        localAddress,
-        ph -> createExtraData(round, ph),
+        Address.ZERO,
+        ph -> createExtraData(ph),
         pendingTransactions,
         protocolContext,
         protocolSchedule,
         gasLimitCalculator,
         getMinTransactionGasPrice(),
-        parentHeader);
+        parentHeader, nodeKeys);
   }
 
-  private BytesValue createExtraData(final int round, final BlockHeader parentHeader) {
+  // This creates an extraData object containing no proposerSeal.
+  private BytesValue createExtraData(final BlockHeader parentHeader) {
     final VoteTally voteTally =
         protocolContext
             .getConsensusState()
             .getVoteTallyCache()
             .getVoteTallyAfterBlock(parentHeader);
-
-    final Optional<ValidatorVote> proposal =
-        protocolContext.getConsensusState().getVoteProposer().getVote(localAddress, voteTally);
 
     final List<Address> validators = new ArrayList<>(voteTally.getValidators());
 
@@ -83,16 +81,9 @@ public class IbftBlockCreatorFactory extends BlockCreatorFactory {
         new IbftExtraData(
             ConsensusHelpers.zeroLeftPad(vanityData, IbftExtraData.EXTRA_VANITY_LENGTH),
             Collections.emptyList(),
-            toVote(proposal),
-            round,
+            null,
             validators);
 
     return extraData.encode();
-  }
-
-  private static Optional<Vote> toVote(final Optional<ValidatorVote> input) {
-    return input
-        .map(v -> Optional.of(new Vote(v.getRecipient(), v.getVotePolarity())))
-        .orElse(Optional.empty());
   }
 }

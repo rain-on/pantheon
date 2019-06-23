@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 public class IbftMiningCoordinator implements MiningCoordinator, BlockAddedObserver {
 
-  private final IbftBlockCreatorFactory blockCreatorFactory;
+  private final BlockCreatorFactory blockCreatorFactory;
   private static final Logger LOG = getLogger();
   protected final Blockchain blockchain;
   private final IbftEventQueue eventQueue;
@@ -36,7 +36,7 @@ public class IbftMiningCoordinator implements MiningCoordinator, BlockAddedObser
 
   public IbftMiningCoordinator(
       final IbftProcessor ibftProcessor,
-      final IbftBlockCreatorFactory blockCreatorFactory,
+      final BlockCreatorFactory blockCreatorFactory,
       final Blockchain blockchain,
       final IbftEventQueue eventQueue) {
     this.ibftProcessor = ibftProcessor;

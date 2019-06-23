@@ -39,7 +39,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class IbftMiningCoordinatorTest {
   @Mock private IbftProcessor ibftProcessor;
-  @Mock private IbftBlockCreatorFactory ibftBlockCreatorFactory;
+  @Mock private IbftBlockCreatorFactory blockCreatorFactory;
   @Mock private Blockchain blockChain;
   @Mock private Block block;
   @Mock private BlockBody blockBody;
@@ -50,7 +50,7 @@ public class IbftMiningCoordinatorTest {
   @Before
   public void setup() {
     ibftMiningCoordinator =
-        new IbftMiningCoordinator(ibftProcessor, ibftBlockCreatorFactory, blockChain, eventQueue);
+        new IbftMiningCoordinator(ibftProcessor, blockCreatorFactory, blockChain, eventQueue);
     when(block.getBody()).thenReturn(blockBody);
     when(block.getHeader()).thenReturn(blockHeader);
     when(blockBody.getTransactions()).thenReturn(Lists.emptyList());
@@ -71,13 +71,13 @@ public class IbftMiningCoordinatorTest {
   public void setsMinTransactionGasPrice() {
     final Wei minGasPrice = Wei.of(10);
     ibftMiningCoordinator.setMinTransactionGasPrice(minGasPrice);
-    verify(ibftBlockCreatorFactory).setMinTransactionGasPrice(minGasPrice);
+    verify(blockCreatorFactory).setMinTransactionGasPrice(minGasPrice);
   }
 
   @Test
   public void getsMinTransactionGasPrice() {
     final Wei minGasPrice = Wei.of(10);
-    when(ibftBlockCreatorFactory.getMinTransactionGasPrice()).thenReturn(minGasPrice);
+    when(blockCreatorFactory.getMinTransactionGasPrice()).thenReturn(minGasPrice);
     assertThat(ibftMiningCoordinator.getMinTransactionGasPrice()).isEqualTo(minGasPrice);
   }
 
@@ -85,7 +85,7 @@ public class IbftMiningCoordinatorTest {
   public void setsTheExtraData() {
     final BytesValue extraData = BytesValue.fromHexStringLenient("0x1234");
     ibftMiningCoordinator.setExtraData(extraData);
-    verify(ibftBlockCreatorFactory).setExtraData(extraData);
+    verify(blockCreatorFactory).setExtraData(extraData);
   }
 
   @Test
