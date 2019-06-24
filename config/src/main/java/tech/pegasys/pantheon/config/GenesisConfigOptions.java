@@ -38,7 +38,7 @@ public interface GenesisConfigOptions {
 
   EthashConfigOptions getEthashConfigOptions();
 
-  IbftConfigOptions getCrossBfrConfigOptions();
+  CrossBftConfigOptions getCrossBfrConfigOptions();
 
   OptionalLong getHomesteadBlockNumber();
 

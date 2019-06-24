@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -10,10 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.consensus.ibftlegacy;
+package tech.pegasys.pantheon.consensus.crossbft;
 
+import tech.pegasys.pantheon.consensus.crossbft.headervalidationrules.CrossBftCommitSealsValidationRule;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.consensus.ibftlegacy.headervalidationrules.IbftCommitSealsValidationRule;
+import tech.pegasys.pantheon.consensus.ibftlegacy.IbftBlockHeaderValidationRulesetFactory;
+import tech.pegasys.pantheon.consensus.ibftlegacy.IbftHelpers;
 import tech.pegasys.pantheon.consensus.ibftlegacy.headervalidationrules.IbftExtraDataValidationRule;
 import tech.pegasys.pantheon.consensus.ibftlegacy.headervalidationrules.VoteValidationRule;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -27,33 +29,14 @@ import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampBou
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampMoreRecentThanParent;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-public class IbftBlockHeaderValidationRulesetFactory {
+public class CrossBftHeaderValidationlRulestetFactory {
 
-  /**
-   * Produces a BlockHeaderValidator configured for assessing ibft block headers which are to form
-   * part of the BlockChain (i.e. not proposed blocks, which do not contain commit seals)
-   *
-   * @param secondsBetweenBlocks the minimum number of seconds which must elapse between blocks.
-   * @return BlockHeaderValidator configured for assessing ibft block headers
-   */
-  public static BlockHeaderValidator<IbftContext> ibftBlockHeaderValidator(
+  public static BlockHeaderValidator<IbftContext> preCrossBftValidationRules(
       final long secondsBetweenBlocks) {
-    return createValidator(secondsBetweenBlocks);
+    return IbftBlockHeaderValidationRulesetFactory.ibftBlockHeaderValidator(secondsBetweenBlocks);
   }
 
-  /**
-   * Produces a BlockHeaderValidator configured for assessing IBFT proposed blocks (i.e. blocks
-   * which need to be vetted by the validators, and do not contain commit seals).
-   *
-   * @param secondsBetweenBlocks the minimum number of seconds which must elapse between blocks.
-   * @return BlockHeaderValidator configured for assessing ibft block headers
-   */
-  public static BlockHeaderValidator<IbftContext> ibftProposedBlockValidator(
-      final long secondsBetweenBlocks) {
-    return createValidator(secondsBetweenBlocks);
-  }
-
-  private static BlockHeaderValidator<IbftContext> createValidator(
+  public static BlockHeaderValidator<IbftContext> postCrossBftValidationRules(
       final long secondsBetweenBlocks) {
     return new BlockHeaderValidator.Builder<IbftContext>()
         .addRule(new AncestryValidationRule())
@@ -72,7 +55,7 @@ public class IbftBlockHeaderValidationRulesetFactory {
                 "Difficulty", BlockHeader::getDifficulty, UInt256.ONE))
         .addRule(new VoteValidationRule())
         .addRule(new IbftExtraDataValidationRule())
-        .addRule(new IbftCommitSealsValidationRule())
+        .addRule(new CrossBftCommitSealsValidationRule())
         .build();
   }
 }

@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.consensus.ibft.BlockTimer;
 import tech.pegasys.pantheon.consensus.ibft.EthSynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.EventMultiplexer;
+import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftEventQueue;
@@ -130,7 +131,8 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, ibftConfig.getGossipedHistoryLimit());
 
-    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
+    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster,
+        IbftBlockHeaderFunctions.forCommittedSeal());
 
     final ScheduledExecutorService timerExecutor =
         newScheduledThreadPool("IbftTimerExecutor", 1, metricsSystem);
@@ -180,7 +182,8 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
             gossiper,
             duplicateMessageTracker,
             futureMessageBuffer,
-            new EthSynchronizerUpdater(ethProtocolManager.ethContext().getEthPeers()));
+            new EthSynchronizerUpdater(ethProtocolManager.ethContext().getEthPeers()),
+            IbftBlockHeaderFunctions.forCommittedSeal());
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, eventMultiplexer);

@@ -106,8 +106,7 @@ public class IbftExtraDataValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     BlockHeader header = createProposedBlockHeader(proposerKeyPair, validators);
 
@@ -132,8 +131,7 @@ public class IbftExtraDataValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     final BlockHeader header = createProposedBlockHeader(proposerKeyPair, validators);
 
@@ -159,8 +157,7 @@ public class IbftExtraDataValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     BlockHeader header = createProposedBlockHeader(proposerKeyPair, validators);
 
@@ -188,8 +185,7 @@ public class IbftExtraDataValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     BlockHeader header = createProposedBlockHeader(proposerKeyPair, validators);
 
@@ -215,8 +211,7 @@ public class IbftExtraDataValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     // Add another validator to the list reported in the IbftExtraData (note, as the
     final List<Address> extraDataValidators =
@@ -254,8 +249,7 @@ public class IbftExtraDataValidationRuleTest {
 
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     assertThat(extraDataValidationRule.validate(header, null, context)).isFalse();
   }
@@ -319,8 +313,7 @@ public class IbftExtraDataValidationRuleTest {
 
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
-    final IbftExtraDataValidationRule extraDataValidationRule =
-        new IbftExtraDataValidationRule(true);
+    final IbftExtraDataValidationRule extraDataValidationRule = new IbftExtraDataValidationRule();
 
     return extraDataValidationRule.validate(header, null, context);
   }

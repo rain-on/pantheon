@@ -20,6 +20,8 @@ import tech.pegasys.pantheon.consensus.ibft.messagedata.RoundChangeMessageData;
 import tech.pegasys.pantheon.consensus.ibft.network.ValidatorMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.payload.Authored;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
 
@@ -31,14 +33,18 @@ import com.google.common.collect.Lists;
 public class IbftGossip implements Gossiper {
 
   private final ValidatorMulticaster multicaster;
+  private final BlockHeaderFunctions blockHeaderFunctions;
 
   /**
    * Constructor that attaches gossip logic to a set of multicaster
    *
    * @param multicaster Network connections to the remote validators
    */
-  public IbftGossip(final ValidatorMulticaster multicaster) {
+  public IbftGossip(
+      final ValidatorMulticaster multicaster,
+      final BlockHeaderFunctions blockHeaderFunctions) {
     this.multicaster = multicaster;
+    this.blockHeaderFunctions = blockHeaderFunctions;
   }
 
   /**
@@ -52,7 +58,7 @@ public class IbftGossip implements Gossiper {
     final Authored decodedMessage;
     switch (messageData.getCode()) {
       case IbftV2.PROPOSAL:
-        decodedMessage = ProposalMessageData.fromMessageData(messageData).decode();
+        decodedMessage = ProposalMessageData.fromMessageData(messageData).decode(blockHeaderFunctions);
         break;
       case IbftV2.PREPARE:
         decodedMessage = PrepareMessageData.fromMessageData(messageData).decode();

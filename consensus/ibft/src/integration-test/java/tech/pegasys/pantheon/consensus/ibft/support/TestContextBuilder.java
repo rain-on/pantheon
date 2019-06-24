@@ -173,7 +173,8 @@ public class TestContextBuilder {
     final UniqueMessageMulticaster uniqueMulticaster =
         new UniqueMessageMulticaster(multicaster, GOSSIPED_HISTORY_LIMIT);
 
-    final Gossiper gossiper = useGossip ? new IbftGossip(uniqueMulticaster) : mock(Gossiper.class);
+    final Gossiper gossiper =
+        useGossip ? new IbftGossip(uniqueMulticaster, protocolSchedule) : mock(Gossiper.class);
 
     final StubbedSynchronizerUpdater synchronizerUpdater = new StubbedSynchronizerUpdater();
 
@@ -347,7 +348,8 @@ public class TestContextBuilder {
             gossiper,
             duplicateMessageTracker,
             futureMessageBuffer,
-            synchronizerUpdater);
+            synchronizerUpdater,
+            protocolSchedule);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT PantheonController ////////////////////////////

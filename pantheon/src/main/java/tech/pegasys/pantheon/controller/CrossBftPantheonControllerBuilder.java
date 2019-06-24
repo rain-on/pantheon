@@ -48,6 +48,7 @@ import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftRoundFactory;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftLegacyBlockInterface;
+import tech.pegasys.pantheon.consensus.ibftlegacy.LegacyIbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64Protocol;
 import tech.pegasys.pantheon.consensus.ibftlegacy.protocol.Istanbul64ProtocolManager;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -58,7 +59,6 @@ import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
@@ -86,7 +86,7 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
 
   @Override
   protected void prepForBuild() {
-    configOptions = genesisConfig.getConfigOptions().getIbft2ConfigOptions();
+    configOptions = genesisConfig.getConfigOptions().getCrossBfrConfigOptions();
     ibftEventQueue = new IbftEventQueue(configOptions.getMessageQueueLimit());
   }
 
@@ -103,15 +103,6 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
         .withSubProtocol(Istanbul64Protocol.get(), ethProtocolManager)
         .withSubProtocol(IbftSubProtocol.get(), new IbftProtocolManager(ibftEventQueue, peers));
   }
-
-/*
-  @Override
-  protected SubProtocolConfiguration createSubProtocolConfiguration(
-      final EthProtocolManager ethProtocolManager) {
-    return new SubProtocolConfiguration()
-        .withSubProtocol(EthProtocol.get(), ethProtocolManager)
-        .withSubProtocol(IbftSubProtocol.get(), new IbftProtocolManager(ibftEventQueue, peers));
-  }*/
 
   @Override
   protected MiningCoordinator createMiningCoordinator(
@@ -143,7 +134,8 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, configOptions.getGossipedHistoryLimit());
 
-    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
+    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster,
+        LegacyIbftBlockHeaderFunctions.forCommittedSeal());
 
     final ScheduledExecutorService timerExecutor =
         newScheduledThreadPool("IbftTimerExecutor", 1, metricsSystem);
@@ -193,7 +185,8 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
             gossiper,
             duplicateMessageTracker,
             futureMessageBuffer,
-            new EthSynchronizerUpdater(ethProtocolManager.ethContext().getEthPeers()));
+            new EthSynchronizerUpdater(ethProtocolManager.ethContext().getEthPeers()),
+            LegacyIbftBlockHeaderFunctions.forCommittedSeal());
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     final IbftProcessor ibftProcessor = new IbftProcessor(ibftEventQueue, eventMultiplexer);

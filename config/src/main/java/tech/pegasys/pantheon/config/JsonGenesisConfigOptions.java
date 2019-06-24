@@ -94,10 +94,10 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public IbftConfigOptions getCrossBfrConfigOptions() {
+  public CrossBftConfigOptions getCrossBfrConfigOptions() {
     return isIbftLegacy()
-        ? new IbftConfigOptions(configRoot.getJsonObject(CROSSBFT_CONFIG_KEY))
-        : IbftConfigOptions.DEFAULT;
+        ? new CrossBftConfigOptions(configRoot.getJsonObject(CROSSBFT_CONFIG_KEY))
+        : CrossBftConfigOptions.DEFAULT;
   }
 
   @Override

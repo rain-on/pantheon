@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
+import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
@@ -29,6 +30,8 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.IbftMessage;
 import tech.pegasys.pantheon.consensus.ibft.payload.Authored;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
+import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
 
@@ -47,6 +50,7 @@ public class IbftController {
   private final Gossiper gossiper;
   private final MessageTracker duplicateMessageTracker;
   private final SynchronizerUpdater sychronizerUpdater;
+  private final BlockHeaderFunctions blockHeaderFunctions;
 
   public IbftController(
       final Blockchain blockchain,
@@ -55,13 +59,15 @@ public class IbftController {
       final Gossiper gossiper,
       final MessageTracker duplicateMessageTracker,
       final FutureMessageBuffer futureMessageBuffer,
-      final SynchronizerUpdater sychronizerUpdater) {
+      final SynchronizerUpdater sychronizerUpdater,
+      final BlockHeaderFunctions blockHeaderFunctions) {
     this.ibftFinalState = ibftFinalState;
     this.ibftBlockHeightManagerFactory = ibftBlockHeightManagerFactory;
     this.futureMessageBuffer = futureMessageBuffer;
     this.gossiper = gossiper;
     this.duplicateMessageTracker = duplicateMessageTracker;
     this.sychronizerUpdater = sychronizerUpdater;
+    this.blockHeaderFunctions = blockHeaderFunctions;
 
     startNewHeightManager(blockchain.getChainHeadHeader());
   }
@@ -82,7 +88,7 @@ public class IbftController {
       case IbftV2.PROPOSAL:
         consumeMessage(
             message,
-            ProposalMessageData.fromMessageData(messageData).decode(),
+            ProposalMessageData.fromMessageData(messageData).decode(blockHeaderFunctions),
             currentHeightManager::handleProposalPayload);
         break;
 

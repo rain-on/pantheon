@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.consensus.common.ValidatorProvider;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftBlockHashing;
 import tech.pegasys.pantheon.consensus.ibftlegacy.IbftExtraData;
-import tech.pegasys.pantheon.consensus.ibftlegacy.IbftHelpers;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -24,7 +23,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.AttachedBlockHeaderValidationRule;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -40,12 +38,6 @@ import org.apache.logging.log4j.Logger;
 public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidationRule<IbftContext> {
 
   private static final Logger LOG = LogManager.getLogger();
-
-  private final boolean validateCommitSeals;
-
-  public IbftExtraDataValidationRule(final boolean validateCommitSeals) {
-    this.validateCommitSeals = validateCommitSeals;
-  }
 
   @Override
   public boolean validate(
@@ -64,14 +56,6 @@ public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidatio
       if (!storedValidators.contains(proposer)) {
         LOG.trace("Proposer sealing block is not a member of the validators.");
         return false;
-      }
-
-      if (validateCommitSeals) {
-        final List<Address> committers =
-            IbftBlockHashing.recoverCommitterAddresses(header, ibftExtraData);
-        if (!validateCommitters(committers, storedValidators)) {
-          return false;
-        }
       }
 
       final SortedSet<Address> sortedReportedValidators =
@@ -101,27 +85,6 @@ public class IbftExtraDataValidationRule implements AttachedBlockHeaderValidatio
       return false;
     } catch (final RuntimeException ex) {
       LOG.trace("Failed to find validators at parent");
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean validateCommitters(
-      final Collection<Address> committers, final Collection<Address> storedValidators) {
-
-    final int minimumSealsRequired =
-        IbftHelpers.calculateRequiredValidatorQuorum(storedValidators.size());
-    if (committers.size() < minimumSealsRequired) {
-      LOG.trace(
-          "Insufficient committers to seal block. (Required {}, received {})",
-          minimumSealsRequired,
-          committers.size());
-      return false;
-    }
-
-    if (!storedValidators.containsAll(committers)) {
-      LOG.trace("Not all committers are in the locally maintained validator list.");
       return false;
     }
 
