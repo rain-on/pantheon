@@ -25,7 +25,7 @@ import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.RoundChange;
 import tech.pegasys.pantheon.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.consensus.ibft.validation.ProposalBlockConsistencyValidator;
+import tech.pegasys.pantheon.consensus.ibft.validation.IbftProposalBlockConsistencyValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangeMessageValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.RoundChangePayloadValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.SignedDataValidator;
@@ -59,8 +59,8 @@ public class RoundChangeManagerTest {
   private final ConsensusRoundIdentifier ri2 = new ConsensusRoundIdentifier(2, 2);
   private final ConsensusRoundIdentifier ri3 = new ConsensusRoundIdentifier(2, 3);
   private final List<Address> validators = Lists.newArrayList();
-  private final ProposalBlockConsistencyValidator proposalConsistencyValidator =
-      mock(ProposalBlockConsistencyValidator.class);
+  private final IbftProposalBlockConsistencyValidator proposalConsistencyValidator =
+      mock(IbftProposalBlockConsistencyValidator.class);
 
   @Before
   public void setup() {

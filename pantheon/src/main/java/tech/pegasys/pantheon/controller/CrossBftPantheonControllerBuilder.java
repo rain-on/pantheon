@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockCreatorFactory;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.consensus.ibft.jsonrpc.IbftJsonRpcMethodsFactory;
@@ -134,11 +135,13 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, configOptions.getGossipedHistoryLimit());
 
-    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster,
-        LegacyIbftBlockHeaderFunctions.forCommittedSeal());
+    final IbftGossip gossiper =
+        new IbftGossip(uniqueMessageMulticaster, LegacyIbftBlockHeaderFunctions.forCommittedSeal());
 
     final ScheduledExecutorService timerExecutor =
         newScheduledThreadPool("IbftTimerExecutor", 1, metricsSystem);
+
+    final BlockOperations blockOperations = new CrossBftBlockOperations(nodeKeys);
 
     final IbftFinalState finalState =
         new IbftFinalState(
@@ -155,7 +158,11 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
             clock);
 
     final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
+        new MessageValidatorFactory(
+            proposerSelector,
+            protocolSchedule,
+            protocolContext,
+            (signedPayload, proposedBlock) -> true, blockOperations);
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = Subscribers.create();
     minedBlockObservers.subscribe(ethProtocolManager);
@@ -180,7 +187,7 @@ public class CrossBftPantheonControllerBuilder extends PantheonControllerBuilder
                     protocolSchedule,
                     minedBlockObservers,
                     messageValidatorFactory,
-                    new CrossBftBlockOperations(nodeKeys)),
+                    blockOperations),
                 messageValidatorFactory),
             gossiper,
             duplicateMessageTracker,

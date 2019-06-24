@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.payload.PreparedCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangeCertificate;
 import tech.pegasys.pantheon.consensus.ibft.payload.RoundChangePayload;
@@ -41,15 +42,18 @@ public class RoundChangeCertificateValidator {
   private final MessageValidatorForHeightFactory messageValidatorFactory;
   private final long quorum;
   private final long chainHeight;
+  private final BlockOperations blockOperations;
 
   public RoundChangeCertificateValidator(
       final Collection<Address> validators,
       final MessageValidatorForHeightFactory messageValidatorFactory,
-      final long chainHeight) {
+      final long chainHeight,
+      BlockOperations blockOperations) {
     this.validators = validators;
     this.messageValidatorFactory = messageValidatorFactory;
     this.quorum = IbftHelpers.calculateRequiredValidatorQuorum(validators.size());
     this.chainHeight = chainHeight;
+    this.blockOperations = blockOperations;
   }
 
   public boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
@@ -118,7 +122,7 @@ public class RoundChangeCertificateValidator {
     // Need to check that if we substitute the LatestPrepareCert round number into the supplied
     // block that we get the SAME hash as PreparedCert.
     final Block currentBlockWithOldRound =
-        IbftBlockInterface.replaceRoundInBlock(
+        blockOperations.replaceRoundInBlock(
             proposedBlock,
             latestPreparedCertificate
                 .get()

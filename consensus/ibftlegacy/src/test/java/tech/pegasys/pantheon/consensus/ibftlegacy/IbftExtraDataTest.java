@@ -12,12 +12,18 @@
  */
 package tech.pegasys.pantheon.consensus.ibftlegacy;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.crypto.SECP256K1.PrivateKey;
 import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
@@ -132,6 +138,17 @@ public class IbftExtraDataTest {
         BytesValue.wrap(BytesValue.wrap(new byte[31]), encoder.encoded());
 
     IbftExtraData.decodeRaw(bufferToInject);
+  }
+
+  @Test
+  public void myGenesisfile() {
+    final KeyPair pair = KeyPair.create(PrivateKey.create(Bytes32.fromHexString("dcdffc4f38e388660c7b663d57f73eadc4327a3f453d339df9762929c822bbce")));
+    final Address addr = Util.publicKeyToAddress(pair.getPublicKey());
+
+    IbftExtraData ed = new IbftExtraData(BytesValue.wrap(new byte[32]), emptyList(), null,
+        singletonList(addr));
+
+    final String output = ed.encode().toString();
   }
 
   @Test

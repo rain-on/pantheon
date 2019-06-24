@@ -17,6 +17,7 @@ import static tech.pegasys.pantheon.consensus.ibft.IbftHelpers.prepareMessageCou
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.IbftHelpers;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.ProposerSelector;
 import tech.pegasys.pantheon.ethereum.BlockValidator;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -31,14 +32,20 @@ public class MessageValidatorFactory {
   private final ProposerSelector proposerSelector;
   private final ProtocolContext<IbftContext> protocolContext;
   private final ProtocolSchedule<IbftContext> protocolSchedule;
+  private final ProposalBlockConsistencyValidator proposalBlockConsistencyValidator;
+  private final BlockOperations blockOperations;
 
   public MessageValidatorFactory(
       final ProposerSelector proposerSelector,
       final ProtocolSchedule<IbftContext> protocolSchedule,
-      final ProtocolContext<IbftContext> protocolContext) {
+      final ProtocolContext<IbftContext> protocolContext,
+      final ProposalBlockConsistencyValidator proposalBlockConsistencyValidator,
+      BlockOperations blockOperations) {
     this.proposerSelector = proposerSelector;
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
+    this.proposalBlockConsistencyValidator = proposalBlockConsistencyValidator;
+    this.blockOperations = blockOperations;
   }
 
   private Collection<Address> getValidatorsAfterBlock(final BlockHeader parentHeader) {
@@ -66,13 +73,13 @@ public class MessageValidatorFactory {
 
     return new MessageValidator(
         createSignedDataValidator(roundIdentifier, parentHeader),
-        new ProposalBlockConsistencyValidator(),
+        proposalBlockConsistencyValidator,
         blockValidator,
         protocolContext,
         new RoundChangeCertificateValidator(
             validators,
             (ri) -> createSignedDataValidator(ri, parentHeader),
-            roundIdentifier.getSequenceNumber()));
+            roundIdentifier.getSequenceNumber(), blockOperations));
   }
 
   public RoundChangeMessageValidator createRoundChangeMessageValidator(
@@ -86,7 +93,7 @@ public class MessageValidatorFactory {
             prepareMessageCountForQuorum(
                 IbftHelpers.calculateRequiredValidatorQuorum(validators.size())),
             chainHeight),
-        new ProposalBlockConsistencyValidator());
+        proposalBlockConsistencyValidator);
   }
 
   public FutureRoundProposalMessageValidator createFutureRoundProposalMessageValidator(

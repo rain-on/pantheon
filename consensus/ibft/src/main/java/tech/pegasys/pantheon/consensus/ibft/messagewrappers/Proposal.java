@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
@@ -68,8 +67,8 @@ public class Proposal extends IbftMessage<ProposalPayload> {
     return rlpOut.encoded();
   }
 
-  public static Proposal decode(final BytesValue data,
-      final BlockHeaderFunctions blockHeaderFunctions) {
+  public static Proposal decode(
+      final BytesValue data, final BlockHeaderFunctions blockHeaderFunctions) {
     RLPInput rlpIn = RLP.input(data);
     rlpIn.enterList();
     final SignedData<ProposalPayload> payload = SignedData.readSignedProposalPayloadFrom(rlpIn);

@@ -118,7 +118,7 @@ public class IbftControllerTest {
             messageTracker,
             futureMessageBuffer,
             mock(EthSynchronizerUpdater.class),
-            protocolSchedule);
+            null); //TODO(tmm): This needs to be mocked
   }
 
   @Test
@@ -412,7 +412,7 @@ public class IbftControllerTest {
     when(proposal.getAuthor()).thenReturn(validator);
     when(proposal.getRoundIdentifier()).thenReturn(roundIdentifier);
     when(proposalMessageData.getCode()).thenReturn(IbftV2.PROPOSAL);
-    when(proposalMessageData.decode()).thenReturn(proposal);
+    when(proposalMessageData.decode(any())).thenReturn(proposal);
     proposalMessage = new DefaultMessage(null, proposalMessageData);
   }
 

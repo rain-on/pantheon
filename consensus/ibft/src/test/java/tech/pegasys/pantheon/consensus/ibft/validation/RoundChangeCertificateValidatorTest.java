@@ -66,7 +66,8 @@ public class RoundChangeCertificateValidatorTest {
 
     proposedBlock = TestHelpers.createProposalBlock(validators, roundIdentifier);
 
-    validator = new RoundChangeCertificateValidator(validators, validatorFactory, 5);
+    validator = new RoundChangeCertificateValidator(validators, validatorFactory, 5,
+        null); //TODO(tmm): This needs to be mocked
   }
 
   @Test

@@ -58,9 +58,10 @@ public class CrossBftProtocolSchedule {
         applyPostCrossOverBftChanges(
                 blockPeriod,
                 MainnetProtocolSpecs.constantinopleFixDefinition(
-                    genesisConfig.getChainId(),
-                    genesisConfig.getContractSizeLimit(),
-                    genesisConfig.getEvmStackSize()).privacyParameters(privacyParameters))
+                        genesisConfig.getChainId(),
+                        genesisConfig.getContractSizeLimit(),
+                        genesisConfig.getEvmStackSize())
+                    .privacyParameters(privacyParameters))
             .build(mutableProtSchedule));
 
     return mutableProtSchedule;

@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
 
 import java.util.Collection;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 
 public class CrossBftBlockOperations implements BlockOperations {
 
@@ -57,5 +58,10 @@ public class CrossBftBlockOperations implements BlockOperations {
             .buildBlockHeader();
 
     return new Block(sealedHeader, block.getBody());
+  }
+
+  public Block replaceRoundInBlock(
+      final Block block, final int round, final BlockHeaderFunctions blockHeaderFunctions) {
+    return block;
   }
 }

@@ -12,48 +12,13 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.validation;
 
-import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
 import tech.pegasys.pantheon.consensus.ibft.payload.ProposalPayload;
 import tech.pegasys.pantheon.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Block;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+@FunctionalInterface
+public interface ProposalBlockConsistencyValidator {
 
-public class ProposalBlockConsistencyValidator {
-
-  private static final Logger LOG = LogManager.getLogger();
-
-  public boolean validateProposalMatchesBlock(
-      final SignedData<ProposalPayload> signedPayload, final Block proposedBlock) {
-
-    if (!signedPayload.getPayload().getDigest().equals(proposedBlock.getHash())) {
-      LOG.info("Invalid Proposal, embedded digest does not match block's hash.");
-      return false;
-    }
-
-    if (proposedBlock.getHeader().getNumber()
-        != signedPayload.getPayload().getRoundIdentifier().getSequenceNumber()) {
-      LOG.info("Invalid proposal/block - message sequence does not align with block number.");
-      return false;
-    }
-
-    if (!validateBlockMatchesProposalRound(signedPayload.getPayload(), proposedBlock)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private boolean validateBlockMatchesProposalRound(
-      final ProposalPayload payload, final Block block) {
-    final ConsensusRoundIdentifier msgRound = payload.getRoundIdentifier();
-    final IbftExtraData extraData = IbftExtraData.decode(block.getHeader());
-    if (extraData.getRound() != msgRound.getRoundNumber()) {
-      LOG.info("Invalid Proposal message, round number in block does not match that in message.");
-      return false;
-    }
-    return true;
-  }
+  boolean validateProposalMatchesBlock(
+      final SignedData<ProposalPayload> signedPayload, final Block proposedBlock);
 }

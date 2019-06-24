@@ -17,10 +17,14 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 
 import java.util.Collection;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 
 public interface BlockOperations {
 
   Signature createCommitSealForBlock(final BlockHeader header);
 
   Block createSealedBlock(final Block block, final Collection<Signature> commitSeals);
+
+  Block replaceRoundInBlock(
+      final Block block, final int round, final BlockHeaderFunctions blockHeaderFunctions);
 }

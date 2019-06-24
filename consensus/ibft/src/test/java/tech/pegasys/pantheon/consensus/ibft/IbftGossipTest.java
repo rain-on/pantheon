@@ -45,7 +45,7 @@ public class IbftGossipTest {
 
   @Before
   public void setup() {
-    ibftGossip = new IbftGossip(validatorMulticaster, protocolSchedule);
+    ibftGossip = new IbftGossip(validatorMulticaster, null); //TODO(tmm): This needs to be mocked
     peerConnection = MockPeerFactory.create(senderAddress);
   }
 

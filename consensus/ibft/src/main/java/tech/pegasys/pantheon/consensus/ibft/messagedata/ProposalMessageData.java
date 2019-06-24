@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.messagedata;
 
 import tech.pegasys.pantheon.consensus.ibft.messagewrappers.Proposal;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 

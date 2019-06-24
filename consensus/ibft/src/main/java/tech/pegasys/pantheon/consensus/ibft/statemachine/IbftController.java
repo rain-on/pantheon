@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.Gossiper;
-import tech.pegasys.pantheon.consensus.ibft.IbftContext;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.SynchronizerUpdater;
 import tech.pegasys.pantheon.consensus.ibft.ibftevent.BlockTimerExpiry;
@@ -31,7 +30,6 @@ import tech.pegasys.pantheon.consensus.ibft.payload.Authored;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
 

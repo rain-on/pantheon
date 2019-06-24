@@ -33,6 +33,7 @@ import tech.pegasys.pantheon.consensus.ibft.IbftProtocolSchedule;
 import tech.pegasys.pantheon.consensus.ibft.MessageTracker;
 import tech.pegasys.pantheon.consensus.ibft.RoundTimer;
 import tech.pegasys.pantheon.consensus.ibft.UniqueMessageMulticaster;
+import tech.pegasys.pantheon.consensus.ibft.blockcreation.BlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftBlockOperations;
 import tech.pegasys.pantheon.consensus.ibft.blockcreation.IbftMiningCoordinator;
@@ -47,6 +48,7 @@ import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftBlockHeightManagerF
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftController;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftFinalState;
 import tech.pegasys.pantheon.consensus.ibft.statemachine.IbftRoundFactory;
+import tech.pegasys.pantheon.consensus.ibft.validation.IbftProposalBlockConsistencyValidator;
 import tech.pegasys.pantheon.consensus.ibft.validation.MessageValidatorFactory;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -131,11 +133,13 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, ibftConfig.getGossipedHistoryLimit());
 
-    final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster,
-        IbftBlockHeaderFunctions.forCommittedSeal());
+    final IbftGossip gossiper =
+        new IbftGossip(uniqueMessageMulticaster, IbftBlockHeaderFunctions.forCommittedSeal());
 
     final ScheduledExecutorService timerExecutor =
         newScheduledThreadPool("IbftTimerExecutor", 1, metricsSystem);
+
+    final BlockOperations blockOperations = new IbftBlockOperations(nodeKeys);
 
     final IbftFinalState finalState =
         new IbftFinalState(
@@ -152,7 +156,11 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
             clock);
 
     final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
+        new MessageValidatorFactory(
+            proposerSelector,
+            protocolSchedule,
+            protocolContext,
+            new IbftProposalBlockConsistencyValidator(), blockOperations);
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = Subscribers.create();
     minedBlockObservers.subscribe(ethProtocolManager);
@@ -177,7 +185,7 @@ public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<Ibf
                     protocolSchedule,
                     minedBlockObservers,
                     messageValidatorFactory,
-                    new IbftBlockOperations(nodeKeys)),
+                    blockOperations),
                 messageValidatorFactory),
             gossiper,
             duplicateMessageTracker,

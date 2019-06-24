@@ -12,9 +12,6 @@
  */
 package tech.pegasys.pantheon.consensus.ibft.statemachine;
 
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.consensus.ibft.ConsensusRoundIdentifier;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockHeaderFunctions;
 import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
@@ -35,6 +32,11 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.util.Subscribers;
+
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class IbftRound {
 
@@ -102,7 +104,7 @@ public class IbftRound {
       LOG.debug(
           "Sending proposal from PreparedCertificate. round={}", roundState.getRoundIdentifier());
       blockToPublish =
-          IbftBlockInterface.replaceRoundInBlock(
+          blockOperations.replaceRoundInBlock(
               bestBlockFromRoundChange.get(),
               getRoundIdentifier().getRoundNumber(),
               IbftBlockHeaderFunctions.forCommittedSeal());

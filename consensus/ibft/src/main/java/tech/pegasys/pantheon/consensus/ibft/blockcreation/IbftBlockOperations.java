@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
+import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.Collection;
@@ -60,5 +61,26 @@ public class IbftBlockOperations implements BlockOperations {
             .buildBlockHeader();
 
     return new Block(sealedHeader, block.getBody());
+  }
+
+  public Block replaceRoundInBlock(
+      final Block block, final int round, final BlockHeaderFunctions blockHeaderFunctions) {
+    final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader());
+    final IbftExtraData substituteExtraData =
+        new IbftExtraData(
+            prevExtraData.getVanityData(),
+            prevExtraData.getSeals(),
+            prevExtraData.getVote(),
+            round,
+            prevExtraData.getValidators());
+
+    final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
+    headerBuilder
+        .extraData(substituteExtraData.encode())
+        .blockHeaderFunctions(blockHeaderFunctions);
+
+    final BlockHeader newHeader = headerBuilder.buildBlockHeader();
+
+    return new Block(newHeader, block.getBody());
   }
 }

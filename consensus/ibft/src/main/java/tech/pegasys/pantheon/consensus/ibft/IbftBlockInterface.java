@@ -53,24 +53,8 @@ public class IbftBlockInterface implements BlockInterface {
     return ibftExtraData.getValidators();
   }
 
-  public static Block replaceRoundInBlock(
+  public Block replaceRoundInBlock(
       final Block block, final int round, final BlockHeaderFunctions blockHeaderFunctions) {
-    final IbftExtraData prevExtraData = IbftExtraData.decode(block.getHeader());
-    final IbftExtraData substituteExtraData =
-        new IbftExtraData(
-            prevExtraData.getVanityData(),
-            prevExtraData.getSeals(),
-            prevExtraData.getVote(),
-            round,
-            prevExtraData.getValidators());
-
-    final BlockHeaderBuilder headerBuilder = BlockHeaderBuilder.fromHeader(block.getHeader());
-    headerBuilder
-        .extraData(substituteExtraData.encode())
-        .blockHeaderFunctions(blockHeaderFunctions);
-
-    final BlockHeader newHeader = headerBuilder.buildBlockHeader();
-
-    return new Block(newHeader, block.getBody());
+    return block;
   }
 }

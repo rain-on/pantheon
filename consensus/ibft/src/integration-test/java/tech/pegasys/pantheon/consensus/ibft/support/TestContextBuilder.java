@@ -320,7 +320,9 @@ public class TestContextBuilder {
             clock);
 
     final MessageValidatorFactory messageValidatorFactory =
-        new MessageValidatorFactory(proposerSelector, protocolSchedule, protocolContext);
+        new MessageValidatorFactory(
+            proposerSelector, protocolSchedule, protocolContext, proposalBlockConsistencyValidator,
+            blockOperations);
 
     final Subscribers<MinedBlockObserver> minedBlockObservers = Subscribers.create();
 

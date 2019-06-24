@@ -58,8 +58,8 @@ public class MessageValidatorTest {
   private ConsensusRoundIdentifier roundIdentifier = new ConsensusRoundIdentifier(1, 0);
 
   private SignedDataValidator signedDataValidator = mock(SignedDataValidator.class);
-  private ProposalBlockConsistencyValidator proposalBlockConsistencyValidator =
-      mock(ProposalBlockConsistencyValidator.class);
+  private IbftProposalBlockConsistencyValidator proposalBlockConsistencyValidator =
+      mock(IbftProposalBlockConsistencyValidator.class);
 
   @Mock private BlockValidator<IbftContext> blockValidator;
   private ProtocolContext<IbftContext> protocolContext;
