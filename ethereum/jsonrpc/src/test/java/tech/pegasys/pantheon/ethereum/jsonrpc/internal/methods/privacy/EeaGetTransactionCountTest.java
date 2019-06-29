@@ -17,20 +17,14 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.MutableAccount;
-import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import org.junit.Test;
 
 public class EeaGetTransactionCountTest {
 
@@ -51,7 +45,7 @@ public class EeaGetTransactionCountTest {
     final EeaGetTransactionCount eeaGetTransactionCount =
         new EeaGetTransactionCount(parameters, privateTransactionHandler);
 
-    final Object[] params = new Object[]{senderAddress, privacyGroupId.toString()};
+    final Object[] params = new Object[] {senderAddress, privacyGroupId.toString()};
     final JsonRpcRequest request = new JsonRpcRequest("1", "eea_getTransactionCount", params);
 
     final JsonRpcSuccessResponse response =

@@ -172,8 +172,7 @@ public class PrivateTransactionHandler {
                     .getMutable(lastRootHash)
                     .map(
                         worldState -> {
-                          final Account maybePrivateSender =
-                              worldState.get(sender);
+                          final Account maybePrivateSender = worldState.get(sender);
 
                           if (maybePrivateSender != null) {
                             return maybePrivateSender.getNonce();

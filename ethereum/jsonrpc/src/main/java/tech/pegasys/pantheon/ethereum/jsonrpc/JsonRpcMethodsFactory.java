@@ -324,10 +324,7 @@ public class JsonRpcMethodsFactory {
           enabledMethods,
           new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
           new EeaSendRawTransaction(
-              blockchainQueries,
-              privateTransactionHandler,
-              transactionPool,
-              parameter),
+              blockchainQueries, privateTransactionHandler, transactionPool, parameter),
           new EeaGetTransactionCount(parameter, privateTransactionHandler),
           new EeaGetPrivateTransaction(enclave, parameter, privacyParameters),
           new EeaCreatePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
