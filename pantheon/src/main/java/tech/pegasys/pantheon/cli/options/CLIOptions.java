@@ -10,12 +10,24 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.cli;
+package tech.pegasys.pantheon.cli.options;
 
-public enum NetworkName {
-  MAINNET,
-  RINKEBY,
-  ROPSTEN,
-  GOERLI,
-  DEV
+import java.util.List;
+
+/**
+ * This interface represents logic that translates between CLI options and a domain object.
+ *
+ * @param <T> A class to be constructed from CLI arguments.
+ */
+public interface CLIOptions<T> {
+
+  /**
+   * Transform CLI options into a domain object.
+   *
+   * @return A domain object representing these CLI options.
+   */
+  T toDomainObject();
+
+  /** @return The list of CLI options corresponding to this class. */
+  List<String> getCLIOptions();
 }

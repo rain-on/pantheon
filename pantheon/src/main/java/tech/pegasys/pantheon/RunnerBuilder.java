@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -104,17 +104,19 @@ public class RunnerBuilder {
 
   private Vertx vertx;
   private PantheonController<?> pantheonController;
+
+  private Collection<BytesValue> bannedNodeIds = new ArrayList<>();
   private boolean p2pEnabled = true;
   private boolean discovery;
-  private EthNetworkConfig ethNetworkConfig;
   private String p2pAdvertisedHost;
   private int p2pListenPort;
   private int maxPeers;
+  private EthNetworkConfig ethNetworkConfig;
+
   private JsonRpcConfiguration jsonRpcConfiguration;
   private GraphQLConfiguration graphQLConfiguration;
   private WebSocketConfiguration webSocketConfiguration;
   private Path dataDir;
-  private Collection<BytesValue> bannedNodeIds = new ArrayList<>();
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
@@ -249,7 +251,7 @@ public class RunnerBuilder {
             .setSupportedProtocols(subProtocols)
             .setClientId(PantheonInfo.version());
     final NetworkingConfiguration networkConfig =
-        new NetworkingConfiguration()
+        NetworkingConfiguration.create()
             .setRlpx(rlpxConfiguration)
             .setDiscovery(discoveryConfiguration);
 

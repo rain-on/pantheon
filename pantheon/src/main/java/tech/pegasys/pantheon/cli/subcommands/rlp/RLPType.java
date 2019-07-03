@@ -10,21 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.cli.rlp;
+package tech.pegasys.pantheon.cli.subcommands.rlp;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+/** Type of the RLP data to encode/decode */
+public enum RLPType {
+  // Enum is used to enable the listing of the possible values in PicoCLI.
+  IBFT_EXTRA_DATA(new IbftExtraDataCLIAdapter());
 
-import java.io.IOException;
+  private final JSONToRLP adapter;
 
-/** Behaviour of objects that can be encoded from JSON to RLP */
-interface JSONToRLP {
+  RLPType(final JSONToRLP adapter) {
 
-  /**
-   * Encodes the object into an RLP value.
-   *
-   * @param json the JSON to convert to RLP
-   * @return the RLP encoded object.
-   * @throws IOException if an error occurs while reading data
-   */
-  BytesValue encode(String json) throws IOException;
+    this.adapter = adapter;
+  }
+
+  public JSONToRLP getAdapter() {
+    return adapter;
+  }
 }
