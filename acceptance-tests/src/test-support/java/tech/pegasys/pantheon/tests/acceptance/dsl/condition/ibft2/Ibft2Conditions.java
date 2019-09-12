@@ -88,7 +88,8 @@ public class Ibft2Conditions {
       final Map<Address, Boolean> proposalsAsAddress =
           this.proposals.entrySet().stream()
               .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
-      return new ExpectProposals(ibft, proposalsAsAddress);
+      return new tech.pegasys.pantheon.tests.acceptance.dsl.condition.ibft2.ExpectProposals(
+          ibft, proposalsAsAddress);
     }
   }
 }

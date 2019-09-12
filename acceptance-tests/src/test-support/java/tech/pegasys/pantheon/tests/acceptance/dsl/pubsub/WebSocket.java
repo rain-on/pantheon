@@ -18,7 +18,6 @@ import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.NodeConfiguration;
 
 import io.vertx.core.Vertx;
-import org.assertj.core.api.Assertions;
 
 public class WebSocket {
 
@@ -51,9 +50,6 @@ public class WebSocket {
   }
 
   public void verifyTotalEventsReceived(final int expectedTotalEventCount) {
-    waitFor(
-        () ->
-            Assertions.assertThat(connection.getSubscriptionEvents())
-                .hasSize(expectedTotalEventCount));
+    waitFor(() -> assertThat(connection.getSubscriptionEvents()).hasSize(expectedTotalEventCount));
   }
 }
