@@ -13,9 +13,6 @@
 
 dependencies {
 
-  testSupportImplementation 'junit:junit'
-  testSupportImplementation 'org.assertj:assertj-core'
-  testSupportImplementation 'org.apache.logging.log4j:log4j-api'
   testSupportImplementation 'org.apache.logging.log4j:log4j-core'
   testSupportImplementation 'org.apache.logging.log4j:log4j-slf4j-impl'
 
@@ -35,7 +32,6 @@ dependencies {
   testSupportImplementation project(':ethereum:rlp')
   testSupportImplementation project(':metrics:core')
   testSupportImplementation project(':pantheon')
-  testSupportImplementation project(path: ':pantheon', configuration: 'testArtifacts')
   testSupportImplementation project(':plugin-api')
   testSupportImplementation project(':services:kvstore')
   testSupportImplementation project(':testutil')

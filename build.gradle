@@ -349,6 +349,7 @@ subprojects {
           }
         }
       }
+    }
 
     bintray {
       user = bintrayUser
