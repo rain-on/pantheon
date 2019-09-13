@@ -616,7 +616,7 @@ tasks.register("verifyDistributions") {
     }
   }
 }
-  
+
 bintray {
   user = bintrayUser
   key = bintrayKey
